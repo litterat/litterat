@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+buildscript {
+  repositories {
+    jcenter()
+    maven { 
+      url "https://repo.maven.apache.org/maven2"
+    }
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "org.javamodularity:moduleplugin:1.5.0"
+    classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.bmuschko.nexus'
+
+// Development environments
+apply plugin: 'eclipse'
+eclipse {
+    classpath {
+        defaultOutputDir = new File("$buildDir/eclipse");
+        file {
+            whenMerged {
+                entries.findAll { isModule(it) }.each {
+                    it.entryAttributes['module'] = 'true'
+                }
+
+                entries.findAll { isSource(it) && isTestScope(it) }.each {
+                    it.entryAttributes['test'] = 'true'
+                }
+
+                entries.findAll { isLibrary(it) && isTestScope(it) }.each {
+                    it.entryAttributes['test'] = 'true'
+                }
+            }
+        }
+    }
+
+}
+
+group = 'io.litterat'
+version = '1.4.0'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    maven { url "https://repo.maven.apache.org/maven2" }
+}
+
+dependencies {
+
+    implementation project(":litterat-pep")
+    implementation project(":litterat-schema")
+
+    // https://mvnrepository.com/artifact/org.ow2.asm/asm
+	implementation group: 'org.ow2.asm', name: 'asm', version: '8.0.1'
+	
+	// https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
+	implementation group: 'org.ow2.asm', name: 'asm-tree', version: '8.0.1'
+	
+	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
+	
+	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+   
+	
+}
+
+test {
+	useJUnitPlatform()
+}
+
+modifyPom {
+    project {
+        name 'Litterat'
+        description 'A fast and flexible serialization library.'
+        url 'http://litterat.io/'
+        packaging 'jar'
+        licenses {
+            license {
+                url 'https://github.com/litterat/litterat/blob/master/LICENSE.TXT'
+            }
+        }
+        scm {
+            url 'https://github.com/litterat/litterat-java'
+            connection 'scm:git:https://github.com/litterat/litterat.git'
+            developerConnection 'scm:git@github.com:litterat/litterat.git'
+        }
+        developers {
+            developer {
+                id 'oobles'
+                name 'David Ryan'
+            }
+        }
+
+    }
+}
+
+boolean isLibrary(entry) {
+  return entry.properties.kind.equals('lib') || entry.properties.kind.equals('src')
+}
+boolean isTestScope(entry) {
+  return entry.entryAttributes.get('gradle_used_by_scope').equals('test'); }
+boolean isModule(entry) {
+  return isLibrary(entry) && !isTestScope(entry); }
+boolean isSource(entry) { return entry.properties.kind.equals('src'); }
+
+
