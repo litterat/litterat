@@ -1,0 +1,10 @@
+rootProject.name = 'litterat'
+
+include ':litterat-pep', 
+        ':litterat-pep-test',
+        ':litterat-json',
+        ':litterat-json-test',
+        ':litterat-schema',
+	':litterat-xpl'
+
+     
