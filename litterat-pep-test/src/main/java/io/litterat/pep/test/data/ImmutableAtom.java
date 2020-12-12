@@ -15,10 +15,12 @@
  */
 package io.litterat.pep.test.data;
 
+import java.util.Optional;
+
 import io.litterat.pep.Data;
 
 /**
- * 
+ *
  * This class tests a constructor with immutable fields.
  */
 
@@ -30,11 +32,14 @@ public class ImmutableAtom {
 
 	private final boolean bool;
 
+	private final Optional<String> optional;
+
 	@Data
-	public ImmutableAtom(SimpleEnum enumCount, String str, boolean bool) {
+	public ImmutableAtom(SimpleEnum enumCount, String str, boolean bool, Optional<String> optional) {
 		this.enumCount = enumCount;
 		this.str = str;
 		this.bool = bool;
+		this.optional = optional;
 	}
 
 	public SimpleEnum enumCount() {
@@ -47,6 +52,10 @@ public class ImmutableAtom {
 
 	public boolean bool() {
 		return bool;
+	}
+
+	public Optional<String> optional() {
+		return optional;
 	}
 
 }

@@ -13,7 +13,9 @@
  */
 package io.litterat.pep.test;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
@@ -32,8 +34,9 @@ public class ImmutableAtomTest {
 	final static SimpleEnum ENUM_TEST = SimpleEnum.THREE;
 	final static String STR_TEST = "test";
 	final static boolean BOOL_TEST = true;
+	final static Optional<String> OPTION_TEST = Optional.of("foo");
 
-	ImmutableAtom test = new ImmutableAtom(ENUM_TEST, STR_TEST, BOOL_TEST);
+	ImmutableAtom test = new ImmutableAtom(ENUM_TEST, STR_TEST, BOOL_TEST, OPTION_TEST);
 
 	PepContext context;
 
@@ -58,6 +61,8 @@ public class ImmutableAtomTest {
 		Object[] values = arrayMap.toArray(test);
 		Assertions.assertNotNull(values);
 
+		System.out.println(Arrays.toString(values));
+
 		// rebuild as an object.
 		ImmutableAtom object = arrayMap.toObject(ImmutableAtom.class, values);
 
@@ -67,6 +72,7 @@ public class ImmutableAtomTest {
 		Assertions.assertEquals(ENUM_TEST, test.enumCount());
 		Assertions.assertEquals(STR_TEST, test.str());
 		Assertions.assertEquals(BOOL_TEST, test.bool());
+		Assertions.assertEquals(OPTION_TEST, test.optional());
 	}
 
 	@Test
@@ -85,5 +91,6 @@ public class ImmutableAtomTest {
 		Assertions.assertEquals(ENUM_TEST, test.enumCount());
 		Assertions.assertEquals(STR_TEST, test.str());
 		Assertions.assertEquals(BOOL_TEST, test.bool());
+		Assertions.assertEquals(OPTION_TEST, test.optional());
 	}
 }
