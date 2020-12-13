@@ -34,7 +34,7 @@ public class TypeMap {
 
 	private final AtomicInteger lastIdentifier;
 
-	public TypeMap(TypeLibrary library) throws TypeException {
+	public TypeMap(TypeLibrary library) {
 		Objects.requireNonNull(library, "TypeLibrary is required");
 
 		this.library = library;

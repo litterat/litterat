@@ -83,10 +83,6 @@ public class TypeLibrary {
 		this.types = new ConcurrentHashMap<>();
 		this.classes = new ConcurrentHashMap<>();
 		this.binder = new PepSchemaBinder();
-	}
-
-	public TypeLibrary() {
-		this(PepContext.builder().build());
 
 		try {
 
@@ -112,9 +108,12 @@ public class TypeLibrary {
 					pepContext.getDescriptor(Array.class));
 
 		} catch (PepException | TypeException e) {
-			// not expecting exception.
-			e.printStackTrace();
+			throw new RuntimeException("Unexpected error", e);
 		}
+	}
+
+	public TypeLibrary() {
+		this(PepContext.builder().build());
 	}
 
 	public PepContext pepContext() {

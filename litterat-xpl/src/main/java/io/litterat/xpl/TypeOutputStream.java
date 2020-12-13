@@ -34,7 +34,7 @@ public class TypeOutputStream implements TypeStream {
 	private final TypeMap typeMap;
 	private final TypeResolver resolver;
 
-	TypeOutputStream(TypeMap map, TypeBaseOutput output) {
+	public TypeOutputStream(TypeMap map, TypeBaseOutput output) {
 		this.output = output;
 		this.typeMap = map;
 		this.resolver = new SchemaResolver(map);
@@ -43,20 +43,32 @@ public class TypeOutputStream implements TypeStream {
 		typeMap.registerMetaData(resolver);
 	}
 
-	TypeOutputStream(TypeMap map, byte[] buffer) {
+	public TypeOutputStream(TypeBaseOutput output) {
+		this(new TypeMap(new TypeLibrary()), output);
+	}
+
+	public TypeOutputStream(TypeMap map, byte[] buffer) {
 		this(map, new ByteArrayBaseOutput(buffer));
 	}
 
-	public TypeOutputStream(byte[] buffer) throws TypeException {
-		this(new TypeMap(new TypeLibrary()), buffer);
+	public TypeOutputStream(byte[] buffer) {
+		this(new ByteArrayBaseOutput(buffer));
 	}
 
-	TypeOutputStream(TypeMap map, OutputStream output) {
+	public TypeOutputStream(TypeMap map, OutputStream output) {
 		this(map, new StreamBaseOutput(output));
 	}
 
-	TypeOutputStream(TypeMap map, ByteBuffer output) {
+	public TypeOutputStream(OutputStream output) {
+		this(new StreamBaseOutput(output));
+	}
+
+	public TypeOutputStream(TypeMap map, ByteBuffer output) {
 		this(map, new ByteBufferBaseOutput(output));
+	}
+
+	public TypeOutputStream(ByteBuffer output) {
+		this(new ByteBufferBaseOutput(output));
 	}
 
 	@Override

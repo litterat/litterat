@@ -16,6 +16,8 @@
 package io.litterat.xpl;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import io.litterat.schema.TypeException;
 import io.litterat.schema.TypeLibrary;
@@ -23,6 +25,8 @@ import io.litterat.schema.meta.SchemaTypes;
 import io.litterat.schema.types.TypeName;
 import io.litterat.schema.types.TypeNameDefinition;
 import io.litterat.xpl.io.ByteArrayBaseInput;
+import io.litterat.xpl.io.ByteBufferBaseInput;
+import io.litterat.xpl.io.StreamBaseInput;
 import io.litterat.xpl.resolve.SchemaResolver;
 
 public class TypeInputStream implements TypeStream {
@@ -40,12 +44,32 @@ public class TypeInputStream implements TypeStream {
 		typeMap.registerMetaData(resolver);
 	}
 
+	public TypeInputStream(TypeBaseInput input) {
+		this(new TypeMap(new TypeLibrary()), input);
+	}
+
 	public TypeInputStream(byte[] buffer) throws TypeException {
-		this(new TypeMap(new TypeLibrary()), new ByteArrayBaseInput(buffer));
+		this(new ByteArrayBaseInput(buffer));
 	}
 
 	public TypeInputStream(TypeMap typeMap, byte[] buffer) {
 		this(typeMap, new ByteArrayBaseInput(buffer));
+	}
+
+	public TypeInputStream(InputStream input) throws TypeException {
+		this(new StreamBaseInput(input));
+	}
+
+	public TypeInputStream(TypeMap typeMap, InputStream input) {
+		this(typeMap, new StreamBaseInput(input));
+	}
+
+	public TypeInputStream(ByteBuffer buffer) throws TypeException {
+		this(new ByteBufferBaseInput(buffer));
+	}
+
+	public TypeInputStream(TypeMap typeMap, ByteBuffer buffer) {
+		this(typeMap, new ByteBufferBaseInput(buffer));
 	}
 
 	@Override

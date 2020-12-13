@@ -20,9 +20,10 @@ import java.util.UUID;
 import io.litterat.pep.Data;
 
 /**
- * 
- * Sample of a class containing immutable UUID values. UUIDs are part of Java and use
- * the UUIDBridge which must be registered to convert values to String atoms.
+ *
+ * Sample of a class containing immutable UUID values. UUIDs are part of Java
+ * and use the UUIDBridge which must be registered to convert values to String
+ * atoms.
  *
  */
 public class SimpleUUIDImmutable {
@@ -42,6 +43,11 @@ public class SimpleUUIDImmutable {
 
 	public UUID second() {
 		return second;
+	}
+
+	@Override
+	public String toString() {
+		return "SimpleUUIDImmutable [first=" + first + ", second=" + second + "]";
 	}
 
 }

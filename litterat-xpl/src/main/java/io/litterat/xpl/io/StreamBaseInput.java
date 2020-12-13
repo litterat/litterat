@@ -16,10 +16,15 @@
 package io.litterat.xpl.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import io.litterat.xpl.TypeBaseInput;
 
 public class StreamBaseInput implements TypeBaseInput {
+
+	public StreamBaseInput(InputStream input) {
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public byte readInt8() throws IOException {
