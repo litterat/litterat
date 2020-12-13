@@ -15,6 +15,7 @@
  */
 package io.litterat.pep.test;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -25,7 +26,6 @@ import io.litterat.pep.PepContext;
 import io.litterat.pep.PepDataClass;
 import io.litterat.pep.PepDataComponent;
 import io.litterat.pep.PepException;
-
 import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
 import io.litterat.pep.test.data.ProjectImmutable;
@@ -58,11 +58,11 @@ public class ProjectImmutableTest {
 		Assertions.assertEquals(2, fields.length);
 
 		PepDataComponent fieldX = fields[0];
-		Assertions.assertEquals("x", fieldX.name());
+		Assertions.assertEquals("a", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
 
 		PepDataComponent fieldY = fields[1];
-		Assertions.assertEquals("y", fieldY.name());
+		Assertions.assertEquals("b", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
 	}
 
@@ -73,6 +73,8 @@ public class ProjectImmutableTest {
 		PepArrayMapper arrayMap = new PepArrayMapper(context);
 		Object[] values = arrayMap.toArray(test);
 		Assertions.assertNotNull(values);
+
+		System.out.println(Arrays.toString(values));
 
 		// rebuild as an object.
 		ProjectImmutable object = arrayMap.toObject(ProjectImmutable.class, values);
@@ -90,6 +92,8 @@ public class ProjectImmutableTest {
 		PepMapMapper mapMapper = new PepMapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
+		System.out.println(map.toString());
+
 		ProjectImmutable object = (ProjectImmutable) mapMapper.toObject(ProjectImmutable.class, map);
 
 		// validate result.
@@ -104,8 +108,8 @@ public class ProjectImmutableTest {
 		PepMapMapper mapMapper = new PepMapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
-		// corrupting the map by putting an invalid value for x.
-		map.put("x", "error");
+		// corrupting the map by putting an invalid value for a.
+		map.put("a", "error");
 
 		Assertions.assertThrows(PepException.class, () -> {
 			mapMapper.toObject(ProjectImmutable.class, map);

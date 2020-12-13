@@ -16,9 +16,11 @@
 package io.litterat.xpl.resolve;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.litterat.pep.PepDataClass;
 import io.litterat.pep.PepException;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.TypeLibrary;
@@ -76,11 +78,11 @@ public class SchemaResolver implements TypeResolver {
 		Definition definition = library.getDefinition(name);
 		if (definition instanceof Record) {
 			Record sequence = (Record) definition;
-			Class<?> clss = library.getTypeClass(name).dataClass();
+			PepDataClass dataClass = library.getTypeClass(name);
 
 			result = new TypeMapEntry(0, name, definition,
-					generateSequenceReaderConstructor(typeMap, sequence, name, clss),
-					generateSequenceWriter(typeMap, sequence, name, clss));
+					generateSequenceReaderConstructor(typeMap, sequence, name, dataClass),
+					generateSequenceWriter(typeMap, sequence, name, dataClass));
 		} else if (definition instanceof Union) {
 			UnionReaderWriter union = new UnionReaderWriter(name);
 			result = new TypeMapEntry(0, name, definition, union, union);
@@ -120,13 +122,13 @@ public class SchemaResolver implements TypeResolver {
 		throw new TypeException("unable to map reverse");
 	}
 
-	private static TypeWriter generateSequenceWriter(TypeMap typeMap, Record sequence, TypeName typeName, Class<?> clss)
-			throws TypeException {
+	private static TypeWriter generateSequenceWriter(TypeMap typeMap, Record sequence, TypeName typeName,
+			PepDataClass dataClass) throws TypeException {
 		try {
 
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
 
-			int varObject = slots.getSlot(clss);
+			int varObject = slots.getSlot(dataClass.dataClass());
 
 			List<Statement> statements = new ArrayList<>();
 			for (Field field : sequence.fields()) {
@@ -163,7 +165,7 @@ public class SchemaResolver implements TypeResolver {
 
 			LambdaFunction lambdaFunction = compiler.compile(typeMap, lambda);
 
-			return new LambdaTypeWriter(lambdaFunction);
+			return new LambdaTypeWriter(lambdaFunction, dataClass);
 
 		} catch (NoSuchMethodException | IllegalAccessException | TypeException | PepException e) {
 			throw new TypeException(e);
@@ -171,13 +173,13 @@ public class SchemaResolver implements TypeResolver {
 	}
 
 	@SuppressWarnings("unused")
-	private static TypeReader generateSequenceReader(TypeMap typeMap, Record sequence, TypeName typeName, Class<?> clss)
-			throws TypeException {
+	private static TypeReader generateSequenceReader(TypeMap typeMap, Record sequence, TypeName typeName,
+			PepDataClass dataClass) throws TypeException {
 
 		try {
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
 
-			int varName = slots.getSlot(clss);
+			int varName = slots.getSlot(dataClass.dataClass());
 
 			List<Statement> statements = new ArrayList<>();
 			statements.add(new SlotSet(varName, new ConstructInstance(typeName, new Expression[0])));
@@ -201,7 +203,7 @@ public class SchemaResolver implements TypeResolver {
 			// LitteratGenerator compiler = new LitteratGenerator();
 			LambdaFunction lambdaFunction = compiler.compile(typeMap, lambda);
 
-			return new LambdaTypeReader(lambdaFunction);
+			return new LambdaTypeReader(lambdaFunction, dataClass);
 
 		} catch (NoSuchMethodException | IllegalAccessException | TypeException | PepException e) {
 			throw new TypeException(e);
@@ -210,7 +212,7 @@ public class SchemaResolver implements TypeResolver {
 	}
 
 	private static TypeReader generateSequenceReaderConstructor(TypeMap typeMap, Record sequence, TypeName typeName,
-			Class<?> clss) throws TypeException {
+			PepDataClass dataClass) throws TypeException {
 
 		try {
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
@@ -257,7 +259,7 @@ public class SchemaResolver implements TypeResolver {
 
 			LambdaFunction lambdaFunction = compiler.compile(typeMap, lambda);
 
-			return new LambdaTypeReader(lambdaFunction);
+			return new LambdaTypeReader(lambdaFunction, dataClass);
 
 		} catch (NoSuchMethodException | IllegalAccessException | PepException e) {
 			throw new TypeException(e);
@@ -268,16 +270,18 @@ public class SchemaResolver implements TypeResolver {
 	private static class LambdaTypeReader implements TypeReader {
 
 		private final LambdaFunction readerLambda;
+		private final MethodHandle toObject;
 
-		public LambdaTypeReader(LambdaFunction reader) {
+		public LambdaTypeReader(LambdaFunction reader, PepDataClass dataClass) {
 			this.readerLambda = reader;
+			this.toObject = dataClass.toObject();
 
 		}
 
 		@Override
 		public Object read(TypeInputStream reader) throws IOException {
 			try {
-				return readerLambda.execute(reader);
+				return toObject.invoke(readerLambda.execute(reader));
 			} catch (Throwable e) {
 				throw new IOException("Failed to read", e);
 			}
@@ -287,16 +291,18 @@ public class SchemaResolver implements TypeResolver {
 	private static class LambdaTypeWriter implements TypeWriter {
 
 		private final LambdaFunction writerLambda;
+		private final MethodHandle toData;
 
-		public LambdaTypeWriter(LambdaFunction writer) {
+		public LambdaTypeWriter(LambdaFunction writer, PepDataClass dataClass) {
 			this.writerLambda = writer;
+			this.toData = dataClass.toData();
 		}
 
 		@Override
 		public void write(TypeOutputStream writer, Object o) throws IOException {
 			try {
-				writerLambda.execute(writer, o);
-			} catch (TypeException e) {
+				writerLambda.execute(writer, toData.invoke(o));
+			} catch (Throwable e) {
 				throw new IOException("Failed to write", e);
 			}
 		}

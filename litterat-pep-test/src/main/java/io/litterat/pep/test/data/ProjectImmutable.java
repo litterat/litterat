@@ -20,10 +20,10 @@ import io.litterat.pep.ToData;
 import io.litterat.pep.test.data.ProjectImmutable.ProjectImmutableData;
 
 /**
- * 
+ *
  * This is an example of a class which uses the ToData interface to expose
- * another class "ProjectImmutableData" as the set of values to be used
- * in the data.
+ * another class "ProjectImmutableData" as the set of values to be used in the
+ * data.
  *
  */
 public class ProjectImmutable implements ToData<ProjectImmutableData> {
@@ -33,21 +33,21 @@ public class ProjectImmutable implements ToData<ProjectImmutableData> {
 
 	public static class ProjectImmutableData {
 
-		private final int x;
-		private final int y;
+		private final int a;
+		private final int b;
 
 		@Data
-		public ProjectImmutableData(int x, int y) {
-			this.x = x;
-			this.y = y;
+		public ProjectImmutableData(int a, int b) {
+			this.a = a;
+			this.b = b;
 		}
 
-		public int x() {
-			return x;
+		public int a() {
+			return a;
 		}
 
-		public int y() {
-			return y;
+		public int b() {
+			return b;
 		}
 
 	}
@@ -59,8 +59,8 @@ public class ProjectImmutable implements ToData<ProjectImmutableData> {
 
 	@Data
 	public ProjectImmutable(ProjectImmutableData data) {
-		this.x = data.x;
-		this.y = data.y;
+		this.x = data.a;
+		this.y = data.b;
 	}
 
 	@Override
@@ -74,6 +74,11 @@ public class ProjectImmutable implements ToData<ProjectImmutableData> {
 
 	public int y() {
 		return y;
+	}
+
+	@Override
+	public String toString() {
+		return "ProjectImmutable [x=" + x + ", y=" + y + "]";
 	}
 
 }

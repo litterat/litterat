@@ -45,6 +45,11 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 	@Override
 	public Object execute(LitteratMachine am) throws Throwable {
 
+		// TODO Investigate escape analysis. The args array can be bigger than
+		// constructor, so it's possible to allocate a bigger static array and maybe it
+		// won't
+		// get put on the heap.
+		// https://stackoverflow.com/questions/59660199/is-this-what-java-can-do-and-c-cant
 		Object[] args = new Object[params.length];
 		for (int x = 0; x < params.length; x++) {
 			args[x] = toObject[x].invoke(params[x].execute(am));
