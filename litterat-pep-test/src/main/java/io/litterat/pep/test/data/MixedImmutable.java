@@ -33,7 +33,7 @@ public class MixedImmutable {
 
 	@Override
 	public String toString() {
-		return "{" + x + "," + y + "}";
+		return "{" + x + "," + y + "," + (location == null ? "null" : location) + "}";
 	}
 
 }

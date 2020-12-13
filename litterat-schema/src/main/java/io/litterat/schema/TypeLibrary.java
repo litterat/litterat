@@ -25,6 +25,7 @@ import io.litterat.schema.annotation.SchemaType;
 import io.litterat.schema.bind.PepSchemaBinder;
 import io.litterat.schema.meta.SchemaTypes;
 import io.litterat.schema.meta.TypeDefinitions;
+import io.litterat.schema.types.Array;
 import io.litterat.schema.types.Definition;
 import io.litterat.schema.types.Element;
 import io.litterat.schema.types.Field;
@@ -107,6 +108,8 @@ public class TypeLibrary {
 					pepContext.getDescriptor(TypeNameDefinition.class));
 			register(SchemaTypes.REFERENCE, binder.createDefinition(this, Reference.class),
 					pepContext.getDescriptor(Reference.class));
+			register(SchemaTypes.ARRAY, binder.createDefinition(this, Array.class),
+					pepContext.getDescriptor(Array.class));
 
 		} catch (PepException | TypeException e) {
 			// not expecting exception.

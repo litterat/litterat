@@ -30,7 +30,7 @@ import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
 import io.litterat.pep.test.data.SimplePojo;
 
-public class PojoDescriptorTest {
+public class SimplePojoTest {
 
 	final static int TEST_X = 1;
 	final static int TEST_Y = 2;

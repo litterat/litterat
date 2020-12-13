@@ -16,6 +16,7 @@
 package io.litterat.schema.bind;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class PepSchemaBinder {
 
 					} else {
 
-						TypeName typeName = library.getTypeName(component.dataClass().typeClass());
+						TypeName typeName = library.getTypeName(component.dataClass().dataClass());
 
 						// TODO - What about optional?
 
@@ -74,6 +75,8 @@ public class PepSchemaBinder {
 
 				Field[] finalFields = new Field[fields.size()];
 				return new Record(fields.toArray(finalFields));
+			} else if (dataClass.isAtom()) {
+				throw new TypeException("Could not generate descriptor for " + clss.getName());
 			} else {
 				throw new TypeException("Could not generate descriptor for " + clss.getName());
 			}
@@ -87,7 +90,14 @@ public class PepSchemaBinder {
 
 		for (PepDataComponent component : dataClass.dataComponents()) {
 			if (component.name().equalsIgnoreCase(field)) {
-				return component.accessor();
+
+				// Pass the accessor through the toData handle to get the correct data type.
+				// toData will be identity function if no change required.
+				PepDataClass componentClass = component.dataClass();
+
+				MethodHandle toData = componentClass.toData();
+
+				return MethodHandles.filterArguments(toData, 0, component.accessor());
 			}
 		}
 
@@ -98,11 +108,35 @@ public class PepSchemaBinder {
 	public static MethodHandle resolveFieldSetter(PepDataClass dataClass, String field) throws PepException {
 		for (PepDataComponent component : dataClass.dataComponents()) {
 			if (component.name().equalsIgnoreCase(field)) {
-				return component.setter().orElseThrow(() -> new PepException("No setter available"));
+
+				MethodHandle setter = component.setter().orElseThrow(() -> new PepException("No setter available"));
+
+				// Pass the object through the toObject method handle to get the correct type
+				// for the setter. toObject will be identity function if no change required.
+				PepDataClass componentClass = component.dataClass();
+
+				MethodHandle toObject = componentClass.toObject();
+
+				return MethodHandles.filterArguments(setter, 0, toObject);
 			}
 		}
 
 		throw new PepException("Field not found");
+	}
+
+	public static MethodHandle[] collectToObject(PepDataClass dataClass) {
+
+		MethodHandle[] toObject = new MethodHandle[dataClass.dataComponents().length];
+
+		PepDataComponent[] components = dataClass.dataComponents();
+
+		for (int x = 0; x < components.length; x++) {
+			PepDataComponent component = dataClass.dataComponents()[x];
+
+			toObject[x] = component.dataClass().toObject();
+		}
+
+		return toObject;
 	}
 
 }

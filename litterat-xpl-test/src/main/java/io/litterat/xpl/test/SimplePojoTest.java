@@ -13,52 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.json.test;
+package io.litterat.xpl.test;
+
+import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.json.JsonMapper;
-import io.litterat.pep.PepContext;
 import io.litterat.pep.test.data.SimplePojo;
+import io.litterat.schema.TypeException;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 
-public class PojoDescriptorTest {
+public class SimplePojoTest {
 
 	final static int TEST_X = 1;
 	final static int TEST_Y = 2;
 
 	SimplePojo test;
 
-	PepContext context;
-
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
-
 		test = new SimplePojo();
 		test.setX(TEST_X);
 		test.setY(TEST_Y);
 	}
 
+	@Test
+	public void testWriteAndReadSimplePojo() throws IOException, TypeException {
 
-	@Test 
-	public void testToJson() throws Throwable {
+		// Test writing out a Point.
+		byte[] buffer = new byte[150];
+		TypeOutputStream out = new TypeOutputStream(buffer);
+		out.writeObject(test);
+		out.close();
 
-		// project to an array.
-		String json = JsonMapper.toJson(test);
+		TypeInputStream in = new TypeInputStream(buffer);
+		SimplePojo p2 = in.readObject();
 
-		System.out.println("json: " + json);
+		Assertions.assertNotNull(p2);
+		Assertions.assertEquals(test.getX(), p2.getX());
+		Assertions.assertEquals(test.getY(), p2.getY());
 
-		SimplePojo object = JsonMapper.fromJson(json, SimplePojo.class);
-
-		// Validate
-		Assertions.assertNotNull(object);
-		Assertions.assertTrue(object instanceof SimplePojo);
-		Assertions.assertEquals(TEST_X, test.getX());
-		Assertions.assertEquals(TEST_Y, test.getY());
+		System.out.println("p1: " + test);
+		System.out.println("p2: " + p2);
 
 	}
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,15 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-module io.litterat.xpl {
+module io.litterat.xpl.test {
 
-	exports io.litterat.xpl;
-	exports io.litterat.xpl.lang;
-
-	requires transitive io.litterat.pep;
-	requires transitive io.litterat.library;
-
-	requires org.objectweb.asm;
-	requires org.objectweb.asm.tree;
+	requires io.litterat.pep;
+	requires io.litterat.pep.test;
+	requires io.litterat.xpl;
+	requires org.junit.jupiter.api;
 
 }

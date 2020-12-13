@@ -17,7 +17,9 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
+import io.litterat.pep.PepDataClass;
 import io.litterat.schema.TypeException;
+import io.litterat.schema.bind.PepSchemaBinder;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.ConstructInstance;
 import io.litterat.xpl.lang.LitteratMachine;
@@ -27,13 +29,17 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 	private final ConstructInstance createInstance;
 	private final ExpressionInterpreter[] params;
 
+	private final MethodHandle[] toObject;
 	private final MethodHandle constructor;
 
 	public ConstructInstanceInterpreter(TypeMap typeMap, final ConstructInstance createInstance,
 			ExpressionInterpreter[] params) throws TypeException {
 		this.createInstance = createInstance;
 		this.params = params;
-		this.constructor = typeMap.library().getTypeClass(createInstance.type()).constructor();
+
+		PepDataClass typeClass = typeMap.library().getTypeClass(createInstance.type());
+		this.constructor = typeClass.constructor();
+		this.toObject = PepSchemaBinder.collectToObject(typeClass);
 	}
 
 	@Override
@@ -41,7 +47,7 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 
 		Object[] args = new Object[params.length];
 		for (int x = 0; x < params.length; x++) {
-			args[x] = params[x].execute(am);
+			args[x] = toObject[x].invoke(params[x].execute(am));
 		}
 
 		return constructor.invoke(args);

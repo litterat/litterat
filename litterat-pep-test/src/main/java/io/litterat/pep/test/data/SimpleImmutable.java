@@ -18,7 +18,7 @@ package io.litterat.pep.test.data;
 import io.litterat.pep.Data;
 
 /**
- * 
+ *
  * An example of a simple immutable tuple.
  *
  */
@@ -40,10 +40,26 @@ public class SimpleImmutable {
 	public int y() {
 		return y;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "{" + x + "," + y + "}";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SimpleImmutable other = (SimpleImmutable) obj;
+		if (x != other.x)
+			return false;
+		if (y != other.y)
+			return false;
+		return true;
 	}
 
 }
