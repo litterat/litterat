@@ -20,78 +20,84 @@ import java.nio.ByteBuffer;
 
 import io.litterat.xpl.TypeBaseOutput;
 
+// Based on...
+// https://stackoverflow.com/questions/9883472/is-it-possible-to-have-an-unsigned-bytebuffer-in-java
+
 public class ByteBufferBaseOutput implements TypeBaseOutput {
 
-	private final ByteBuffer buffer;
+	private final ByteBuffer output;
 
-
-	public ByteBufferBaseOutput(ByteBuffer buffer) {
-		this.buffer = buffer;
+	public ByteBufferBaseOutput(ByteBuffer output) {
+		this.output = output;
 	}
-
 
 	@Override
 	public void writeInt8(byte b) throws IOException {
-		buffer.put(b);
+		output.put(b);
 	}
-
 
 	@Override
 	public void writeUInt8(short b) throws IOException {
-		buffer.put((byte) b);
+		output.put((byte) (b & 0xff));
 	}
-
 
 	@Override
 	public void writeInt16(short s) throws IOException {
-		buffer.putShort(s);
+		output.putShort(s);
 	}
-
 
 	@Override
 	public void writeUInt16(int s) throws IOException {
-		buffer.putShort((short) s);
+		output.putShort((short) (s & 0xffff));
 	}
-
 
 	@Override
 	public void writeInt32(int i) throws IOException {
-		buffer.putInt(i);
+		output.putInt(i);
 	}
-
 
 	@Override
 	public void writeUInt32(long i) throws IOException {
-		buffer.putInt((int) i);
+		output.putInt((int) (i & 0xffffffffL));
 	}
-
-
-	@Override
-	public void writeUVarInt32(int i) throws IOException {
-		buffer.putInt(i);
-	}
-
 
 	@Override
 	public void writeInt64(long l) throws IOException {
-		buffer.putLong(l);
+		output.putLong(l);
 	}
-
 
 	@Override
 	public void writeUInt64(long l) throws IOException {
-		buffer.putLong(l);
+		// TODO Need to decide about representation of unsigned long in Java.
+		output.putLong(l);
 	}
-
 
 	@Override
-	public void writeUVarInt64(long l) throws IOException {
-		buffer.putLong(l);
+	public void writeUVarInt32(int s) throws IOException {
+		do {
+			int b = s & 0x7f;
+			s >>>= 7;
+			if (s != 0) {
+				b |= 0x80;
+			}
+			output.put((byte) b);
+		} while (s != 0);
 	}
 
+	@Override
+	public void writeUVarInt64(long s) throws IOException {
+		do {
+			int b = (int) (s & 0x7f);
+			s >>>= 7;
+			if (s != 0) {
+				b |= 0x80;
+			}
+			output.put((byte) b);
+		} while (s != 0);
+	}
 
 	@Override
 	public void writeBytes(byte[] src, int offset, int length) throws IOException {
-		buffer.put(src, offset, length);
+		output.put(src, offset, length);
 	}
 }

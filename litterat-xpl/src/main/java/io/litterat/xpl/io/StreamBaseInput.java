@@ -15,6 +15,7 @@
  */
 package io.litterat.xpl.io;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,74 +23,154 @@ import io.litterat.xpl.TypeBaseInput;
 
 public class StreamBaseInput implements TypeBaseInput {
 
+	private final InputStream input;
+
 	public StreamBaseInput(InputStream input) {
-		// TODO Auto-generated constructor stub
+		this.input = input;
 	}
 
 	@Override
 	public byte readInt8() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		int b = input.read();
+		if (b < 0) {
+			throw new EOFException();
+		}
+		return (byte) b;
 	}
 
 	@Override
 	public short readUInt8() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		int b = input.read();
+		if (b < 0) {
+			throw new EOFException();
+		}
+		return (short) b;
 	}
 
 	@Override
 	public short readInt16() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+
+		int a = input.read();
+		int b = input.read();
+		if ((a | b) < 0) {
+			throw new EOFException();
+		}
+
+		return (short) (((a & 0xff) << 8) | (b & 0xff));
 	}
 
 	@Override
 	public int readUInt16() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+
+		int a = input.read();
+		int b = input.read();
+		if ((a | b) < 0) {
+			throw new EOFException();
+		}
+
+		return ((a & 0xff) << 8) | (b & 0xff);
 	}
 
 	@Override
 	public int readInt32() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		int a = input.read();
+		int b = input.read();
+		int c = input.read();
+		int d = input.read();
+		if ((a | b | c | d) < 0) {
+			throw new EOFException();
+		}
+
+		return (((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | (d & 0xff) << 24);
 	}
 
 	@Override
 	public long readUInt32() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		int a = input.read();
+		int b = input.read();
+		int c = input.read();
+		int d = input.read();
+		if ((a | b | c | d) < 0) {
+			throw new EOFException();
+		}
+
+		return (((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | (d & 0xff) << 24);
 	}
 
 	@Override
 	public long readInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+
+		int a = input.read();
+		int b = input.read();
+		int c = input.read();
+		int d = input.read();
+		int e = input.read();
+		int f = input.read();
+		int g = input.read();
+		int h = input.read();
+		if ((a | b | c | d | e | f | g | h) < 0) {
+			throw new EOFException();
+		}
+
+		return (((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | ((d & 0xff) << 24) | ((e & 0xff) << 32)
+				| ((f & 0xff) << 40) | ((g & 0xff) << 48) | (h & 0xff) << 56);
 	}
 
 	@Override
 	public long readUInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		int a = input.read();
+		int b = input.read();
+		int c = input.read();
+		int d = input.read();
+		int e = input.read();
+		int f = input.read();
+		int g = input.read();
+		int h = input.read();
+		if ((a | b | c | d | e | f | g | h) < 0) {
+			throw new EOFException();
+		}
+
+		return (((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | ((d & 0xff) << 24) | ((e & 0xff) << 32)
+				| ((f & 0xff) << 40) | ((g & 0xff) << 48) | (h & 0xff) << 56);
 	}
 
 	@Override
 	public int readUVarInt32() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		int result = 0;
+		int shift = 0;
+		while (true) {
+			int b = input.read();
+			if (b < 0) {
+				throw new EOFException();
+			}
+			result |= (b & 0x7f) << shift;
+			if ((b & 0x80) == 0)
+				break;
+			shift += 7;
+		}
+		return result;
 	}
 
 	@Override
 	public long readUVarInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		long result = 0;
+		int shift = 0;
+		while (true) {
+			int b = input.read();
+			if (b < 0) {
+				throw new EOFException();
+			}
+			result |= (b & 0x7f) << shift;
+			if ((b & 0x80) == 0)
+				break;
+			shift += 7;
+		}
+		return result;
 	}
 
 	@Override
 	public void readBytes(byte[] buffer, int offset, int length) throws IOException {
-		// TODO Auto-generated method stub
-
+		input.read(buffer, offset, length);
 	}
 
 }

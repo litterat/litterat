@@ -15,6 +15,7 @@
  */
 package io.litterat.xpl.io;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import io.litterat.xpl.TypeBaseInput;
@@ -29,18 +30,27 @@ public class ByteArrayBaseInput implements TypeBaseInput {
 		this.pos = 0;
 	}
 
+	private void checkAvailable(int bytes) throws IOException {
+		if (pos + bytes > buffer.length) {
+			throw new EOFException();
+		}
+	}
+
 	@Override
 	public byte readInt8() throws IOException {
+		checkAvailable(1);
 		return (byte) ((buffer[pos++] & 0xff) << 0);
 	}
 
 	@Override
 	public short readInt16() throws IOException {
+		checkAvailable(2);
 		return (short) (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8));
 	}
 
 	@Override
 	public int readInt32() throws IOException {
+		checkAvailable(4);
 		return (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8) | ((buffer[pos++] & 0xff) << 16)
 				| ((buffer[pos++] & 0xff) << 24));
 
@@ -48,38 +58,44 @@ public class ByteArrayBaseInput implements TypeBaseInput {
 
 	@Override
 	public long readInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		checkAvailable(8);
+		return (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8) | ((buffer[pos++] & 0xff) << 16)
+				| ((buffer[pos++] & 0xff) << 24)) | ((buffer[pos++] & 0xff) << 32) | ((buffer[pos++] & 0xff) << 40)
+				| ((buffer[pos++] & 0xff) << 48) | ((buffer[pos++] & 0xff) << 56);
 	}
 
 	@Override
 	public short readUInt8() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		checkAvailable(1);
+		return (short) ((buffer[pos++] & 0xff) << 0);
 	}
 
 	@Override
 	public int readUInt16() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		checkAvailable(2);
+		return ((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8);
 	}
 
 	@Override
 	public long readUInt32() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		checkAvailable(4);
+		return (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8) | ((buffer[pos++] & 0xff) << 16)
+				| ((buffer[pos++] & 0xff) << 24));
 	}
 
 	@Override
 	public long readUInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		checkAvailable(8);
+		return (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8) | ((buffer[pos++] & 0xff) << 16)
+				| ((buffer[pos++] & 0xff) << 24)) | ((buffer[pos++] & 0xff) << 32) | ((buffer[pos++] & 0xff) << 40)
+				| ((buffer[pos++] & 0xff) << 48) | ((buffer[pos++] & 0xff) << 56);
 	}
 
 	// https://en.wikipedia.org/wiki/LEB128
 
 	@Override
 	public int readUVarInt32() throws IOException {
+		checkAvailable(5);
 		int result = 0;
 		int shift = 0;
 		while (true) {
@@ -94,6 +110,7 @@ public class ByteArrayBaseInput implements TypeBaseInput {
 
 	@Override
 	public long readUVarInt64() throws IOException {
+		checkAvailable(9);
 		long result = 0;
 		int shift = 0;
 		while (true) {
@@ -108,6 +125,7 @@ public class ByteArrayBaseInput implements TypeBaseInput {
 
 	@Override
 	public void readBytes(byte[] dst, int offset, int length) throws IOException {
+		checkAvailable(length);
 		System.arraycopy(buffer, pos, dst, offset, length);
 		pos += length;
 

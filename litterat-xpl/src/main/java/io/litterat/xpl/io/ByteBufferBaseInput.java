@@ -22,74 +22,85 @@ import io.litterat.xpl.TypeBaseInput;
 
 public class ByteBufferBaseInput implements TypeBaseInput {
 
-	public ByteBufferBaseInput(ByteBuffer buffer) {
-		// TODO Auto-generated constructor stub
+	private final ByteBuffer input;
+
+	// TODO Need to catch BufferUnderflowException somewhere.
+
+	public ByteBufferBaseInput(ByteBuffer input) {
+		this.input = input;
 	}
 
 	@Override
 	public byte readInt8() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return input.get();
 	}
 
 	@Override
 	public short readUInt8() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return (short) (input.get() & 0xff);
 	}
 
 	@Override
 	public short readInt16() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return input.getShort();
 	}
 
 	@Override
 	public int readUInt16() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return (input.getShort() & 0xffff);
 	}
 
 	@Override
 	public int readInt32() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return input.getInt();
 	}
 
 	@Override
 	public long readUInt32() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return (input.getInt() & 0xffffffffL);
 	}
 
 	@Override
 	public long readInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return input.getLong();
 	}
 
 	@Override
 	public long readUInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return input.getLong();
 	}
 
 	@Override
 	public int readUVarInt32() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		int result = 0;
+		int shift = 0;
+		while (true) {
+			int b = input.get();
+			result |= (b & 0x7f) << shift;
+			if ((b & 0x80) == 0)
+				break;
+			shift += 7;
+		}
+		return result;
 	}
 
 	@Override
 	public long readUVarInt64() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		long result = 0;
+		int shift = 0;
+		while (true) {
+			int b = input.get();
+			result |= (b & 0x7f) << shift;
+			if ((b & 0x80) == 0)
+				break;
+			shift += 7;
+		}
+		return result;
 	}
 
 	@Override
 	public void readBytes(byte[] buffer, int offset, int length) throws IOException {
-		// TODO Auto-generated method stub
-
+		input.get(buffer, offset, length);
 	}
 
 }

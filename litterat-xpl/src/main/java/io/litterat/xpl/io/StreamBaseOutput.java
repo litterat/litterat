@@ -138,7 +138,6 @@ public class StreamBaseOutput implements TypeBaseOutput {
 
 	@Override
 	public void writeBytes(byte[] buffer, int offset, int length) throws IOException {
-		writeUVarInt32(length);
 		out.write(buffer, offset, length);
 	}
 
