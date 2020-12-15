@@ -46,5 +46,72 @@ The data might be represented differently depending on the format. In JSON this 
 Most schemas conflate the representation of the data in the schema because they are tied directly, however, it should be possible to keep these concepts separate. This way the representation can be decided later.
 
 
+## Day 5 - December 15 - PEP Lists and Arrays
 
+Exploring Lists and Arrays today. Currently PEP defines an interaction with Lists/Arrays using Object[]. The accessor for a field returns the Object[]. The constructor takes a count which returns an Object[]. The client code can then iterate over the array to write or read entries. This works, but isn't very efficient as it might allocate and throw away the Object[] as it creates a List<String> for instance. The other problem is that it requires autoboxing for int[] and more duplication. If int[] is the base case and Valhalla isn't available it requires method handles that will allow direct interaction with the Array or List. Reading/Writing an int[] might look as follows:
+
+int[] intArray = create( length );
+for (int x=0; x < length; x++ ) {
+   add( intArray, in.readInt() );
+}
+return intArray;
+
+int[] intArray = object.accessor();
+for (int x=0; x< length; x++ ) {
+   out.writeInt( get( intArray ) );
+}
+
+To fit within PEP, this should have the same set of MethodHandles as the List<String> which would be:
+
+List<String> stringList = create( length );
+for (int x=0; x<length(stringList); x++ ) {
+   add( stringList, in.readString() );
+}
+return stringList;
+
+List<String> stringList = object.accessor();
+for (int x=0; x<length(stringList); x++ ) {
+   out.writeString( get( stringList ) );
+}
+
+
+
+There's an implied Iterator concept being created in both of the above examples, but isn't referenced directly. The problem with using an Iterator interface is that it forces basic types to be autoboxed through the interface. One way would be to define a partner iterator. The interface could then be for int[]:
+
+accessor(Object): int[]
+iterator(int[]):IntIterator;
+length(int[]):int
+get(int[], IntIterator): int;
+add(int[], IntIterator, int ): void;
+constructor(int):int[];
+
+This would work using MethodHandles equally for a List. For example List<String>.
+
+accessor(): List<String>
+iterator(List<String>):ListIterator;
+length(List<String>):int
+get(List<String>, ListIterator):String;
+add(List<String>, ListIterator, String): void;
+constructor(int): List<String>;
+
+Implementation client for an array is then the same for both:
+
+PepArrayClass arrayClass = (PepArrayClass) dataClass;
+Object arrayData = arrayClass.accessor().invoke(object);
+int length = arrayClass.length().invoke(arrayData);
+output.writeInt(length);
+Object iterator = arrayClass.iterator().invoke(arrayData);
+for (int x=0; x<length; x++ ) {
+   writer.invoke( arrayClass.get().invoke( arrayData, iterator) ); // writer accepts int, String, etc.
+}
+
+int length = in.readInt();
+Object arrayData = arrayClass.contructor().invoke(length);
+Object iterator = arrayClass.iterator.invoke(arrayData);
+for (int x=0; x<length; x++ ) {
+   arrayClass.add().invoke( iterator, in.read(array.type())); // in.read returns int, String, etc.
+}
+return v;
+
+Part way through implementation. Not sure if this will work as expected, so may require changes to interface.
 
