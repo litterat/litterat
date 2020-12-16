@@ -6,19 +6,19 @@ public class IntArrayBridge {
 		int pos;
 	}
 
-	IntIterator iterator(int[] array) {
+	public IntIterator iterator(int[] array) {
 		return new IntIterator();
 	}
 
-	int size(int[] array) {
+	public int size(int[] array) {
 		return array.length;
 	}
 
-	int get(IntIterator iterator, int[] array) {
+	public int get(IntIterator iterator, int[] array) {
 		return array[iterator.pos++];
 	}
 
-	void put(IntIterator iterator, int[] array, int value) {
+	public void put(IntIterator iterator, int[] array, int value) {
 		array[iterator.pos++] = value;
 	}
 }

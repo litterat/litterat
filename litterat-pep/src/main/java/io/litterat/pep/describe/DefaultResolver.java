@@ -37,11 +37,14 @@ import io.litterat.pep.Atom;
 import io.litterat.pep.Data;
 import io.litterat.pep.PepContext;
 import io.litterat.pep.PepContextResolver;
+import io.litterat.pep.PepDataArrayClass;
 import io.litterat.pep.PepDataClass;
 import io.litterat.pep.PepDataClass.DataType;
 import io.litterat.pep.PepDataComponent;
 import io.litterat.pep.PepException;
 import io.litterat.pep.ToData;
+import io.litterat.pep.array.CollectionArrayBridge;
+import io.litterat.pep.array.PrimitiveBridges;
 
 public class DefaultResolver implements PepContextResolver {
 
@@ -76,12 +79,21 @@ public class DefaultResolver implements PepContextResolver {
 	}
 
 	private boolean isBase(Class<?> targetClass) {
-		if (targetClass.isInterface()) {
+		if (targetClass.isInterface() && !Collection.class.isAssignableFrom(targetClass)) {
 			return true;
 		}
 
 		// Array classes are abstract and we don't want them.
-		if (!targetClass.isArray() && Modifier.isAbstract(targetClass.getModifiers())) {
+		if (Modifier.isAbstract(targetClass.getModifiers())) {
+
+			if (targetClass.isArray()) {
+				// this is classed as an array, not a base
+				return false;
+			} else if (Collection.class.isAssignableFrom(targetClass)) {
+				// this is classed as an array, not an interface.
+				return false;
+			}
+
 			return true;
 		}
 
@@ -202,15 +214,24 @@ public class DefaultResolver implements PepContextResolver {
 				MethodHandle constructor = MethodHandles.arrayConstructor(targetClass);
 				MethodHandle identity = MethodHandles.identity(targetClass);
 
-				descriptor = new PepDataClass(targetClass, targetClass, null, constructor, identity, identity,
-						new PepDataComponent[0], DataType.ARRAY);
+				descriptor = new PepDataArrayClass(targetClass, targetClass, null, constructor, identity, identity,
+						new PepDataComponent[0], DataType.ARRAY,
+						PrimitiveBridges.getPrimitiveArrayBridge(targetClass.getComponentType()));
 
 			} else if (Collection.class.isAssignableFrom(targetClass)) {
 
 				// TODO Some Collections will not have a size constructor. Fallback and drop the
 				// argument.
-				MethodHandle constructor = MethodHandles.lookup()
-						.unreflectConstructor(targetClass.getConstructor(int.class));
+				MethodHandle constructor = null;
+
+				// TODO this is a hack and needs to be extended.
+				if (targetClass == List.class) {
+					constructor = MethodHandles.lookup()
+							.unreflectConstructor(ArrayList.class.getConstructor(int.class));
+				} else {
+					constructor = MethodHandles.lookup().unreflectConstructor(targetClass.getConstructor(int.class));
+				}
+
 				CollectionBridge bridge = new CollectionBridge(constructor);
 
 				MethodHandle toObject = MethodHandles.lookup().findVirtual(CollectionBridge.class, TOOBJECT_METHOD,
@@ -218,8 +239,8 @@ public class DefaultResolver implements PepContextResolver {
 				MethodHandle toData = MethodHandles.lookup().findVirtual(CollectionBridge.class, TODATA_METHOD,
 						MethodType.methodType(Object[].class, Collection.class)).bindTo(bridge);
 
-				descriptor = new PepDataClass(targetClass, Object[].class, null, constructor, toData, toObject,
-						new PepDataComponent[0], DataType.ARRAY);
+				descriptor = new PepDataArrayClass(targetClass, Object[].class, null, constructor, toData, toObject,
+						new PepDataComponent[0], DataType.ARRAY, new CollectionArrayBridge());
 
 			}
 

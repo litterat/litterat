@@ -6,19 +6,19 @@ public class CharArrayBridge {
 		int pos;
 	}
 
-	CharIterator iterator(char[] array) {
+	public CharIterator iterator(char[] array) {
 		return new CharIterator();
 	}
 
-	int size(char[] array) {
+	public int size(char[] array) {
 		return array.length;
 	}
 
-	char get(CharIterator iterator, char[] array) {
+	public char get(CharIterator iterator, char[] array) {
 		return array[iterator.pos++];
 	}
 
-	void put(CharIterator iterator, char[] array, char value) {
+	public void put(CharIterator iterator, char[] array, char value) {
 		array[iterator.pos++] = value;
 	}
 }

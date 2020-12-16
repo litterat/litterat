@@ -7,15 +7,15 @@ import java.util.Iterator;
 @SuppressWarnings("rawtypes")
 public class CollectionArrayBridge {
 
-	Iterator iterator(Collection list) {
+	public Iterator iterator(Collection list) {
 		return list.iterator();
 	}
 
-	int size(Collection list) {
+	public int size(Collection list) {
 		return list.size();
 	}
 
-	Object get(Iterator iterator, Collection list) {
+	public Object get(Iterator iterator, Collection list) {
 		if (iterator.hasNext()) {
 			return iterator.next();
 		}
@@ -23,11 +23,11 @@ public class CollectionArrayBridge {
 	}
 
 	@SuppressWarnings("unchecked")
-	void add(Iterator iterator, Collection list, Object value) {
+	public void put(Iterator iterator, Collection list, Object value) {
 		list.add(value);
 	}
 
-	Collection constructor(int length) {
+	public Collection constructor(int length) {
 		return new ArrayList(length); // This is specific to the collection type.
 	}
 

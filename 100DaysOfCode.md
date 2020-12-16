@@ -115,3 +115,40 @@ return v;
 
 Part way through implementation. Not sure if this will work as expected, so may require changes to interface.
 
+## Day 6 - December 16 - Continuing to refactor arrays and lists
+
+Another possible solution is to provide two interfaces for arrays and allow the underlying data structure to expose either of the interfaces. One interface based on index based accessor (e.g. an array) and the other based on an Iterator (e.g. a Set). From a client it would look like:
+
+PepArrayClass arrayClass = (PepArrayClass) dataClass;
+
+ // an int[] can't be cast to an Object[] so can't directly access values.
+ Object arrayData = arrayClass.accessor().invoke(object);
+ int length = arrayClass.length().invoke(arrayData);
+ output.writeInt(length);
+   
+if (arrayClass.isIterator() ) {
+  
+   Object iterator = arrayClass.iterator().invoke(arrayData);
+   for (int x=0; x<length; x++ ) {
+      writer.invoke( arrayClass.get().invoke( arrayData, iterator) ); // writer accepts int, String, etc.
+   }
+} else {
+   for (int x=0; x<length; x++ ) {
+   		 writer.invoke( arrayClass.get().invoke( arrayData, x) ); // writer accepts int, String, etc.
+   }
+}
+
+Based on the little gained (i.e. iterator not allocated for arrays), this original solution is more consistent. Will continue with that implementation.
+
+### Collection constructors
+
+Collections are also a problem because the serializer does not know the concrete class representation for the Collection ahead of time. A list has many implementations and some (e.g. unmodifiable list) requires the set to be created prior to construction.  It's not possible to select ArrayList for List for every field, as the implementation might be a different for different fields.
+
+The solution needs to be that if a concrete class is provided (e.g. ArrayList) then use it, other wise fall back to a default implementation. The use also requires a way to override the default implementation. One possibility is to allow setting the implementation class on the @Field tag, or create another tag.  Another way to deal with this is to allow setting a specific bridge for the field. 
+
+
+
+
+
+
+

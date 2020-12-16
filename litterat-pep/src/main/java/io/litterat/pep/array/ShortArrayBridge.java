@@ -6,19 +6,19 @@ public class ShortArrayBridge {
 		int pos;
 	}
 
-	ShortIterator iterator(short[] array) {
+	public ShortIterator iterator(short[] array) {
 		return new ShortIterator();
 	}
 
-	int size(short[] array) {
+	public int size(short[] array) {
 		return array.length;
 	}
 
-	short get(ShortIterator iterator, short[] array) {
+	public short get(ShortIterator iterator, short[] array) {
 		return array[iterator.pos++];
 	}
 
-	void put(ShortIterator iterator, short[] array, short value) {
+	public void put(ShortIterator iterator, short[] array, short value) {
 		array[iterator.pos++] = value;
 	}
 }

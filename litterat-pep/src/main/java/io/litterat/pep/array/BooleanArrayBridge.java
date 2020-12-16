@@ -6,19 +6,19 @@ public class BooleanArrayBridge {
 		int pos;
 	}
 
-	BooleanIterator iterator(boolean[] array) {
+	public BooleanIterator iterator(boolean[] array) {
 		return new BooleanIterator();
 	}
 
-	int size(boolean[] array) {
+	public int size(boolean[] array) {
 		return array.length;
 	}
 
-	boolean get(BooleanIterator iterator, boolean[] array) {
+	public boolean get(BooleanIterator iterator, boolean[] array) {
 		return array[iterator.pos++];
 	}
 
-	void put(BooleanIterator iterator, boolean[] array, boolean value) {
+	public void put(BooleanIterator iterator, boolean[] array, boolean value) {
 		array[iterator.pos++] = value;
 	}
 }

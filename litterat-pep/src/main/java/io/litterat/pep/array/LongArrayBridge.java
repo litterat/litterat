@@ -6,19 +6,19 @@ public class LongArrayBridge {
 		int pos;
 	}
 
-	LongIterator iterator(long[] array) {
+	public LongIterator iterator(long[] array) {
 		return new LongIterator();
 	}
 
-	int size(long[] array) {
+	public int size(long[] array) {
 		return array.length;
 	}
 
-	long get(LongIterator iterator, long[] array) {
+	public long get(LongIterator iterator, long[] array) {
 		return array[iterator.pos++];
 	}
 
-	void put(LongIterator iterator, long[] array, long value) {
+	public void put(LongIterator iterator, long[] array, long value) {
 		array[iterator.pos++] = value;
 	}
 }

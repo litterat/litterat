@@ -3,6 +3,7 @@ package io.litterat.pep;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.Collection;
 
 public class PepDataArrayClass extends PepDataClass {
 
@@ -23,36 +24,42 @@ public class PepDataArrayClass extends PepDataClass {
 			throws NoSuchMethodException, IllegalAccessException {
 		super(targetType, serialType, creator, constructor, toData, toObject, fields, dataType);
 
-		Class<?> iteratorClass = bridge.getClass().getMethod("iterator", targetType).getReturnType();
+		Class<?> iteratorClass = bridge.getClass().getMethod("iterator", Collection.class).getReturnType();
+
+		Class<?> arrayClass = targetType;
+		Class<?> arrayValue = Object.class;
+		if (Collection.class.isAssignableFrom(targetType)) {
+			arrayClass = Collection.class;
+		}
 
 		size = MethodHandles.lookup()
-				.findVirtual(bridge.getClass(), "size", MethodType.methodType(int.class, targetType)).bindTo(bridge);
+				.findVirtual(bridge.getClass(), "size", MethodType.methodType(int.class, arrayClass)).bindTo(bridge);
 
 		iterator = MethodHandles.lookup()
-				.findVirtual(bridge.getClass(), "iterator", MethodType.methodType(iteratorClass, targetType))
+				.findVirtual(bridge.getClass(), "iterator", MethodType.methodType(iteratorClass, arrayClass))
 				.bindTo(bridge);
 
-		put = MethodHandles.lookup()
-				.findVirtual(bridge.getClass(), "put", MethodType.methodType(iteratorClass, targetType)).bindTo(bridge);
+		put = MethodHandles.lookup().findVirtual(bridge.getClass(), "put",
+				MethodType.methodType(void.class, iteratorClass, arrayClass, arrayValue)).bindTo(bridge);
 
 		get = MethodHandles.lookup()
-				.findVirtual(bridge.getClass(), "iterator", MethodType.methodType(iteratorClass, targetType))
+				.findVirtual(bridge.getClass(), "get", MethodType.methodType(arrayValue, iteratorClass, arrayClass))
 				.bindTo(bridge);
 	}
 
-	MethodHandle size() {
+	public MethodHandle size() {
 		return this.size;
 	}
 
-	MethodHandle iterator() {
+	public MethodHandle iterator() {
 		return this.iterator;
 	}
 
-	MethodHandle put() {
+	public MethodHandle put() {
 		return this.put;
 	}
 
-	MethodHandle get() {
+	public MethodHandle get() {
 		return this.get;
 	}
 

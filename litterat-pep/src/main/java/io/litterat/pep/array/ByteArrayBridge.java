@@ -6,19 +6,19 @@ public class ByteArrayBridge {
 		int pos;
 	}
 
-	ByteIterator iterator(byte[] array) {
+	public ByteIterator iterator(byte[] array) {
 		return new ByteIterator();
 	}
 
-	int size(byte[] array) {
+	public int size(byte[] array) {
 		return array.length;
 	}
 
-	byte get(ByteIterator iterator, byte[] array) {
+	public byte get(ByteIterator iterator, byte[] array) {
 		return array[iterator.pos++];
 	}
 
-	void put(ByteIterator iterator, byte[] array, byte value) {
+	public void put(ByteIterator iterator, byte[] array, byte value) {
 		array[iterator.pos++] = value;
 	}
 }
