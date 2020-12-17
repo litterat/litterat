@@ -15,7 +15,9 @@
  */
 package io.litterat.pep;
 
+import java.lang.reflect.Type;
+
 public interface PepContextResolver {
 
-	PepDataClass resolve(PepContext context, Class<?> clss) throws PepException;
+	PepDataClass resolve(PepContext context, Class<?> clss, Type parameterizedType) throws PepException;
 }

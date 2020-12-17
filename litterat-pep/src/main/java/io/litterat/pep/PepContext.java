@@ -18,6 +18,7 @@ package io.litterat.pep;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.litterat.pep.describe.DefaultResolver;
@@ -25,7 +26,7 @@ import io.litterat.pep.describe.DefaultResolver;
 public class PepContext {
 
 	// Resolved class information
-	private final ConcurrentHashMap<Class<?>, PepDataClass> descriptors = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Type, PepDataClass> descriptors = new ConcurrentHashMap<>();
 
 	// Resolver
 	private final PepContextResolver resolver;
@@ -113,26 +114,32 @@ public class PepContext {
 	}
 
 	public PepDataClass getDescriptor(Class<?> targetClass) throws PepException {
+		// Use the erased type if type parameters not provided.
+		return getDescriptor(targetClass, targetClass);
+	}
 
-		PepDataClass descriptor = descriptors.get(targetClass);
+	public PepDataClass getDescriptor(Class<?> targetClass, Type parameterizedType) throws PepException {
+
+		PepDataClass descriptor = descriptors.get(parameterizedType);
 		if (descriptor == null) {
-			descriptor = resolver.resolve(this, targetClass);
+			descriptor = resolver.resolve(this, targetClass, parameterizedType);
 			if (descriptor == null) {
-				throw new PepException(String.format("Unable to find suitable data descriptor for class: %s", targetClass.getName()));
+				throw new PepException(
+						String.format("Unable to find suitable data descriptor for class: %s", targetClass.getName()));
 			}
-			register(targetClass, descriptor);
+			register(parameterizedType, descriptor);
 		}
 
 		return descriptor;
 	}
 
-	private <T> void checkExists(Class<T> targetClass) throws PepException {
+	private <T> void checkExists(Type targetClass) throws PepException {
 		if (descriptors.containsKey(targetClass)) {
-			throw new PepException(String.format("Class already registered: %s", targetClass.getName()));
+			throw new PepException(String.format("Class already registered: %s", targetClass.getTypeName()));
 		}
 	}
 
-	public <T> void register(Class<T> targetClass, PepDataClass descriptor) throws PepException {
+	public <T> void register(Type targetClass, PepDataClass descriptor) throws PepException {
 		checkExists(targetClass);
 
 		descriptors.put(targetClass, descriptor);

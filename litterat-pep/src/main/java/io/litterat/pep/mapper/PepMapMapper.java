@@ -39,68 +39,75 @@ public class PepMapMapper {
 		this.context = context;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Map<String, Object> toMap(Object object) throws PepException {
 		Objects.requireNonNull(object);
 
-		return toMap(context.getDescriptor(object.getClass()), object);
+		return (Map<String, Object>) toMap(context.getDescriptor(object.getClass()), object);
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> toMap(PepDataClass dataClass, Object object) throws PepException {
+	public Object toMap(PepDataClass dataClass, Object object) throws PepException {
 
 		int fieldIndex = 0;
 
 		try {
-			Object data = dataClass.toData().invoke(object);
+			Object v = null;
+			if (dataClass.isAtom()) {
+				v = dataClass.toData().invoke(object);
+			} else if (dataClass.isData()) {
 
-			Map<String, Object> map = new HashMap<>();
+				Object data = dataClass.toData().invoke(object);
 
-			PepDataComponent[] fields = dataClass.dataComponents();
-			for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
-				PepDataComponent field = fields[fieldIndex];
+				Map<String, Object> map = new HashMap<>();
 
-				Object v = field.accessor().invoke(data);
+				PepDataComponent[] fields = dataClass.dataComponents();
+				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
+					PepDataComponent field = fields[fieldIndex];
 
-				// Recursively convert object to map.
-				if (v != null) {
-					PepDataClass fieldDataClass = field.dataClass();
+					Object fv = field.accessor().invoke(data);
 
-					if (fieldDataClass.isAtom()) {
-						v = fieldDataClass.toData().invoke(v);
-					} else if (fieldDataClass.isData()) {
-						v = toMap(fieldDataClass, v);
-					} else if (fieldDataClass.isBase()) {
-						// An interface needs to know the type being written so it can be picked up by
-						// the reader later.
-						//
-						v = toMap(object);
-						if (v instanceof Map) {
-							@SuppressWarnings("rawtypes")
-							Map baseMap = (Map) v;
-							baseMap.put("type", object.getClass().getName());
-						}
-					} else if (fieldDataClass.isArray()) {
-
-						PepDataArrayClass arrayClass = (PepDataArrayClass) fieldDataClass;
-
-						Object arrayData = v;
-						int length = (int) arrayClass.size().invoke(arrayData);
-						Object[] outputArray = new Object[length];
-						Object iterator = arrayClass.iterator().invoke(arrayData);
-						for (int x = 0; x < length; x++) {
-							outputArray[x] = arrayClass.get().invoke(iterator, arrayData); // writer accepts int, //
-																							// String, etc.
-						}
-
-						v = outputArray;
-					} else {
-						throw new IllegalArgumentException("Unknown data class");
+					// Recursively convert object to map.
+					if (fv != null) {
+						PepDataClass fieldDataClass = field.dataClass();
+						fv = toMap(fieldDataClass, fv);
 					}
+
+					map.put(field.name(), fv);
 				}
 
-				map.put(field.name(), v);
+				v = map;
+
+			} else if (dataClass.isBase()) {
+				// An interface needs to know the type being written so it can be picked up by
+				// the reader later.
+				v = toMap(object);
+				if (v instanceof Map) {
+					@SuppressWarnings("rawtypes")
+					Map baseMap = (Map) v;
+					baseMap.put("type", object.getClass().getName());
+				}
+			} else if (dataClass.isArray()) {
+
+				PepDataArrayClass arrayClass = (PepDataArrayClass) dataClass;
+
+				Object arrayData = object;
+				int length = (int) arrayClass.size().invoke(arrayData);
+				Object[] outputArray = new Object[length];
+				Object iterator = arrayClass.iterator().invoke(arrayData);
+
+				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+
+				for (int x = 0; x < length; x++) {
+					Object av = arrayClass.get().invoke(iterator, arrayData);
+					outputArray[x] = toMap(arrayDataClass, av);
+				}
+
+				v = outputArray;
+			} else {
+				throw new IllegalArgumentException("Unknown data class");
 			}
-			return map;
+			return v;
 		} catch (Throwable t) {
 			throw new PepException(String.format("Failed to convert %s to Map. Could not convert field %s",
 					dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
@@ -116,59 +123,56 @@ public class PepMapMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object toObject(PepDataClass dataClass, Map<String, Object> map) throws PepException {
+	public Object toObject(PepDataClass dataClass, Object data) throws PepException {
 
 		int fieldIndex = 0;
 
 		try {
+			Object v = null;
+			if (dataClass.isAtom()) {
+				v = dataClass.toObject().invoke(data);
+			} else if (dataClass.isData()) {
+				Map<String, Object> map = (Map<String, Object>) data;
+				PepDataComponent[] fields = dataClass.dataComponents();
+				Object[] construct = new Object[fields.length];
+				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
+					PepDataComponent field = fields[fieldIndex];
 
-			PepDataComponent[] fields = dataClass.dataComponents();
-			Object[] construct = new Object[fields.length];
-			for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
-				PepDataComponent field = fields[fieldIndex];
+					Object fv = map.get(field.name());
 
-				Object v = map.get(field.name());
+					// Recursively convert maps back to objects.
+					if (fv != null) {
+						PepDataClass fieldDataClass = field.dataClass();
 
-				// Recursively convert maps back to objects.
-				if (v != null) {
-					PepDataClass fieldDataClass = field.dataClass();
-					if (fieldDataClass.isAtom()) {
-						v = fieldDataClass.toObject().invoke(v);
-					} else if (fieldDataClass.isData()) {
-						v = toObject(fieldDataClass.typeClass(), (Map<String, Object>) v);
-					} else if (fieldDataClass.isArray()) {
-						PepDataArrayClass arrayClass = (PepDataArrayClass) fieldDataClass;
+						fv = toObject(fieldDataClass, fv);
 
-						Object[] inputArray = (Object[]) v;
-
-						Object dataArray = fieldDataClass.constructor().invoke(inputArray.length);
-
-						int length = inputArray.length;
-						Object arrayData = arrayClass.constructor().invoke(length);
-						Object iterator = arrayClass.iterator().invoke(arrayData);
-						for (int x = 0; x < length; x++) {
-
-							arrayClass.put().invoke(iterator, toObject(arrayClass, inputArray[x])); // in.read returns
-																									// int, String, etc.
-						}
-
-//						Class<?> arrayClass = fieldDataClass.typeClass().getComponentType();
-//						for (int x = 0; x < inputArray.length; x++) {
-//							if (inputArray[x] != null) {
-//								dataArray[x] = toObject(arrayClass, (Map<String, Object>) inputArray[x]);
-//							}
-//						}
-						v = dataArray;
-					} else {
-						throw new IllegalArgumentException("unrecognised type");
 					}
+					construct[fieldIndex] = fv;
 				}
-				construct[fieldIndex] = v;
+
+				v = dataClass.constructor().invoke(construct);
+
+				v = dataClass.toObject().invoke(v);
+			} else if (dataClass.isArray()) {
+				PepDataArrayClass arrayClass = (PepDataArrayClass) dataClass;
+
+				Object[] inputArray = (Object[]) data;
+
+				int length = inputArray.length;
+				Object arrayData = arrayClass.constructor().invoke(length);
+				Object iterator = arrayClass.iterator().invoke(arrayData);
+
+				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+
+				for (int x = 0; x < length; x++) {
+					arrayClass.put().invoke(iterator, arrayData, toObject(arrayDataClass, inputArray[x]));
+				}
+
+				v = arrayData;
+			} else {
+				throw new IllegalArgumentException("unrecognised type");
 			}
-
-			Object data = dataClass.constructor().invoke(construct);
-
-			return dataClass.toObject().invoke(data);
+			return v;
 		} catch (Throwable t) {
 			if (fieldIndex < dataClass.dataComponents().length) {
 				throw new PepException(String.format("Failed to convert Map to %s. Incorrect value for field %s",

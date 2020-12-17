@@ -7,6 +7,9 @@ import java.util.Collection;
 
 public class PepDataArrayClass extends PepDataClass {
 
+	// data class.
+	private final PepDataClass arrayDataClass;
+
 	// int size( <Array> );
 	private final MethodHandle size;
 
@@ -20,16 +23,18 @@ public class PepDataArrayClass extends PepDataClass {
 	private final MethodHandle get;
 
 	public PepDataArrayClass(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
-			MethodHandle toData, MethodHandle toObject, PepDataComponent[] fields, DataType dataType, Object bridge)
-			throws NoSuchMethodException, IllegalAccessException {
+			MethodHandle toData, MethodHandle toObject, PepDataComponent[] fields, DataType dataType,
+			PepDataClass arrayDataClass, Object bridge) throws NoSuchMethodException, IllegalAccessException {
 		super(targetType, serialType, creator, constructor, toData, toObject, fields, dataType);
 
 		Class<?> iteratorClass = bridge.getClass().getMethod("iterator", Collection.class).getReturnType();
 
 		Class<?> arrayClass = targetType;
-		Class<?> arrayValue = Object.class;
+		this.arrayDataClass = arrayDataClass;
+		Class<?> bridgeDataClass = arrayDataClass.typeClass();
 		if (Collection.class.isAssignableFrom(targetType)) {
 			arrayClass = Collection.class;
+			bridgeDataClass = Object.class;
 		}
 
 		size = MethodHandles.lookup()
@@ -40,11 +45,14 @@ public class PepDataArrayClass extends PepDataClass {
 				.bindTo(bridge);
 
 		put = MethodHandles.lookup().findVirtual(bridge.getClass(), "put",
-				MethodType.methodType(void.class, iteratorClass, arrayClass, arrayValue)).bindTo(bridge);
+				MethodType.methodType(void.class, iteratorClass, arrayClass, bridgeDataClass)).bindTo(bridge);
 
-		get = MethodHandles.lookup()
-				.findVirtual(bridge.getClass(), "get", MethodType.methodType(arrayValue, iteratorClass, arrayClass))
-				.bindTo(bridge);
+		get = MethodHandles.lookup().findVirtual(bridge.getClass(), "get",
+				MethodType.methodType(bridgeDataClass, iteratorClass, arrayClass)).bindTo(bridge);
+	}
+
+	public PepDataClass arrayDataClass() {
+		return arrayDataClass;
 	}
 
 	public MethodHandle size() {

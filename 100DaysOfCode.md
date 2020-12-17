@@ -3,48 +3,47 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
-## Day 1 - December 11 - Initial commit
+## Day 7 - December 17 - More on arrays...
 
-This is the first day of the challenge, but there's been a lot of code written in the weeks prior. This is the first day of making the Litterat project public. Very rough around the edges and many things not yet working, but it's a start. Getting the PointTest working which writes and reads a Point class was the trigger to commit to github. It's very basic, but demonstrates the end-to-end project working.
+Preparing List<String> test case and implementing the PepMapMapper. Hitting the issue early on that type erasure makes
+it difficult to get hold of the fact that List<String> is a list of String. While Java erases the generic information
+from the Class, it is available on [Parameter and Field](https://stackoverflow.com/questions/1901164/get-type-of-a-generic-parameter-in-java-with-reflection) meta data. The PepContext interface was only designed with Class in mind, so it is going to need a redesign to allow using additional information when it is available.
 
-## Day 2 - December 12 - Optional tests
+Java reflection provides most of the information required by the PEP library in the Class object. It's only the situation where additional information is required from the ParameterizedType object. Expanding the interface to allow passing in additional Type information makes sense. Updated the PepContext lookup to use the Type instead of the Class to allow looking up parameterized type descriptors.
 
-Not a lot of code done today. Added the ImmutableAtomTest to JSON serializer. Also added Optional<String> to the test case.
+Refactored the PepMapMapper to deal better with arrays using the extra information. Tested List<List<String>> to
+see if that would work correctly. Still more work required on arrays for PepArrayMapper, JSON and XPL.
 
-Responded to a message on the [Java Amber mailing list](https://mail.openjdk.java.net/pipermail/amber-dev/2020-December/006863.html). Still trying to work out which direction to take this project. There are many serialization formats and libraries available. For now Litterat is very conceptual project that still needs to evolve and find its feet.
+## Day 6 - December 16 - Continuing to refactor arrays and lists
 
-## Day 3 - December 13 - Added XPL test project
+Another possible solution is to provide two interfaces for arrays and allow the underlying data structure to expose either of the interfaces. One interface based on index based accessor (e.g. an array) and the other based on an Iterator (e.g. a Set). From a client it would look like:
 
-Added the litterat-xpl-test sub-project and created test cases which write and read the various PEP test classes. Implementation went incredibly smoothly and the PEP and Schema library did the job they were designed. A couple of fixes required in XPL for toData and toObject transformations.
+PepArrayClass arrayClass = (PepArrayClass) dataClass;
 
-Fixed up the TypeInputStream and TypeOutputStream constructors to take various combinations of byte[], streams and ByteBuffers. There's also the option to write custom transport implementations.
-
-## Day 4 - December 14 - Add transport implementations.
-
-Added implementations for byte[], streams and ByteBuffer transports. Nothing too complex.
-
-__TODO__  There's still an issue with ByteBuffer transports throwing BufferOverflowException, BufferUnderflowException or ReadOnlyBufferException. For now these will be thrown to the caller. Not sure if these should be caught and re-thrown as IOException.
-
-Thinking more about the roles of code, schema and data formats and how to separate the concepts and ensure they don't influence each other.
-As an example an integer might represent a persons age. The setter:
-
-```java
-public void setAge(int age) {
-   if (age < 0 || age > 150) {
-   	 throw new IllegalArgumentException("invalid age");
-   }
-   this.age = age;
-}
-```
-
-The schema is required to hold enough information to say if the data recorded in the data format is valid. It might record something like:
-
-   field: { name:"age" type:"uint8" constraints: { min:"0", max:"150" }}
+ // an int[] can't be cast to an Object[] so can't directly access values.
+ Object arrayData = arrayClass.accessor().invoke(object);
+ int length = arrayClass.length().invoke(arrayData);
+ output.writeInt(length);
    
-The data might be represented differently depending on the format. In JSON this would be a Number while it would be presented as binary in XPL. Where the integer was larger, for example, int32, it would could be presented as varint32, little endian or big endian. Another better example might be UUID which is converted to text in JSON and kept in binary for a binary file. 
+if (arrayClass.isIterator() ) {
+  
+   Object iterator = arrayClass.iterator().invoke(arrayData);
+   for (int x=0; x<length; x++ ) {
+      writer.invoke( arrayClass.get().invoke( arrayData, iterator) ); // writer accepts int, String, etc.
+   }
+} else {
+   for (int x=0; x<length; x++ ) {
+   		 writer.invoke( arrayClass.get().invoke( arrayData, x) ); // writer accepts int, String, etc.
+   }
+}
 
-Most schemas conflate the representation of the data in the schema because they are tied directly, however, it should be possible to keep these concepts separate. This way the representation can be decided later.
+Based on the little gained (i.e. iterator not allocated for arrays), this original solution is more consistent. Will continue with that implementation.
 
+### Collection constructors
+
+Collections are also a problem because the serializer does not know the concrete class representation for the Collection ahead of time. A list has many implementations and some (e.g. unmodifiable list) requires the set to be created prior to construction.  It's not possible to select ArrayList for List for every field, as the implementation might be a different for different fields.
+
+The solution needs to be that if a concrete class is provided (e.g. ArrayList) then use it, other wise fall back to a default implementation. The use also requires a way to override the default implementation. One possibility is to allow setting the implementation class on the @Field tag, or create another tag.  Another way to deal with this is to allow setting a specific bridge for the field. 
 
 ## Day 5 - December 15 - PEP Lists and Arrays
 
@@ -115,36 +114,53 @@ return v;
 
 Part way through implementation. Not sure if this will work as expected, so may require changes to interface.
 
-## Day 6 - December 16 - Continuing to refactor arrays and lists
+## Day 4 - December 14 - Add transport implementations.
 
-Another possible solution is to provide two interfaces for arrays and allow the underlying data structure to expose either of the interfaces. One interface based on index based accessor (e.g. an array) and the other based on an Iterator (e.g. a Set). From a client it would look like:
+Added implementations for byte[], streams and ByteBuffer transports. Nothing too complex.
 
-PepArrayClass arrayClass = (PepArrayClass) dataClass;
+__TODO__  There's still an issue with ByteBuffer transports throwing BufferOverflowException, BufferUnderflowException or ReadOnlyBufferException. For now these will be thrown to the caller. Not sure if these should be caught and re-thrown as IOException.
 
- // an int[] can't be cast to an Object[] so can't directly access values.
- Object arrayData = arrayClass.accessor().invoke(object);
- int length = arrayClass.length().invoke(arrayData);
- output.writeInt(length);
-   
-if (arrayClass.isIterator() ) {
-  
-   Object iterator = arrayClass.iterator().invoke(arrayData);
-   for (int x=0; x<length; x++ ) {
-      writer.invoke( arrayClass.get().invoke( arrayData, iterator) ); // writer accepts int, String, etc.
+Thinking more about the roles of code, schema and data formats and how to separate the concepts and ensure they don't influence each other.
+As an example an integer might represent a persons age. The setter:
+
+```java
+public void setAge(int age) {
+   if (age < 0 || age > 150) {
+   	 throw new IllegalArgumentException("invalid age");
    }
-} else {
-   for (int x=0; x<length; x++ ) {
-   		 writer.invoke( arrayClass.get().invoke( arrayData, x) ); // writer accepts int, String, etc.
-   }
+   this.age = age;
 }
+```
 
-Based on the little gained (i.e. iterator not allocated for arrays), this original solution is more consistent. Will continue with that implementation.
+The schema is required to hold enough information to say if the data recorded in the data format is valid. It might record something like:
 
-### Collection constructors
+   field: { name:"age" type:"uint8" constraints: { min:"0", max:"150" }}
+   
+The data might be represented differently depending on the format. In JSON this would be a Number while it would be presented as binary in XPL. Where the integer was larger, for example, int32, it would could be presented as varint32, little endian or big endian. Another better example might be UUID which is converted to text in JSON and kept in binary for a binary file. 
 
-Collections are also a problem because the serializer does not know the concrete class representation for the Collection ahead of time. A list has many implementations and some (e.g. unmodifiable list) requires the set to be created prior to construction.  It's not possible to select ArrayList for List for every field, as the implementation might be a different for different fields.
+Most schemas conflate the representation of the data in the schema because they are tied directly, however, it should be possible to keep these concepts separate. This way the representation can be decided later.
 
-The solution needs to be that if a concrete class is provided (e.g. ArrayList) then use it, other wise fall back to a default implementation. The use also requires a way to override the default implementation. One possibility is to allow setting the implementation class on the @Field tag, or create another tag.  Another way to deal with this is to allow setting a specific bridge for the field. 
+
+## Day 3 - December 13 - Added XPL test project
+
+Added the litterat-xpl-test sub-project and created test cases which write and read the various PEP test classes. Implementation went incredibly smoothly and the PEP and Schema library did the job they were designed. A couple of fixes required in XPL for toData and toObject transformations.
+
+Fixed up the TypeInputStream and TypeOutputStream constructors to take various combinations of byte[], streams and ByteBuffers. There's also the option to write custom transport implementations.
+
+## Day 2 - December 12 - Optional tests
+
+Not a lot of code done today. Added the ImmutableAtomTest to JSON serializer. Also added Optional<String> to the test case.
+
+Responded to a message on the [Java Amber mailing list](https://mail.openjdk.java.net/pipermail/amber-dev/2020-December/006863.html). Still trying to work out which direction to take this project. There are many serialization formats and libraries available. For now Litterat is very conceptual project that still needs to evolve and find its feet.
+
+
+## Day 1 - December 11 - Initial commit
+
+This is the first day of the challenge, but there's been a lot of code written in the weeks prior. This is the first day of making the Litterat project public. Very rough around the edges and many things not yet working, but it's a start. Getting the PointTest working which writes and reads a Point class was the trigger to commit to github. It's very basic, but demonstrates the end-to-end project working.
+
+
+
+
 
 
 

@@ -61,13 +61,13 @@ public class DefaultResolver implements PepContextResolver {
 	}
 
 	@Override
-	public PepDataClass resolve(PepContext context, Class<?> targetClass) throws PepException {
+	public PepDataClass resolve(PepContext context, Class<?> targetClass, Type parameterizedType) throws PepException {
 		PepDataClass descriptor = null;
 
 		if (isBase(targetClass)) {
 			descriptor = resolveBase(context, targetClass);
 		} else if (isArray(targetClass)) {
-			descriptor = resolveArray(context, targetClass);
+			descriptor = resolveArray(context, targetClass, parameterizedType);
 		} else if (isAtom(targetClass)) {
 			descriptor = resolveAtom(context, targetClass);
 		} else if (isTuple(targetClass)) {
@@ -205,7 +205,12 @@ public class DefaultResolver implements PepContextResolver {
 				DataType.BASE);
 	}
 
-	private PepDataClass resolveArray(PepContext context, Class<?> targetClass) throws PepException {
+	// TODO If the targetClass is a Collection it isn't possible get the generic
+	// parameter as the class will erazed.
+	// The resolution should use a Type which can get the information from the field
+	// or parameter and pass that through.
+	private PepDataClass resolveArray(PepContext context, Class<?> targetClass, Type parameterizedType)
+			throws PepException {
 		PepDataClass descriptor = null;
 
 		try {
@@ -214,11 +219,28 @@ public class DefaultResolver implements PepContextResolver {
 				MethodHandle constructor = MethodHandles.arrayConstructor(targetClass);
 				MethodHandle identity = MethodHandles.identity(targetClass);
 
+				PepDataClass arrayDataClass = context.getDescriptor(targetClass.getComponentType());
+
 				descriptor = new PepDataArrayClass(targetClass, targetClass, null, constructor, identity, identity,
-						new PepDataComponent[0], DataType.ARRAY,
+						new PepDataComponent[0], DataType.ARRAY, arrayDataClass,
 						PrimitiveBridges.getPrimitiveArrayBridge(targetClass.getComponentType()));
 
 			} else if (Collection.class.isAssignableFrom(targetClass)) {
+
+				if (!(parameterizedType instanceof ParameterizedType)) {
+					throw new PepException("Collection must provide parameterized type information");
+				}
+
+				PepDataClass arrayDataClass;
+				Type paramType = ((ParameterizedType) parameterizedType).getActualTypeArguments()[0];
+				if (paramType instanceof Class) {
+					arrayDataClass = context.getDescriptor((Class<?>) paramType);
+				} else if (paramType instanceof ParameterizedType) {
+					ParameterizedType arrayParamType = (ParameterizedType) paramType;
+					arrayDataClass = context.getDescriptor((Class<?>) arrayParamType.getRawType(), arrayParamType);
+				} else {
+					throw new PepException("Unrecognized parameterized type");
+				}
 
 				// TODO Some Collections will not have a size constructor. Fallback and drop the
 				// argument.
@@ -240,7 +262,7 @@ public class DefaultResolver implements PepContextResolver {
 						MethodType.methodType(Object[].class, Collection.class)).bindTo(bridge);
 
 				descriptor = new PepDataArrayClass(targetClass, Object[].class, null, constructor, toData, toObject,
-						new PepDataComponent[0], DataType.ARRAY, new CollectionArrayBridge());
+						new PepDataComponent[0], DataType.ARRAY, arrayDataClass, new CollectionArrayBridge());
 
 			}
 
@@ -480,7 +502,8 @@ public class DefaultResolver implements PepContextResolver {
 
 					} else {
 
-						PepDataClass dataClass = context.getDescriptor(info.getType());
+						PepDataClass dataClass = context.getDescriptor(info.getType(),
+								(info.getParamType() != null ? info.getParamType() : info.getType()));
 
 						component = new PepDataComponent(x, info.getName(), info.getType(), dataClass, accessor,
 								setter);
