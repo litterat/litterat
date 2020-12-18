@@ -68,9 +68,9 @@ public class ListOfStringTest {
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ListOfString);
 
-		Assertions.assertEquals(TEST_ONE, object.list().get(0));
-		Assertions.assertEquals(TEST_TWO, object.list().get(1));
-		Assertions.assertEquals(TEST_THREE, object.list().get(2));
+		Assertions.assertEquals(TEST_ONE, object.list().get(0).get(0));
+		Assertions.assertEquals(TEST_TWO, object.list().get(0).get(1));
+		Assertions.assertEquals(TEST_THREE, object.list().get(0).get(2));
 
 	}
 

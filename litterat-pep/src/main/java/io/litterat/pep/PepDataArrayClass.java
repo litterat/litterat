@@ -27,14 +27,22 @@ public class PepDataArrayClass extends PepDataClass {
 			PepDataClass arrayDataClass, Object bridge) throws NoSuchMethodException, IllegalAccessException {
 		super(targetType, serialType, creator, constructor, toData, toObject, fields, dataType);
 
-		Class<?> iteratorClass = bridge.getClass().getMethod("iterator", Collection.class).getReturnType();
-
+		Class<?> iteratorClass;
 		Class<?> arrayClass = targetType;
 		this.arrayDataClass = arrayDataClass;
 		Class<?> bridgeDataClass = arrayDataClass.typeClass();
 		if (Collection.class.isAssignableFrom(targetType)) {
 			arrayClass = Collection.class;
 			bridgeDataClass = Object.class;
+			iteratorClass = bridge.getClass().getMethod("iterator", Collection.class).getReturnType();
+		} else {
+			if (bridgeDataClass.isPrimitive()) {
+				iteratorClass = bridge.getClass().getMethod("iterator", targetType).getReturnType();
+			} else {
+				arrayClass = Object[].class;
+				bridgeDataClass = Object.class;
+				iteratorClass = bridge.getClass().getMethod("iterator", arrayClass).getReturnType();
+			}
 		}
 
 		size = MethodHandles.lookup()

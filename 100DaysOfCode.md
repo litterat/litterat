@@ -3,6 +3,15 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
+## Day 8 - December 18 - Expanding and testing the array implementation
+
+Spent a lot of time refactoring the PepArrayMapper MethodHandle based implementation. The array implementation has now
+been tested with SimpleImmutable[], ArrayList<ArrayList<String>> and int[]. Combined they cover the main array based
+data types. This can be expanded and testing can be expanded later without much effort. The PepMapMapper and PepArrayMapper shows that the array MethodHandle interface works well enough to continue.
+
+Noticed that the introduction of the PepDataArrayClass as an extension of the PepDataClass ends up with some PepDataClass methods and information not being relevant to the PepDataArrayClass. Currently the toObject and toData MethodHandles don't seem to have any use. I'll need to explore if there's a use case for these, or if there should be a PepDataTupleClass so that less is in the base class.
+
+
 ## Day 7 - December 17 - More on arrays...
 
 Preparing List<String> test case and implementing the PepMapMapper. Hitting the issue early on that type erasure makes
