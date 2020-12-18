@@ -11,6 +11,7 @@ data types. This can be expanded and testing can be expanded later without much 
 
 Noticed that the introduction of the PepDataArrayClass as an extension of the PepDataClass ends up with some PepDataClass methods and information not being relevant to the PepDataArrayClass. Currently the toObject and toData MethodHandles don't seem to have any use. I'll need to explore if there's a use case for these, or if there should be a PepDataTupleClass so that less is in the base class.
 
+Implementation and testing of the JsonMapper "just worked". Completed in a short time.
 
 ## Day 7 - December 17 - More on arrays...
 

@@ -32,6 +32,7 @@ import io.litterat.json.parser.JsonReader;
 import io.litterat.json.parser.JsonToken;
 import io.litterat.json.parser.JsonWriter;
 import io.litterat.pep.PepContext;
+import io.litterat.pep.PepDataArrayClass;
 import io.litterat.pep.PepDataClass;
 import io.litterat.pep.PepDataComponent;
 import io.litterat.pep.PepException;
@@ -108,24 +109,24 @@ public class JsonMapper {
 			} else {
 				writer.beginArray();
 
-				Object[] dataArray = (Object[]) object;
+				PepDataArrayClass arrayClass = (PepDataArrayClass) dataClass;
 
-				for (int x = 0; x < dataArray.length; x++) {
-					Object av = dataArray[x];
-					if (av != null) {
-						PepDataClass avClass = context.getDescriptor(av.getClass());
-						toJson(dataArray[x], avClass, writer);
-					} else {
-						writer.nullValue();
-					}
+				Object arrayData = object;
+				int length = (int) arrayClass.size().invoke(arrayData);
+				Object iterator = arrayClass.iterator().invoke(arrayData);
+				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+
+				for (int x = 0; x < length; x++) {
+					Object av = arrayClass.get().invoke(iterator, arrayData);
+					toJson(av, arrayDataClass, writer);
 				}
 
 				writer.endArray();
 			}
 
 		} catch (Throwable t) {
-			throw new PepException(String.format("Failed to convert %s to Map. Could not convert field %s", dataClass.typeClass(),
-					dataClass.dataComponents()[fieldIndex].name()), t);
+			throw new PepException(String.format("Failed to convert %s to Map. Could not convert field %s",
+					dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
 		}
 	}
 
@@ -156,7 +157,8 @@ public class JsonMapper {
 
 	private Map<String, PepDataComponent> componentMap(PepDataClass dataClass) {
 		return fieldMaps.computeIfAbsent(dataClass, (clss) -> {
-			return Arrays.asList(clss.dataComponents()).stream().collect(Collectors.toMap(PepDataComponent::name, item -> item));
+			return Arrays.asList(clss.dataComponents()).stream()
+					.collect(Collectors.toMap(PepDataComponent::name, item -> item));
 		});
 
 	}
@@ -202,7 +204,8 @@ public class JsonMapper {
 
 					// Find the name in the fields.
 					PepDataComponent field = componentMap(dataClass).get(name);
-					Objects.requireNonNull(field, String.format("field %s not found in class", name, dataClass.dataClass()));
+					Objects.requireNonNull(field,
+							String.format("field %s not found in class", name, dataClass.dataClass()));
 
 					construct[field.index()] = fromJson(field.dataClass(), reader);
 
@@ -222,17 +225,30 @@ public class JsonMapper {
 
 				reader.beginArray();
 
-				Class<?> arrayClass = dataClass.typeClass().getComponentType();
+				PepDataArrayClass arrayDataClass = (PepDataArrayClass) dataClass;
+
+				// Token based reader needs to read everything in the array before creating.
+				// TODO could potentially provide meta data saying if the collection type is
+				// static or dynamic.
+				// A dynamic sized collection could be created and then have each added.
+				PepDataClass arrayValueClass = arrayDataClass.arrayDataClass();
 				List<Object> list = new ArrayList<Object>();
 				while (reader.hasNext()) {
-					list.add(fromJson(context.getDescriptor(arrayClass), reader));
+					list.add(fromJson(arrayValueClass, reader));
 				}
 
 				reader.endArray();
 
-				// Convert from list to array.
-				Object[] dataArray = (Object[]) dataClass.constructor().invoke(list.size());
-				return list.toArray(dataArray);
+				// Convert the ArrayList to the actual array implementation.
+				int length = list.size();
+				Object arrayData = arrayDataClass.constructor().invoke(length);
+				Object iterator = arrayDataClass.iterator().invoke(arrayData);
+
+				for (int x = 0; x < length; x++) {
+					arrayDataClass.put().invoke(iterator, arrayData, list.get(x));
+				}
+
+				return arrayData;
 
 			case END_DOCUMENT:
 				return null;
