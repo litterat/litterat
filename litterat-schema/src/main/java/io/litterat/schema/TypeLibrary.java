@@ -15,6 +15,7 @@
  */
 package io.litterat.schema;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -183,6 +184,7 @@ public class TypeLibrary {
 	}
 
 	public TypeName getTypeName(Class<?> clss) throws TypeException {
+		Objects.requireNonNull(clss, "class value required");
 
 		TypeName typeName = this.classes.get(clss);
 		if (typeName == null) {

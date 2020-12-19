@@ -20,9 +20,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.litterat.pep.describe.IdentityBridge;
+
 /**
- * 
- *
+ * Allows specifying the name of a field. Either overriding the name or
+ * selecting the name for parameters where the name cannot be detected.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
@@ -30,5 +32,7 @@ public @interface Field {
 
 	// allow overriding the name of the field.
 	public String name();
-	
+
+	@SuppressWarnings("rawtypes")
+	public Class<? extends DataBridge> bridge() default IdentityBridge.class;
 }

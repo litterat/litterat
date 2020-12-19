@@ -145,7 +145,7 @@ public class PepContext {
 		descriptors.put(targetClass, descriptor);
 	}
 
-	public void registerAtom(Class<?> targetClass, ObjectDataBridge<?, ?> bridge) throws PepException {
+	public void registerAtom(Class<?> targetClass, DataBridge<?, ?> bridge) throws PepException {
 		checkExists(targetClass);
 
 		Class<?> bridgeClass = bridge.getClass();

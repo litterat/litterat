@@ -90,10 +90,12 @@ public class ImmutableFinder implements ComponentFinder {
 					if (component != null) {
 						// renaming the field.
 						component.setName(field.name());
+						component.setBridge(field.bridge());
 					} else {
 						// Add the parameter.
 						component = new ComponentInfo(field.name(), params[x].getType());
 						component.setConstructorArgument(x);
+						component.setBridge(field.bridge());
 
 						immutableFields.add(component);
 					}
@@ -127,6 +129,7 @@ public class ImmutableFinder implements ComponentFinder {
 							.orElse(null);
 					if (component != null && component.getReadMethod() == null) {
 						component.setReadMethod(method);
+						component.setBridge(field.bridge());
 						continue;
 					}
 				}

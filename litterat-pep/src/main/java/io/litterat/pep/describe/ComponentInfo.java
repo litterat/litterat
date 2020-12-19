@@ -16,6 +16,8 @@ package io.litterat.pep.describe;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 
+import io.litterat.pep.DataBridge;
+
 public class ComponentInfo {
 
 	private String name;
@@ -29,6 +31,9 @@ public class ComponentInfo {
 	private int constructorArgument;
 
 	private ParameterizedType paramType;
+
+	@SuppressWarnings("rawtypes")
+	private Class<? extends DataBridge> bridge;
 
 	public ComponentInfo(String name, Class<?> type) {
 		this.name = name;
@@ -77,5 +82,15 @@ public class ComponentInfo {
 
 	public void setParamType(ParameterizedType paramType) {
 		this.paramType = paramType;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Class<? extends DataBridge> bridge() {
+		return this.bridge;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void setBridge(Class<? extends DataBridge> bridge) {
+		this.bridge = bridge;
 	}
 }

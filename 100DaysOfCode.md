@@ -3,6 +3,53 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
+
+## Day 9 - December 19 - Array bridges
+
+Noticed yesterday that the PepDataArrayClass has toObject and toData MethodHandles that needed to be reviewed. If you consider the idea that a class wants to include an UnmodifiableList using a LinkedList as the implementation for a class like:
+
+```java
+class ClassWithList {
+
+  @Field( bridge=UnmodifiableLinkListBridge.class )
+  private final List<String> list;
+
+  @Data
+  public ClassWithList( List<String> list ) {
+     this.list = list;
+  }
+
+  public List<String> list() {
+     return this.list;
+  }
+
+}
+```
+
+In this case the use defines a bridge like:
+
+```java
+class UnmodifiableLinkedListBridge implements DataBridge<String[],List<String>> {
+
+  public String[] toData(List<String> list) {
+     String[] dataArray = new String[list.size()];
+     return list.toArray(dataArray);
+  }
+  
+  public List<String> toObject( String[] data ) {
+     List<String> list = new LinkedList();
+  	for (int x=0; x< data.length; x++ ) {
+  	   list.add( data[x] );
+  	}
+  	return Collections.unmodifiableList( list );
+  }
+
+}
+```
+There's likely many other use cases where a bridge for an array would be useful beyond this contrived example. This is a good example of where a bridge annotation is useful to specify the bridge required. Not sure if this should be part of the @Field annotation or its own annotation. For now, will try with adding to @Field annotation.
+
+Got part way through the implementation for @Field bridge annotation. There's an issue with the field meta data on whether to keep both the data type and the actual type or just the data type information. To some degree the user doesn't care what the actual type is as it is the data type that is being interfaced. As long as the toData and toObject are being called correctly. It may also be possible to simplify other exceptional cases like Optional and List using a bridge rather than special cases in the resolver.
+
 ## Day 8 - December 18 - Expanding and testing the array implementation
 
 Spent a lot of time refactoring the PepArrayMapper MethodHandle based implementation. The array implementation has now
@@ -11,7 +58,10 @@ data types. This can be expanded and testing can be expanded later without much 
 
 Noticed that the introduction of the PepDataArrayClass as an extension of the PepDataClass ends up with some PepDataClass methods and information not being relevant to the PepDataArrayClass. Currently the toObject and toData MethodHandles don't seem to have any use. I'll need to explore if there's a use case for these, or if there should be a PepDataTupleClass so that less is in the base class.
 
-Implementation and testing of the JsonMapper "just worked". Completed in a short time.
+Implementation and testing of the JsonMapper "just worked". Completed in a short time. One interesting element of
+JSON is that the tokenizer doesn't look ahead. The current interface to array creation is based on knowing the size prior to reading as that is required to allocate an array. The JSON reader currently needs to read the values and then create the array when converting toObject. A redesign of the array toObject interface would be required to try and improve performance.
+
+
 
 ## Day 7 - December 17 - More on arrays...
 

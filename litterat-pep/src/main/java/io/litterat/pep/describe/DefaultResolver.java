@@ -20,6 +20,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 import io.litterat.pep.Atom;
 import io.litterat.pep.Data;
+import io.litterat.pep.DataBridge;
 import io.litterat.pep.PepContext;
 import io.litterat.pep.PepContextResolver;
 import io.litterat.pep.PepDataArrayClass;
@@ -254,12 +256,13 @@ public class DefaultResolver implements PepContextResolver {
 					constructor = MethodHandles.lookup().unreflectConstructor(targetClass.getConstructor(int.class));
 				}
 
-				CollectionBridge bridge = new CollectionBridge(constructor);
+				MethodHandle toObject = MethodHandles.identity(targetClass);
+				MethodHandle toData = MethodHandles.identity(targetClass);
 
-				MethodHandle toObject = MethodHandles.lookup().findVirtual(CollectionBridge.class, TOOBJECT_METHOD,
-						MethodType.methodType(Collection.class, Object[].class)).bindTo(bridge);
-				MethodHandle toData = MethodHandles.lookup().findVirtual(CollectionBridge.class, TODATA_METHOD,
-						MethodType.methodType(Object[].class, Collection.class)).bindTo(bridge);
+//				MethodHandle toObject = MethodHandles.lookup().findVirtual(CollectionBridge.class, TOOBJECT_METHOD,
+//						MethodType.methodType(Collection.class, Object[].class)).bindTo(bridge);
+//				MethodHandle toData = MethodHandles.lookup().findVirtual(CollectionBridge.class, TODATA_METHOD,
+//						MethodType.methodType(Object[].class, Collection.class)).bindTo(bridge);
 
 				descriptor = new PepDataArrayClass(targetClass, Object[].class, null, constructor, toData, toObject,
 						new PepDataComponent[0], DataType.ARRAY, arrayDataClass, new CollectionArrayBridge());
@@ -466,7 +469,52 @@ public class DefaultResolver implements PepContextResolver {
 					PepDataComponent component;
 
 					// Will probably need a more generic way of handling paramterized types.
-					if (info.getType() == Optional.class && info.getParamType() != null) {
+					if (info.bridge() != null && info.bridge() != IdentityBridge.class) {
+
+						@SuppressWarnings("rawtypes")
+						Class<? extends DataBridge> bridgeClass = info.bridge();
+
+						ParameterizedType bridgeDataType = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
+
+						// ToData has one parameter so this should be safe.
+						Class<?> dataType = (Class<?>) bridgeDataType.getActualTypeArguments()[0];
+
+						// Recursively get hold of the data class descriptor.
+						PepDataClass tupleData = context.getDescriptor(dataType);
+
+						// TODO Currently assume Bridge classes have no state. This might need to change
+						// if a bridge uses IOC framework.
+
+						@SuppressWarnings("rawtypes")
+						DataBridge bridge;
+						try {
+							bridge = bridgeClass.getConstructor().newInstance();
+						} catch (InstantiationException | IllegalArgumentException | InvocationTargetException e) {
+							throw new PepException("Failed to instantiate bridge", e);
+						}
+
+						// bridge.toData(dataType):type
+						toData = MethodHandles.lookup()
+								.findVirtual(bridgeClass, TODATA_METHOD, MethodType.methodType(dataType, targetClass))
+								.bindTo(bridge);
+
+						// bridge.toData( targetClass.getOptional() ): optionalType
+						MethodHandle bridgeToData = MethodHandles.collectArguments(toObject, 0, accessor)
+								.asType(MethodType.methodType(dataType, targetClass));
+
+						// bridge.toObject(type):dataType
+						toObject = MethodHandles.lookup()
+								.findVirtual(bridgeClass, TOOBJECT_METHOD, MethodType.methodType(dataType, targetClass))
+								.bindTo(bridge);
+
+						if (setter != null) {
+							setter = MethodHandles.collectArguments(setter, 1, toObject)
+									.asType(MethodType.methodType(targetClass, dataType));
+						}
+
+						component = new PepDataComponent(x, info.getName(), info.getType(), tupleData, bridgeToData,
+								setter);
+					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
 						Class<?> optionalType = (Class<?>) info.getParamType().getActualTypeArguments()[0];
 

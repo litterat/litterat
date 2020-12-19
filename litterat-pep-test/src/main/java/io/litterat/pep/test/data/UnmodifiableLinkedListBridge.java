@@ -11,23 +11,23 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.litterat.pep.describe;
+package io.litterat.pep.test.data;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Collection;
 
-import io.litterat.pep.ObjectDataBridge;
+import io.litterat.pep.DataBridge;
 
 /**
  *
  * Default Collection to array bridge.
  *
  */
-public class CollectionBridge implements ObjectDataBridge<Object[], Collection<?>> {
+public class UnmodifiableLinkedListBridge implements DataBridge<Object[], Collection<?>> {
 
 	MethodHandle collectionConstructor;
 
-	public CollectionBridge(MethodHandle collectionConstructor) {
+	public UnmodifiableLinkedListBridge(MethodHandle collectionConstructor) {
 		this.collectionConstructor = collectionConstructor;
 	}
 

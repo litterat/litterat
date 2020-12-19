@@ -15,10 +15,10 @@ package io.litterat.pep.describe;
 
 import java.util.Optional;
 
-import io.litterat.pep.ObjectDataBridge;
+import io.litterat.pep.DataBridge;
 import io.litterat.pep.PepException;
 
-public class OptionalBridge<T> implements ObjectDataBridge<T, Optional<T>> {
+public class OptionalBridge<T> implements DataBridge<T, Optional<T>> {
 
 	@Override
 	public T toData(Optional<T> value) throws PepException {
