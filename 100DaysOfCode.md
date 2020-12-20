@@ -3,6 +3,16 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
+## Day 10 - December 20 - Continue with Array bridges
+
+Annoying Java library issue. Collections.unmodifiableList(x) returns a class that is private and can not be checked
+with instanceof. Documented [here](https://stackoverflow.com/questions/8364856/how-to-test-if-a-list-extends-object-is-an-unmodifablelist).
+
+Implemented the UnmodifiableLinkedListTest which uses a bridge and bridge annotation. This was supposed to validate the need for toObject and toData on the PepDataArrayClass. However, the bridge is associated with the tuple of the class using the array. As such it didn't actually require calling toData/toObject on the array. This provides additional support for removing them from PepDataArrayClass.
+
+The initial implementation of the UnmodifiableLinkedListBridge was converting from Object[] to Collection<?> to be as generic as possible. However, this requires that Object be defined in the Pep library. Object could be an Atom, Array, Record or Interface. For now, it's better that the user defines a more concrete class for the bridges.
+
+Also noticed that the @Field annotation renaming won't work. It also requires deciding on precedence for if the annotation is added to multiple places and have different names. Most likely this should result in an error. Additional test cases required for these scenarios.
 
 ## Day 9 - December 19 - Array bridges
 
@@ -26,7 +36,7 @@ class ClassWithList {
 }
 ```
 
-In this case the use defines a bridge like:
+In this case the user defines a bridge like:
 
 ```java
 class UnmodifiableLinkedListBridge implements DataBridge<String[],List<String>> {
@@ -46,6 +56,7 @@ class UnmodifiableLinkedListBridge implements DataBridge<String[],List<String>> 
 
 }
 ```
+
 There's likely many other use cases where a bridge for an array would be useful beyond this contrived example. This is a good example of where a bridge annotation is useful to specify the bridge required. Not sure if this should be part of the @Field annotation or its own annotation. For now, will try with adding to @Field annotation.
 
 Got part way through the implementation for @Field bridge annotation. There's an issue with the field meta data on whether to keep both the data type and the actual type or just the data type information. To some degree the user doesn't care what the actual type is as it is the data type that is being interfaced. As long as the toData and toObject are being called correctly. It may also be possible to simplify other exceptional cases like Optional and List using a bridge rather than special cases in the resolver.

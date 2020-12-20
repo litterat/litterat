@@ -13,8 +13,10 @@
  */
 package io.litterat.pep.test.data;
 
-import java.lang.invoke.MethodHandle;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import io.litterat.pep.DataBridge;
 
@@ -23,33 +25,22 @@ import io.litterat.pep.DataBridge;
  * Default Collection to array bridge.
  *
  */
-public class UnmodifiableLinkedListBridge implements DataBridge<Object[], Collection<?>> {
-
-	MethodHandle collectionConstructor;
-
-	public UnmodifiableLinkedListBridge(MethodHandle collectionConstructor) {
-		this.collectionConstructor = collectionConstructor;
-	}
+public class UnmodifiableLinkedListBridge implements DataBridge<String[], Collection<String>> {
 
 	@Override
-	public Object[] toData(Collection<?> b) {
-		return b.toArray();
+	public String[] toData(Collection<String> b) {
+		String[] values = new String[b.size()];
+		return b.toArray(values);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Collection<?> toObject(Object[] s) {
-		try {
-
-			Collection collection = (Collection) collectionConstructor.invoke();
-
-			for (int x = 0; x < s.length; x++) {
-				collection.add(s[x]);
-			}
-		} catch (Throwable e) {
-			throw new RuntimeException("Failed to convert to Collection");
+	public Collection<String> toObject(String[] data) {
+		List<String> list = new LinkedList();
+		for (int x = 0; x < data.length; x++) {
+			list.add(data[x]);
 		}
-		return null;
+		return Collections.unmodifiableList(list);
 	}
 
 }

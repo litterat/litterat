@@ -88,14 +88,12 @@ public class ImmutableFinder implements ComponentFinder {
 					ComponentInfo component = immutableFields.stream()
 							.filter(e -> e.getConstructorArgument() == paramIndex).findFirst().orElse(null);
 					if (component != null) {
-						// renaming the field.
-						component.setName(field.name());
-						component.setBridge(field.bridge());
+						component.setField(field);
 					} else {
 						// Add the parameter.
 						component = new ComponentInfo(field.name(), params[x].getType());
 						component.setConstructorArgument(x);
-						component.setBridge(field.bridge());
+						component.setField(field);
 
 						immutableFields.add(component);
 					}
@@ -129,7 +127,7 @@ public class ImmutableFinder implements ComponentFinder {
 							.orElse(null);
 					if (component != null && component.getReadMethod() == null) {
 						component.setReadMethod(method);
-						component.setBridge(field.bridge());
+						component.setField(field);
 						continue;
 					}
 				}
@@ -173,6 +171,22 @@ public class ImmutableFinder implements ComponentFinder {
 			argumentTypes[i] = Class.forName(types[i].getClassName());
 		}
 		return argumentTypes;
+	}
+
+	private void checkFieldAnnotation(ComponentInfo info, Class<?> clss, String fieldName) {
+		// Capture field annotation from field if present.
+		try {
+			java.lang.reflect.Field clssField = clss.getDeclaredField(fieldName);
+			Field field = clssField.getAnnotation(Field.class);
+			if (field != null) {
+				info.setField(field);
+			}
+
+		} catch (NoSuchFieldException | SecurityException e1) {
+			// don't expect an exception here.
+			throw new RuntimeException("unexepected exception", e1);
+		}
+
 	}
 
 	/**
@@ -227,6 +241,9 @@ public class ImmutableFinder implements ComponentFinder {
 					if (paramType instanceof ParameterizedType) {
 						component.setParamType((ParameterizedType) paramType);
 					}
+
+					// Check if either the parameter or field has the @Field parameter.
+					checkFieldAnnotation(component, constructor.getDeclaringClass(), putFieldInsn.name);
 
 					fields.add(component);
 					argsFound++;
@@ -289,6 +306,7 @@ public class ImmutableFinder implements ComponentFinder {
 							.orElse(null);
 					if (info != null) {
 						info.setReadMethod(clss.getDeclaredMethod(method.name));
+						checkFieldAnnotation(info, clss, fieldName);
 					}
 
 					// accessor matches, break;

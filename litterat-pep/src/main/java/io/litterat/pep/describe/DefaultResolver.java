@@ -37,6 +37,7 @@ import java.util.Set;
 import io.litterat.pep.Atom;
 import io.litterat.pep.Data;
 import io.litterat.pep.DataBridge;
+import io.litterat.pep.Field;
 import io.litterat.pep.PepContext;
 import io.litterat.pep.PepContextResolver;
 import io.litterat.pep.PepDataArrayClass;
@@ -259,11 +260,6 @@ public class DefaultResolver implements PepContextResolver {
 				MethodHandle toObject = MethodHandles.identity(targetClass);
 				MethodHandle toData = MethodHandles.identity(targetClass);
 
-//				MethodHandle toObject = MethodHandles.lookup().findVirtual(CollectionBridge.class, TOOBJECT_METHOD,
-//						MethodType.methodType(Collection.class, Object[].class)).bindTo(bridge);
-//				MethodHandle toData = MethodHandles.lookup().findVirtual(CollectionBridge.class, TODATA_METHOD,
-//						MethodType.methodType(Object[].class, Collection.class)).bindTo(bridge);
-
 				descriptor = new PepDataArrayClass(targetClass, Object[].class, null, constructor, toData, toObject,
 						new PepDataComponent[0], DataType.ARRAY, arrayDataClass, new CollectionArrayBridge());
 
@@ -469,18 +465,44 @@ public class DefaultResolver implements PepContextResolver {
 					PepDataComponent component;
 
 					// Will probably need a more generic way of handling paramterized types.
-					if (info.bridge() != null && info.bridge() != IdentityBridge.class) {
+					Field fieldAnnotation = info.getField();
+					if (fieldAnnotation != null && fieldAnnotation.bridge() != null
+							&& fieldAnnotation.bridge() != IdentityBridge.class) {
 
 						@SuppressWarnings("rawtypes")
-						Class<? extends DataBridge> bridgeClass = info.bridge();
+						Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
 
-						ParameterizedType bridgeDataType = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
+						ParameterizedType bridgeTypes = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
 
 						// ToData has one parameter so this should be safe.
-						Class<?> dataType = (Class<?>) bridgeDataType.getActualTypeArguments()[0];
+						Type bridgeDataType = bridgeTypes.getActualTypeArguments()[0];
+						Type bridgeObjectType = bridgeTypes.getActualTypeArguments()[1];
+
+						Class<?> bridgeDataClass;
+						Class<?> bridgeObjectClass;
+
+						if (bridgeDataType instanceof Class) {
+							bridgeDataClass = (Class<?>) bridgeDataType;
+						} else if (bridgeDataType instanceof ParameterizedType) {
+							bridgeDataClass = (Class<?>) ((ParameterizedType) bridgeDataType).getRawType();
+						} else {
+							throw new PepException("Unrecognised Type");
+						}
+
+						if (bridgeObjectType instanceof Class) {
+							bridgeObjectClass = (Class<?>) bridgeObjectType;
+						} else if (bridgeObjectType instanceof ParameterizedType) {
+							bridgeObjectClass = (Class<?>) ((ParameterizedType) bridgeObjectType).getRawType();
+						} else {
+							throw new PepException("Unrecognised Type");
+						}
 
 						// Recursively get hold of the data class descriptor.
-						PepDataClass tupleData = context.getDescriptor(dataType);
+						PepDataClass tupleData = context.getDescriptor(bridgeDataClass, bridgeDataType);
+
+						if (!bridgeObjectClass.isAssignableFrom(info.getType())) {
+							throw new PepException("Bridge object type not assignable from field type");
+						}
 
 						// TODO Currently assume Bridge classes have no state. This might need to change
 						// if a bridge uses IOC framework.
@@ -494,25 +516,25 @@ public class DefaultResolver implements PepContextResolver {
 						}
 
 						// bridge.toData(dataType):type
-						toData = MethodHandles.lookup()
-								.findVirtual(bridgeClass, TODATA_METHOD, MethodType.methodType(dataType, targetClass))
-								.bindTo(bridge);
+						MethodHandle bridgeToData = MethodHandles.publicLookup().findVirtual(bridgeClass, TODATA_METHOD,
+								MethodType.methodType(bridgeDataClass, bridgeObjectClass)).bindTo(bridge);
+
+						accessor = accessor.asType(accessor.type().changeReturnType(bridgeObjectClass));
 
 						// bridge.toData( targetClass.getOptional() ): optionalType
-						MethodHandle bridgeToData = MethodHandles.collectArguments(toObject, 0, accessor)
-								.asType(MethodType.methodType(dataType, targetClass));
+						accessor = MethodHandles.collectArguments(bridgeToData, 0, accessor);
 
 						// bridge.toObject(type):dataType
-						toObject = MethodHandles.lookup()
-								.findVirtual(bridgeClass, TOOBJECT_METHOD, MethodType.methodType(dataType, targetClass))
+						MethodHandle bridgeToObject = MethodHandles.publicLookup().findVirtual(bridgeClass,
+								TOOBJECT_METHOD, MethodType.methodType(bridgeObjectClass, bridgeDataClass))
 								.bindTo(bridge);
 
 						if (setter != null) {
-							setter = MethodHandles.collectArguments(setter, 1, toObject)
-									.asType(MethodType.methodType(targetClass, dataType));
+							setter = MethodHandles.collectArguments(setter, 1, bridgeToObject)
+									.asType(MethodType.methodType(info.getType(), bridgeDataClass));
 						}
 
-						component = new PepDataComponent(x, info.getName(), info.getType(), tupleData, bridgeToData,
+						component = new PepDataComponent(x, info.getName(), bridgeDataClass, tupleData, accessor,
 								setter);
 					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
@@ -674,9 +696,10 @@ public class DefaultResolver implements PepContextResolver {
 	 * @return
 	 * @throws IllegalAccessException
 	 * @throws NoSuchMethodException
+	 * @throws PepException
 	 */
 	private MethodHandle createTupleConstructor(Class<?> dataClass, List<ComponentInfo> fields,
-			MethodHandle dataConstructor) throws IllegalAccessException, NoSuchMethodException {
+			MethodHandle dataConstructor) throws IllegalAccessException, NoSuchMethodException, PepException {
 
 		// Class<?>[] params = new Class[fields.size()];
 		// for (int x = 0; x < fields.size(); x++) {
@@ -712,9 +735,10 @@ public class DefaultResolver implements PepContextResolver {
 	 * @return
 	 * @throws IllegalAccessException
 	 * @throws NoSuchMethodException
+	 * @throws PepException
 	 */
 	private MethodHandle createEmbedConstructor(Class<?> dataClass, MethodHandle dataConstructor,
-			List<ComponentInfo> fields) throws NoSuchMethodException, IllegalAccessException {
+			List<ComponentInfo> fields) throws NoSuchMethodException, IllegalAccessException, PepException {
 		MethodHandle result = dataConstructor;
 
 		for (int x = 0; x < fields.size(); x++) {
@@ -733,8 +757,61 @@ public class DefaultResolver implements PepContextResolver {
 
 				MethodHandle arrayIndexGetter;
 
-				// TODO this is a hack to get Optional to work. Needs more work.
-				if (field.getType() == Optional.class && field.getParamType() != null) {
+				Field fieldAnnotation = field.getField();
+				if (fieldAnnotation != null && fieldAnnotation.bridge() != null
+						&& fieldAnnotation.bridge() != IdentityBridge.class) {
+
+					@SuppressWarnings("rawtypes")
+					Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
+
+					ParameterizedType bridgeTypes = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
+
+					// ToData has one parameter so this should be safe.
+					Type bridgeDataType = bridgeTypes.getActualTypeArguments()[0];
+					Type bridgeObjectType = bridgeTypes.getActualTypeArguments()[1];
+
+					Class<?> bridgeDataClass;
+					Class<?> bridgeObjectClass;
+
+					if (bridgeDataType instanceof Class) {
+						bridgeDataClass = (Class<?>) bridgeDataType;
+					} else if (bridgeDataType instanceof ParameterizedType) {
+						bridgeDataClass = (Class<?>) ((ParameterizedType) bridgeDataType).getRawType();
+					} else {
+						throw new PepException("Unrecognised Type");
+					}
+
+					if (bridgeObjectType instanceof Class) {
+						bridgeObjectClass = (Class<?>) bridgeObjectType;
+					} else if (bridgeObjectType instanceof ParameterizedType) {
+						bridgeObjectClass = (Class<?>) ((ParameterizedType) bridgeObjectType).getRawType();
+					} else {
+						throw new PepException("Unrecognised Type");
+					}
+
+					@SuppressWarnings("rawtypes")
+					DataBridge bridge;
+					try {
+						bridge = bridgeClass.getConstructor().newInstance();
+					} catch (InstantiationException | IllegalArgumentException | InvocationTargetException e) {
+						throw new PepException("Failed to instantiate bridge", e);
+					}
+
+					// (values[]) -> values[inputIndex]:optionalType
+					arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index)
+							.asType(MethodType.methodType(bridgeDataClass, Object[].class));
+
+					// bridge.toObject(type):dataType
+					MethodHandle bridgeToObject = MethodHandles.publicLookup().findVirtual(bridgeClass, TOOBJECT_METHOD,
+							MethodType.methodType(bridgeObjectClass, bridgeDataClass)).bindTo(bridge);
+
+					bridgeToObject = bridgeToObject.asType(bridgeToObject.type().changeReturnType(field.getType()));
+
+					// (values[]) -> bridge.toObject( (bridgeData) values[inputIndex] ):bridgeObject
+					arrayIndexGetter = MethodHandles.collectArguments(bridgeToObject, 0, arrayIndexGetter);
+
+				} else if (field.getType() == Optional.class && field.getParamType() != null) {
+					// TODO this is a hack to get Optional to work. Needs more work.
 					Class<?> optionalType = (Class<?>) field.getParamType().getActualTypeArguments()[0];
 
 					@SuppressWarnings("rawtypes")

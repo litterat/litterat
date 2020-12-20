@@ -16,7 +16,7 @@ package io.litterat.pep.describe;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 
-import io.litterat.pep.DataBridge;
+import io.litterat.pep.Field;
 
 public class ComponentInfo {
 
@@ -32,8 +32,7 @@ public class ComponentInfo {
 
 	private ParameterizedType paramType;
 
-	@SuppressWarnings("rawtypes")
-	private Class<? extends DataBridge> bridge;
+	private Field field;
 
 	public ComponentInfo(String name, Class<?> type) {
 		this.name = name;
@@ -46,6 +45,14 @@ public class ComponentInfo {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setField(Field field) {
+		this.field = field;
+	}
+
+	public Field getField() {
+		return this.field;
 	}
 
 	public Class<?> getType() {
@@ -84,13 +91,4 @@ public class ComponentInfo {
 		this.paramType = paramType;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public Class<? extends DataBridge> bridge() {
-		return this.bridge;
-	}
-
-	@SuppressWarnings("rawtypes")
-	public void setBridge(Class<? extends DataBridge> bridge) {
-		this.bridge = bridge;
-	}
 }
