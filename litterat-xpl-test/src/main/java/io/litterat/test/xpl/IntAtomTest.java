@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.litterat.xpl.test;
+package io.litterat.test.xpl;
 
 import java.io.IOException;
 
@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.pep.PepContext;
-import io.litterat.pep.test.data.IntAtom;
-import io.litterat.pep.test.data.IntAtomData;
+import io.litterat.test.pep.data.IntAtom;
+import io.litterat.test.pep.data.IntAtomData;
 import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;

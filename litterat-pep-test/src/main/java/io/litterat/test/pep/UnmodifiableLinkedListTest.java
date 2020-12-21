@@ -1,4 +1,4 @@
-package io.litterat.pep.test;
+package io.litterat.test.pep;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +14,7 @@ import io.litterat.pep.PepDataComponent;
 import io.litterat.pep.PepException;
 import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
-import io.litterat.pep.test.data.UnmodifiableLinkedList;
+import io.litterat.test.pep.data.UnmodifiableLinkedList;
 
 public class UnmodifiableLinkedListTest {
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.pep.test;
+package io.litterat.test.pep;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +27,7 @@ import io.litterat.pep.PepDataClass;
 import io.litterat.pep.PepDataComponent;
 import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
-import io.litterat.pep.test.data.OptionalImmutable;
+import io.litterat.test.pep.data.OptionalImmutable;
 
 public class OptionalImmutableTest {
 

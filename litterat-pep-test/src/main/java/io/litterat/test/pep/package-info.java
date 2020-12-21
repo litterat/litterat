@@ -1,1 +1,1 @@
-package io.litterat.pep.test;
+package io.litterat.test.pep;

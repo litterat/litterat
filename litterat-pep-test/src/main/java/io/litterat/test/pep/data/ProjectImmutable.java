@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.pep.test.data;
+package io.litterat.test.pep.data;
 
 import io.litterat.pep.Data;
 import io.litterat.pep.ToData;
-import io.litterat.pep.test.data.ProjectImmutable.ProjectImmutableData;
+import io.litterat.test.pep.data.ProjectImmutable.ProjectImmutableData;
 
 /**
  *

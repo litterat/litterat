@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.xpl.test;
+package io.litterat.test.xpl;
 
 import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.pep.test.data.MixedImmutable;
+import io.litterat.test.pep.data.MixedImmutable;
 import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.json.test;
+package io.litterat.test.json;
 
 import java.util.Arrays;
 
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.json.JsonMapper;
 import io.litterat.pep.PepContext;
-import io.litterat.pep.test.data.PrimitiveArray;
+import io.litterat.test.pep.data.PrimitiveArray;
 
 public class PrimitiveArrayTest {
 

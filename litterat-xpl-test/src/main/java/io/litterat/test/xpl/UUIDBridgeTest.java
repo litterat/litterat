@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.xpl.test;
+package io.litterat.test.xpl;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.pep.PepContext;
 import io.litterat.pep.PepException;
-import io.litterat.pep.test.data.SimpleUUIDImmutable;
-import io.litterat.pep.test.data.UUIDBridge;
+import io.litterat.test.pep.data.SimpleUUIDImmutable;
+import io.litterat.test.pep.data.UUIDBridge;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.TypeLibrary;
 import io.litterat.xpl.TypeInputStream;

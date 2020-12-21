@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.json.test;
+package io.litterat.test.json;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.json.JsonMapper;
 import io.litterat.pep.PepContext;
-import io.litterat.pep.test.data.SimpleArray;
-import io.litterat.pep.test.data.SimpleImmutable;
+import io.litterat.test.pep.data.SimpleArray;
+import io.litterat.test.pep.data.SimpleImmutable;
 
 public class SimpleArrayTest {
 

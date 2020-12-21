@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.json.test;
+package io.litterat.test.json;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 import io.litterat.json.JsonMapper;
 import io.litterat.pep.PepContext;
 import io.litterat.pep.PepException;
-import io.litterat.pep.test.data.SimpleUUIDImmutable;
-import io.litterat.pep.test.data.UUIDBridge;
+import io.litterat.test.pep.data.SimpleUUIDImmutable;
+import io.litterat.test.pep.data.UUIDBridge;
 
 public class UUIDBridgeTest {
 

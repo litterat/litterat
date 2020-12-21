@@ -1,4 +1,4 @@
-package io.litterat.pep.test.data;
+package io.litterat.test.pep.data;
 
 import java.util.List;
 

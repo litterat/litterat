@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.pep.test;
+package io.litterat.test.pep;
 
 import java.util.Map;
 import java.util.UUID;
@@ -26,9 +26,9 @@ import io.litterat.pep.PepContext;
 
 import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
-import io.litterat.pep.test.data.SimpleArray;
-import io.litterat.pep.test.data.SimpleImmutable;
-import io.litterat.pep.test.data.UUIDBridge;
+import io.litterat.test.pep.data.SimpleArray;
+import io.litterat.test.pep.data.SimpleImmutable;
+import io.litterat.test.pep.data.UUIDBridge;
 
 public class SimpleArrayTest {
 

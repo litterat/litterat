@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.pep.test;
+package io.litterat.test.pep;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -28,7 +28,7 @@ import io.litterat.pep.PepDataComponent;
 import io.litterat.pep.PepException;
 import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
-import io.litterat.pep.test.data.ProjectImmutable;
+import io.litterat.test.pep.data.ProjectImmutable;
 
 public class ProjectImmutableTest {
 

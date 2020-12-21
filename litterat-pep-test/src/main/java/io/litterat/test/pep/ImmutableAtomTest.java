@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.litterat.pep.test;
+package io.litterat.test.pep;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -25,9 +25,9 @@ import org.junit.jupiter.api.Test;
 import io.litterat.pep.PepContext;
 import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
-import io.litterat.pep.test.data.ImmutableAtom;
-import io.litterat.pep.test.data.SimpleEnum;
-import io.litterat.pep.test.data.UUIDBridge;
+import io.litterat.test.pep.data.ImmutableAtom;
+import io.litterat.test.pep.data.SimpleEnum;
+import io.litterat.test.pep.data.UUIDBridge;
 
 public class ImmutableAtomTest {
 

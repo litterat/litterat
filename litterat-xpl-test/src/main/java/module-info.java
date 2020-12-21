@@ -13,10 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-module io.litterat.xpl.test {
+module io.litterat.test.xpl {
 
 	requires io.litterat.pep;
-	requires io.litterat.pep.test;
+	requires io.litterat.test.pep;
 	requires io.litterat.xpl;
 	requires org.junit.jupiter.api;
 
