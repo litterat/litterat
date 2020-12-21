@@ -43,6 +43,7 @@ java {
 
 // Annoying hack because Gradle and Eclipse won't play nicely together.
 // https://github.com/eclipse/buildship/issues/658
+/*
 eclipse {
 	classpath {
 		file {
@@ -62,6 +63,6 @@ eclipse {
 	}
 }
 
-
+*/
 
 

@@ -16,10 +16,12 @@ buildscript {
     repositories {
        mavenCentral()
     }
+    /*
     dependencies {
        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
    	   classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
     }
+    */
 }
 
 plugins {
@@ -43,6 +45,7 @@ java {
 
 // Annoying hack because Gradle and Eclipse won't play nicely together.
 // https://github.com/eclipse/buildship/issues/658
+/*
 eclipse {
 	classpath {
 		file {
@@ -61,9 +64,9 @@ eclipse {
 		}
 	}
 }
-
+*/
 // release information
-
+/*
 apply plugin: 'maven-publish'
 apply plugin: 'com.bmuschko.nexus'
 apply plugin: 'io.codearte.nexus-staging'
@@ -101,3 +104,4 @@ modifyPom {
         }
   }
 }
+*/
