@@ -5,5 +5,5 @@ include ':litterat-pep',
         ':litterat-json',
         ':litterat-json-test',
         ':litterat-schema',
-	':litterat-xpl',
-	':litterat-xpl-test'
+	    ':litterat-xpl',
+	    ':litterat-xpl-test'

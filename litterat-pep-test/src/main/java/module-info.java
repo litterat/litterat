@@ -17,7 +17,7 @@ open module io.litterat.test.pep {
 
 	exports io.litterat.test.pep.data;
 
-	requires io.litterat.pep;
+	requires transitive io.litterat.pep;
 
 	requires org.junit.jupiter.api;
 }

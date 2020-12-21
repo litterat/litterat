@@ -18,6 +18,7 @@ package io.litterat.xpl.lang.mh;
 import java.lang.invoke.MethodHandle;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.schema.TypeLibrary;
@@ -32,6 +33,7 @@ import io.litterat.xpl.lang.Value;
 public class FieldSetGeneratorTest {
 
 	@Test
+	@Disabled
 	public void testBind() throws Throwable {
 
 		Point p = new Point(1.23f, 2.34f);

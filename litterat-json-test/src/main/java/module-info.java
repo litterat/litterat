@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-module io.litterat.test.json {
+open module io.litterat.test.json {
 
 	requires transitive io.litterat.pep;
 	requires io.litterat.test.pep;

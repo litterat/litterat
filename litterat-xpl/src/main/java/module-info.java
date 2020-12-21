@@ -19,9 +19,6 @@ module io.litterat.xpl {
 	exports io.litterat.xpl.lang;
 
 	requires transitive io.litterat.pep;
-	requires transitive io.litterat.library;
-
-	requires org.objectweb.asm;
-	requires org.objectweb.asm.tree;
+	requires transitive io.litterat.schema;
 
 }

@@ -15,70 +15,38 @@
  */
  
 buildscript {
-  repositories {
-    jcenter()
-    maven { 
-      url "https://repo.maven.apache.org/maven2"
+    repositories {
+       mavenCentral()
     }
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "org.javamodularity:moduleplugin:1.5.0"
-    classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-    
-  }
 }
 
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'com.bmuschko.nexus'
-
-// Development environments
-apply plugin: 'eclipse'
-eclipse {
-    classpath {
-        defaultOutputDir = new File("$buildDir/eclipse");
-        file {
-            whenMerged {
-                entries.findAll { isModule(it) }.each {
-                    it.entryAttributes['module'] = 'true'
-                }
-
-                entries.findAll { isSource(it) && isTestScope(it) }.each {
-                    it.entryAttributes['test'] = 'true'
-                }
-
-                entries.findAll { isLibrary(it) && isTestScope(it) }.each {
-                    it.entryAttributes['test'] = 'true'
-                }
-            }
-        }
-    }
-
+plugins {
+    id 'java'
+    id 'eclipse'
 }
-
-group = 'io.litterat'
-version = '0.5.0'
 
 sourceCompatibility = 11
 targetCompatibility = 11
 
 repositories {
-    maven { url "https://repo.maven.apache.org/maven2" }
+    mavenCentral()
 }
 
 dependencies {
-
     // litterat-pep
     implementation project(":litterat-pep")
-    
 }
 
-test {
-	useJUnitPlatform()
+java {
+   modularity.inferModulePath = true
 }
+
+
+/*
+TODO Not publishing anything yet.
+
+group = 'io.litterat'
+version = '0.5.0'
 
 modifyPom {
     project {
@@ -105,14 +73,5 @@ modifyPom {
 
     }
 }
-
-boolean isLibrary(entry) {
-  return entry.properties.kind.equals('lib') || entry.properties.kind.equals('src')
-}
-boolean isTestScope(entry) {
-  return entry.entryAttributes.get('gradle_used_by_scope').equals('test'); }
-boolean isModule(entry) {
-  return isLibrary(entry) && !isTestScope(entry); }
-boolean isSource(entry) { return entry.properties.kind.equals('src'); }
-
+*/
 

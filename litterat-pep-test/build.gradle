@@ -16,10 +16,6 @@ buildscript {
     repositories {
        mavenCentral()
     }
-    dependencies {
-       classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
-   	   classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-    }
 }
 
 plugins {
@@ -27,14 +23,12 @@ plugins {
     id 'eclipse'
 }
 
-
 sourceCompatibility = 11
 targetCompatibility = 11
 
 repositories {
    mavenCentral()
 }
-
 
 
 dependencies {
@@ -53,29 +47,35 @@ java {
    modularity.inferModulePath = true
 }
 
+test {
+	useJUnitPlatform()
+	
+	afterSuite { desc, result ->
+    if (!desc.parent)
+        println("${result.resultType} " +
+            "(${result.testCount} tests, " +
+            "${result.successfulTestCount} successes, " +
+            "${result.failedTestCount} failures, " +
+            "${result.skippedTestCount} skipped)")
+    }
+}
 
-// Annoying hack because Gradle and Eclipse won't play nicely together.
-// https://github.com/eclipse/buildship/issues/658
+sourceSets {
+    test {
+        java.srcDir 'src/main/java'
+    }
+}
+
 eclipse {
-	classpath {
-		file {
-			whenMerged {
-				//Define a module as being either a library or a project dependency.
-				//Test sources are excluded because eclipse wants them on the classpath for some reason (1)
-				entries.findAll { (it instanceof org.gradle.plugins.ide.eclipse.model.Library || it instanceof org.gradle.plugins.ide.eclipse.model.ProjectDependency) && !it.entryAttributes.get('gradle_used_by_scope').equals('test') }.each {
-					it.entryAttributes['module'] = 'true'
-				}
-				
-				//Test-scoped stuff should set the appropriate flag
-				entries.findAll { (it.properties.kind.equals('src') || it.properties.kind.equals('lib')) && it.entryAttributes.get('gradle_used_by_scope').equals('test') }.each {
-					it.entryAttributes['test'] = 'true'
-				}
-			}
-		}
-	}
+    classpath {
+        // remove the source set from the Eclipse classpath because adding main/java to tests confuses eclipse plugin
+        sourceSets -= [sourceSets.test]
+    }
 }
 
 
+/*
+// TODO Not realeasing to maven at this stage.
 // release information
 
 apply plugin: 'maven-publish'
@@ -115,4 +115,4 @@ modifyPom {
         }
   }
 }
-
+*/

@@ -3,16 +3,25 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
+## Day 11 - December 21 - Build scripts and testing
+
+Continued on today with working out the gradle build system to work nicely with testing and eclipse. All maven publishing has been disabled until more of the library is complete and tested.
+
+
 ## Day 10 - December 20 - Continue with Array bridges
 
-Annoying Java library issue. Collections.unmodifiableList(x) returns a class that is private and can not be checked
-with instanceof. Documented [here](https://stackoverflow.com/questions/8364856/how-to-test-if-a-list-extends-object-is-an-unmodifablelist).
+Annoying Java library issue. Collections.unmodifiableList(x) returns a class that is private and can not be checked with instanceof. Documented [here](https://stackoverflow.com/questions/8364856/how-to-test-if-a-list-extends-object-is-an-unmodifablelist).
 
 Implemented the UnmodifiableLinkedListTest which uses a bridge and bridge annotation. This was supposed to validate the need for toObject and toData on the PepDataArrayClass. However, the bridge is associated with the tuple of the class using the array. As such it didn't actually require calling toData/toObject on the array. This provides additional support for removing them from PepDataArrayClass.
 
 The initial implementation of the UnmodifiableLinkedListBridge was converting from Object[] to Collection<?> to be as generic as possible. However, this requires that Object be defined in the Pep library. Object could be an Atom, Array, Record or Interface. For now, it's better that the user defines a more concrete class for the bridges.
 
 Also noticed that the @Field annotation renaming won't work. It also requires deciding on precedence for if the annotation is added to multiple places and have different names. Most likely this should result in an error. Additional test cases required for these scenarios.
+
+------
+
+Spent many hours working on figuring out why Eclipse wouldn't execute all tests in a package. Resulted in a  bug being [raised on junit5 project](https://github.com/junit-team/junit5/issues/2500). Related to using similar package names in pep and pep.test modules. Also looked at getting tests working from gradle command line.
+
 
 ## Day 9 - December 19 - Array bridges
 
