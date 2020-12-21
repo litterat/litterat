@@ -5,7 +5,9 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 
 ## Day 11 - December 21 - Build scripts and testing
 
-Continued on today with working out the gradle build system to work nicely with testing and eclipse. All maven publishing has been disabled until more of the library is complete and tested.
+Continued on today with working out the gradle build system to work nicely with testing and eclipse. All maven publishing has been disabled until more of the library is complete and tested. Both "gradle test" and "gradle eclipse" are both producing the correct output.
+
+Adding gradlew gradle wrapper and configuring [BuildKite](https://buildkite.com) as a continuous integration pipeline.
 
 
 ## Day 10 - December 20 - Continue with Array bridges
