@@ -7,7 +7,7 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 
 Continued on today with working out the gradle build system to work nicely with testing and eclipse. All maven publishing has been disabled until more of the library is complete and tested. Both "gradle test" and "gradle eclipse" are both producing the correct output.
 
-Adding gradlew gradle wrapper and configuring [BuildKite](https://buildkite.com) as a continuous integration pipeline.
+Adding gradlew gradle wrapper and configuring [BuildKite](https://buildkite.com) as a continuous integration pipeline. Also added jacoco coverage to the build. Not sure how or if it is possible to make coverage report visible in BuildKite.
 
 
 ## Day 10 - December 20 - Continue with Array bridges
@@ -74,9 +74,7 @@ Got part way through the implementation for @Field bridge annotation. There's an
 
 ## Day 8 - December 18 - Expanding and testing the array implementation
 
-Spent a lot of time refactoring the PepArrayMapper MethodHandle based implementation. The array implementation has now
-been tested with SimpleImmutable[], ArrayList<ArrayList<String>> and int[]. Combined they cover the main array based
-data types. This can be expanded and testing can be expanded later without much effort. The PepMapMapper and PepArrayMapper shows that the array MethodHandle interface works well enough to continue.
+Spent a lot of time refactoring the PepArrayMapper MethodHandle based implementation. The array implementation has now been tested with SimpleImmutable[], ArrayList<ArrayList<String>> and int[]. Combined they cover the main array based data types. This can be expanded and testing can be expanded later without much effort. The PepMapMapper and PepArrayMapper shows that the array MethodHandle interface works well enough to continue.
 
 Noticed that the introduction of the PepDataArrayClass as an extension of the PepDataClass ends up with some PepDataClass methods and information not being relevant to the PepDataArrayClass. Currently the toObject and toData MethodHandles don't seem to have any use. I'll need to explore if there's a use case for these, or if there should be a PepDataTupleClass so that less is in the base class.
 
@@ -87,9 +85,7 @@ JSON is that the tokenizer doesn't look ahead. The current interface to array cr
 
 ## Day 7 - December 17 - More on arrays...
 
-Preparing List<String> test case and implementing the PepMapMapper. Hitting the issue early on that type erasure makes
-it difficult to get hold of the fact that List<String> is a list of String. While Java erases the generic information
-from the Class, it is available on [Parameter and Field](https://stackoverflow.com/questions/1901164/get-type-of-a-generic-parameter-in-java-with-reflection) meta data. The PepContext interface was only designed with Class in mind, so it is going to need a redesign to allow using additional information when it is available.
+Preparing List<String> test case and implementing the PepMapMapper. Hitting the issue early on that type erasure makes it difficult to get hold of the fact that List<String> is a list of String. While Java erases the generic information from the Class, it is available on [Parameter and Field](https://stackoverflow.com/questions/1901164/get-type-of-a-generic-parameter-in-java-with-reflection) meta data. The PepContext interface was only designed with Class in mind, so it is going to need a redesign to allow using additional information when it is available.
 
 Java reflection provides most of the information required by the PEP library in the Class object. It's only the situation where additional information is required from the ParameterizedType object. Expanding the interface to allow passing in additional Type information makes sense. Updated the PepContext lookup to use the Type instead of the Class to allow looking up parameterized type descriptors.
 

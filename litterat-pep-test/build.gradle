@@ -21,6 +21,7 @@ buildscript {
 plugins {
     id 'java'
     id 'eclipse'
+    id 'jacoco'
 }
 
 sourceCompatibility = 11
@@ -57,6 +58,16 @@ test {
             "${result.successfulTestCount} successes, " +
             "${result.failedTestCount} failures, " +
             "${result.skippedTestCount} skipped)")
+    }
+}
+
+jacocoTestReport {
+    sourceSets project(':litterat-pep').sourceSets.main
+    
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'io/litterat/test/**')
+        }))
     }
 }
 

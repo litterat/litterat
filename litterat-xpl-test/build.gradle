@@ -22,6 +22,7 @@ buildscript {
 plugins {
     id 'java'
     id 'eclipse'
+    id 'jacoco'
 }
 
 
@@ -63,6 +64,18 @@ test {
             "${result.successfulTestCount} successes, " +
             "${result.failedTestCount} failures, " +
             "${result.skippedTestCount} skipped)")
+    }
+}
+
+jacocoTestReport {
+	sourceSets project(':litterat-schema').sourceSets.main
+    sourceSets project(':litterat-xpl').sourceSets.main
+    
+    
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'io/litterat/test/**')
+        }))
     }
 }
 
