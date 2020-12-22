@@ -29,14 +29,18 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.litterat.pep.Atom;
 import io.litterat.pep.Data;
 import io.litterat.pep.DataBridge;
+import io.litterat.pep.DataOrder;
 import io.litterat.pep.Field;
 import io.litterat.pep.PepContext;
 import io.litterat.pep.PepContextResolver;
@@ -450,6 +454,12 @@ public class DefaultResolver implements PepContextResolver {
 				MethodHandle toObject = MethodHandles.identity(targetClass);
 				MethodHandle toData = MethodHandles.identity(targetClass);
 
+				// Modify the order of fields if order annotation supplied.
+				DataOrder dataOrder = targetClass.getAnnotation(DataOrder.class);
+				if (dataOrder != null) {
+					reorderFields(dataOrder, components);
+				}
+
 				// Prepare the field descriptors.
 				PepDataComponent[] dataComponents = new PepDataComponent[components.size()];
 				for (int x = 0; x < components.size(); x++) {
@@ -608,11 +618,37 @@ public class DefaultResolver implements PepContextResolver {
 		return descriptor;
 	}
 
+	private void reorderFields(DataOrder dataOrder, List<ComponentInfo> components) throws PepException {
+
+		// Check lengths are ok.
+		String[] fieldOrder = dataOrder.value();
+		if (fieldOrder == null || fieldOrder.length != components.size()) {
+			throw new PepException("DataOrder annotation has different field count to components found in data");
+		}
+
+		// build map of components to select from.
+		Map<String, ComponentInfo> componentMap = components.stream()
+				.collect(Collectors.toMap(e -> e.getName(), e -> e));
+
+		// check all fields are present.
+		List<String> fieldOrderList = List.of(dataOrder.value());
+		for (String field : fieldOrderList) {
+			if (!componentMap.containsKey(field)) {
+				throw new PepException(String.format("DataOrder annotation had no corresponding field '%s'", field));
+			}
+		}
+
+		// sort the list.
+		components.sort(Comparator.comparing((ComponentInfo v) -> {
+			return fieldOrderList.indexOf(v.getName());
+		}));
+
+	}
+
 	/**
-	 * Returns the Constructor for the dataClass. This may be different to what is
-	 * used in creating the dataClass as a static constructor might be used instead.
-	 * getDataConstructor is used to retrieve the MethodHandle for the correct data
-	 * constructor.
+	 * Returns the Constructor for the dataClass. This may be different to what is used in creating the
+	 * dataClass as a static constructor might be used instead. getDataConstructor is used to retrieve
+	 * the MethodHandle for the correct data constructor.
 	 *
 	 * @param dataClass
 	 * @return
@@ -687,9 +723,9 @@ public class DefaultResolver implements PepContextResolver {
 	}
 
 	/**
-	 * Creates a single MethodHandle that both constructs an object and sets any
-	 * setters using a single Object[] as input. Fields are passed in through the
-	 * real constructor or through the setters if present.
+	 * Creates a single MethodHandle that both constructs an object and sets any setters using a single
+	 * Object[] as input. Fields are passed in through the real constructor or through the setters if
+	 * present.
 	 *
 	 * @param fields
 	 * @param dataConstructor
@@ -727,8 +763,8 @@ public class DefaultResolver implements PepContextResolver {
 	}
 
 	/**
-	 * Builds a constructor that takes Object[] as constructor arguments and return
-	 * an object instance. Passes relevant fields into the data class constructor.
+	 * Builds a constructor that takes Object[] as constructor arguments and return an object instance.
+	 * Passes relevant fields into the data class constructor.
 	 *
 	 * @param objectConstructor
 	 * @param fields
@@ -855,8 +891,7 @@ public class DefaultResolver implements PepContextResolver {
 	}
 
 	/**
-	 * Creates a MethodHandle that takes an Object[] as input and calls any field
-	 * setters.
+	 * Creates a MethodHandle that takes an Object[] as input and calls any field setters.
 	 *
 	 * @param fields
 	 * @return

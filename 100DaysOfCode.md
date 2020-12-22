@@ -14,6 +14,17 @@ Next steps list. A general list of things that could be done next in no particul
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Field ordering for POJO.
  - Dates and timestamps.
+ - Implement allowing public fields as record components.
+ - Rename PEP to litterat bind.
+ - Create PEP error examples and test edge cases.
+ 
+ Documents to write:
+ 
+ - Litterat PEP theory. Background and theory behind design.
+ - Litterat PEP end user guide. User guide to using library & examples.
+ - Litterat PEP serialization guide. For people writing serialization formats.
+ 
+ 
 
 ## Day 12 - December 22 - Atomic and Array type testing
 
@@ -24,6 +35,8 @@ Found an edge case in the ImmutableFinder where long and double primitive data t
 The other issue that appeared is that the POJO parameter ordering is alpha based because order of methods or fields is not guaranteed in Java. There's an outstanding question on if field order is important for schemas or if this is a file format detail that should be annotated on the record/tuple. Not sure of the answer to this yet. Added to the 'next steps' list to explore later.
 
 Implemented same tests for JSON reader and writer. There's still more work to be done on literat schema before implementing arrays on XPL.
+
+Moved back to field ordering on POJOs and other records. Other serialization libraries have solved this using an annotation. Implementing a similar design as Jackson @JsonPropertyOrder which is easy enough to reorder. However, if any object has its fields reordered then the constructor should also have the fields reordered to match the field order. This needs to work for both Immutable, POJO and mixed classes. Implemented by performing ordering before building the PepDataComponent classes.
 
 ## Day 11 - December 21 - Build scripts and testing
 
