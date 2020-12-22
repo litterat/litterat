@@ -25,7 +25,6 @@ import io.litterat.pep.PepContext;
 import io.litterat.pep.PepDataClass;
 import io.litterat.pep.PepDataComponent;
 import io.litterat.pep.PepException;
-
 import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
 import io.litterat.test.pep.data.SimplePojo;
@@ -84,8 +83,8 @@ public class SimplePojoTest {
 		// Validate
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof SimplePojo);
-		Assertions.assertEquals(TEST_X, test.getX());
-		Assertions.assertEquals(TEST_Y, test.getY());
+		Assertions.assertEquals(TEST_X, object.getX());
+		Assertions.assertEquals(TEST_Y, object.getY());
 
 	}
 

@@ -82,8 +82,8 @@ public class ProjectImmutableTest {
 		// Validate
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ProjectImmutable);
-		Assertions.assertEquals(TEST_X, test.x());
-		Assertions.assertEquals(TEST_Y, test.y());
+		Assertions.assertEquals(TEST_X, object.x());
+		Assertions.assertEquals(TEST_Y, object.y());
 
 	}
 

@@ -65,10 +65,10 @@ public class ImmutableAtomTest {
 		// Validate
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ImmutableAtom);
-		Assertions.assertEquals(ENUM_TEST, test.enumCount());
-		Assertions.assertEquals(STR_TEST, test.str());
-		Assertions.assertEquals(BOOL_TEST, test.bool());
-		Assertions.assertEquals(OPTION_TEST, test.optional());
+		Assertions.assertEquals(ENUM_TEST, object.enumCount());
+		Assertions.assertEquals(STR_TEST, object.str());
+		Assertions.assertEquals(BOOL_TEST, object.bool());
+		Assertions.assertEquals(OPTION_TEST, object.optional());
 	}
 
 }

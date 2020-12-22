@@ -64,8 +64,8 @@ public class UUIDBridgeTest {
 		// Validate
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof SimpleUUIDImmutable);
-		Assertions.assertEquals(FIRST_UUID, test.first());
-		Assertions.assertEquals(SECOND_UUID, test.second());
+		Assertions.assertEquals(FIRST_UUID, object.first());
+		Assertions.assertEquals(SECOND_UUID, object.second());
 
 	}
 
@@ -82,7 +82,7 @@ public class UUIDBridgeTest {
 		// validate result.
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof SimpleUUIDImmutable);
-		Assertions.assertEquals(FIRST_UUID, test.first());
-		Assertions.assertEquals(SECOND_UUID, test.second());
+		Assertions.assertEquals(FIRST_UUID, object.first());
+		Assertions.assertEquals(SECOND_UUID, object.second());
 	}
 }

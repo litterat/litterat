@@ -41,8 +41,7 @@ public class SimplePojoTest {
 		test.setY(TEST_Y);
 	}
 
-
-	@Test 
+	@Test
 	public void testToJson() throws Throwable {
 
 		// project to an array.
@@ -55,10 +54,9 @@ public class SimplePojoTest {
 		// Validate
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof SimplePojo);
-		Assertions.assertEquals(TEST_X, test.getX());
-		Assertions.assertEquals(TEST_Y, test.getY());
+		Assertions.assertEquals(TEST_X, object.getX());
+		Assertions.assertEquals(TEST_Y, object.getY());
 
 	}
-
 
 }

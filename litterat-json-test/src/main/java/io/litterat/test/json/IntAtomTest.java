@@ -32,7 +32,7 @@ public class IntAtomTest {
 
 	PepContext context;
 
-	@BeforeEach 
+	@BeforeEach
 	public void setup() {
 		context = PepContext.builder().build();
 	}
@@ -50,8 +50,7 @@ public class IntAtomTest {
 		// Validate
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof IntAtomData);
-		Assertions.assertEquals(INT_ATOM_TEST, test.intAtom());
+		Assertions.assertEquals(INT_ATOM_TEST, object.intAtom());
 	}
-
 
 }

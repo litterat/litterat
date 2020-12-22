@@ -42,8 +42,7 @@ public class UUIDBridgeTest {
 	public void setup() throws PepException {
 		context = PepContext.builder().build();
 		context.registerAtom(UUID.class, new UUIDBridge());
-	} 
-
+	}
 
 	@Test
 	public void testToJson() throws Throwable {
@@ -62,10 +61,9 @@ public class UUIDBridgeTest {
 		// Validate
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof SimpleUUIDImmutable);
-		Assertions.assertEquals(FIRST_UUID, test.first());
-		Assertions.assertEquals(SECOND_UUID, test.second());
+		Assertions.assertEquals(FIRST_UUID, object.first());
+		Assertions.assertEquals(SECOND_UUID, object.second());
 
 	}
-
 
 }
