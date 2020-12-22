@@ -14,7 +14,6 @@ Next steps list. A general list of things that could be done next in no particul
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Field ordering for POJO.
  - Dates and timestamps.
- - Implement allowing public fields as record components.
  - Rename PEP to litterat bind.
  - Create PEP error examples and test edge cases.
  
@@ -36,7 +35,10 @@ The other issue that appeared is that the POJO parameter ordering is alpha based
 
 Implemented same tests for JSON reader and writer. There's still more work to be done on literat schema before implementing arrays on XPL.
 
-Moved back to field ordering on POJOs and other records. Other serialization libraries have solved this using an annotation. Implementing a similar design as Jackson @JsonPropertyOrder which is easy enough to reorder. However, if any object has its fields reordered then the constructor should also have the fields reordered to match the field order. This needs to work for both Immutable, POJO and mixed classes. Implemented by performing ordering before building the PepDataComponent classes.
+Moved back to field ordering on POJOs and other records. Other serialization libraries have solved this using an annotation. Implementing a similar design as Jackson @JsonPropertyOrder which is easy enough to reorder. However, if any object has its fields reordered then the constructor should also have the fields reordered to match the field order. This needs to work for both Immutable, POJO and mixed classes. Implemented by performing ordering before building the PepDataComponent classes. Added test cases for both immutable and mixed classes.
+
+Finished off with detecting public fields to allow them to be part of a record. Added detection to the GetSetFinder. Required refactoring to use MethodHandles for getters/setters in ComponentInfo class.
+
 
 ## Day 11 - December 21 - Build scripts and testing
 

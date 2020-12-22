@@ -16,6 +16,8 @@
 package io.litterat.pep.describe;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -49,15 +51,17 @@ public class ImmutableFinder implements ComponentFinder {
 	}
 
 	/**
-	 * This attempts to match up the arguments of the given constructor with field
-	 * accessors. It relies on both the accessors and constructor to be using simple
-	 * set and get field with no changes to values.
+	 * This attempts to match up the arguments of the given constructor with field accessors. It relies
+	 * on both the accessors and constructor to be using simple set and get field with no changes to
+	 * values.
 	 */
 	@Override
 	public void findComponents(Class<?> clss, Constructor<?> constructor, List<ComponentInfo> fields)
 			throws PepException {
 
 		try {
+			Lookup lookup = MethodHandles.publicLookup();
+
 			ClassReader cr = new ClassReader(clss.getName());
 			ClassNode classNode = new ClassNode();
 			cr.accept(classNode, 0);
@@ -128,7 +132,7 @@ public class ImmutableFinder implements ComponentFinder {
 					ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
 							.orElse(null);
 					if (component != null && component.getReadMethod() == null) {
-						component.setReadMethod(method);
+						component.setReadMethod(lookup.unreflect(method));
 						component.setField(field);
 						continue;
 					}
@@ -138,7 +142,7 @@ public class ImmutableFinder implements ComponentFinder {
 				ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
 						.orElse(null);
 				if (component != null && component.getReadMethod() == null) {
-					component.setReadMethod(method);
+					component.setReadMethod(lookup.unreflect(method));
 					continue;
 				}
 			}
@@ -161,7 +165,7 @@ public class ImmutableFinder implements ComponentFinder {
 			// Add the fields to the list for use.
 			fields.addAll(immutableFields);
 
-		} catch (IOException | NoSuchMethodException | SecurityException e) {
+		} catch (IOException | NoSuchMethodException | SecurityException | IllegalAccessException e) {
 			throw new PepException("Failed to access class", e);
 		}
 	}
@@ -203,25 +207,24 @@ public class ImmutableFinder implements ComponentFinder {
 		boolean foundLoadArg = false;
 		int arg = 0;
 		int argsFound = 0;
-		
+
 		// Find param load instruction indexes.
-		Map<Integer,Integer> loadIndexToParamMap = new HashMap<>();
+		Map<Integer, Integer> loadIndexToParamMap = new HashMap<>();
 		Class<?>[] paramClasses = constructor.getParameterTypes();
 		int paramCounter = 0;
-		for (int x=0; x<paramClasses.length;x++) {
+		for (int x = 0; x < paramClasses.length; x++) {
 			// index is 1 based. increment first.
 			paramCounter++;
-			
+
 			loadIndexToParamMap.put(paramCounter, x);
-			
+
 			// primitive longs and doubles take up two slots and move all subsequent params out by one.
 			if (paramClasses[x] == long.class || paramClasses[x] == double.class) {
 				paramCounter++;
 			}
-			
+
 		}
-		
-		
+
 		int maxVarLoadInsn = paramCounter;
 
 		ListIterator<AbstractInsnNode> it = method.instructions.iterator();
@@ -251,7 +254,7 @@ public class ImmutableFinder implements ComponentFinder {
 				if (foundLoadThis & varLoadInsn.var > 0 && varLoadInsn.var <= maxVarLoadInsn) {
 					foundLoadArg = true;
 					// map back to the correct argument index.
-					arg = loadIndexToParamMap.get( varLoadInsn.var );
+					arg = loadIndexToParamMap.get(varLoadInsn.var);
 				}
 				break;
 			case Opcodes.PUTFIELD:
@@ -288,17 +291,18 @@ public class ImmutableFinder implements ComponentFinder {
 	}
 
 	/**
-	 * Look through the instructions looking for ALOAD, GETFIELD, RETURN
-	 * combination.
+	 * Look through the instructions looking for ALOAD, GETFIELD, RETURN combination.
 	 *
 	 * @param clss
 	 * @param fieldMap
 	 * @param method
 	 * @return field name
 	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws IllegalAccessException
 	 */
 	private String examineAccessor(Class<?> clss, List<ComponentInfo> fields, MethodNode method)
-			throws NoSuchMethodException {
+			throws NoSuchMethodException, IllegalAccessException, SecurityException {
 		boolean foundLoadThis = false;
 		String lastField = null;
 
@@ -332,7 +336,7 @@ public class ImmutableFinder implements ComponentFinder {
 					ComponentInfo info = fields.stream().filter(e -> e.getName().equals(fieldName)).findFirst()
 							.orElse(null);
 					if (info != null) {
-						info.setReadMethod(clss.getDeclaredMethod(method.name));
+						info.setReadMethod(MethodHandles.publicLookup().unreflect(clss.getDeclaredMethod(method.name)));
 						checkFieldAnnotation(info, clss, fieldName);
 					}
 

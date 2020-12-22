@@ -13,7 +13,7 @@
  */
 package io.litterat.pep.describe;
 
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.ParameterizedType;
 
 import io.litterat.pep.Field;
@@ -24,9 +24,9 @@ public class ComponentInfo {
 
 	private final Class<?> type;
 
-	private Method writeMethod;
+	private MethodHandle writeMethod;
 
-	private Method readMethod;
+	private MethodHandle readMethod;
 
 	private int constructorArgument;
 
@@ -59,19 +59,19 @@ public class ComponentInfo {
 		return type;
 	}
 
-	public Method getWriteMethod() {
+	public MethodHandle getWriteMethod() {
 		return writeMethod;
 	}
 
-	public void setWriteMethod(Method writeMethod) {
+	public void setWriteMethod(MethodHandle writeMethod) {
 		this.writeMethod = writeMethod;
 	}
 
-	public Method getReadMethod() {
+	public MethodHandle getReadMethod() {
 		return readMethod;
 	}
 
-	public void setReadMethod(Method readMethod) {
+	public void setReadMethod(MethodHandle readMethod) {
 		this.readMethod = readMethod;
 	}
 

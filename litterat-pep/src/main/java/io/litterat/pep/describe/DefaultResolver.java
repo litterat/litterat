@@ -465,11 +465,11 @@ public class DefaultResolver implements PepContextResolver {
 				for (int x = 0; x < components.size(); x++) {
 					ComponentInfo info = components.get(x);
 
-					MethodHandle accessor = MethodHandles.publicLookup().unreflect(info.getReadMethod());
+					MethodHandle accessor = info.getReadMethod();
 
 					MethodHandle setter = null;
 					if (info.getWriteMethod() != null) {
-						setter = MethodHandles.publicLookup().unreflect(info.getWriteMethod());
+						setter = info.getWriteMethod();
 					}
 
 					PepDataComponent component;
@@ -914,7 +914,7 @@ public class DefaultResolver implements PepContextResolver {
 			if (field.getWriteMethod() != null) {
 
 				// (obj, value):void -> obj.setField( value );
-				MethodHandle fieldSetter = MethodHandles.publicLookup().unreflect(field.getWriteMethod());
+				MethodHandle fieldSetter = field.getWriteMethod();
 
 				// (value[],x):Object -> value[x]
 				MethodHandle arrayGetter = MethodHandles.arrayElementGetter(Object[].class);
