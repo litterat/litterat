@@ -4,7 +4,6 @@ import io.litterat.pep.Data;
 
 public class ArrayPrimitiveTypeTestImmutable {
 
-
 	private final boolean[] pBoolean;
 	private final Boolean[] oBoolean;
 	private final byte[] pByte;
@@ -22,11 +21,12 @@ public class ArrayPrimitiveTypeTestImmutable {
 	private final double[] pDouble;
 	private final Double[] oDouble;
 	private final String[] string;
-	
+
 	@Data
 	public ArrayPrimitiveTypeTestImmutable(boolean[] pBoolean, Boolean[] oBoolean, byte[] pByte, Byte[] oByte,
-			char[] pChar, Character[] oChar, short[] pShort, Short[] oShort, int[] pInteger, Integer[] oInteger, long[] pLong,
-			Long[] oLong, float[] pFloat, Float[] oFloat, double[] pDouble, Double[] oDouble, String[] string) {
+			char[] pChar, Character[] oChar, short[] pShort, Short[] oShort, int[] pInteger, Integer[] oInteger,
+			long[] pLong, Long[] oLong, float[] pFloat, Float[] oFloat, double[] pDouble, Double[] oDouble,
+			String[] string) {
 		super();
 		this.pBoolean = pBoolean;
 		this.oBoolean = oBoolean;
@@ -66,7 +66,7 @@ public class ArrayPrimitiveTypeTestImmutable {
 	public char[] getpChar() {
 		return pChar;
 	}
-	
+
 	public Character[] getoChar() {
 		return oChar;
 	}

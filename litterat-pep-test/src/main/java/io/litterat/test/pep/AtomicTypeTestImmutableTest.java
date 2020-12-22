@@ -48,9 +48,9 @@ public class AtomicTypeTestImmutableTest {
 	private final static double pDouble = 56.34d;
 	private final static Double oDouble = Double.valueOf(123.456d);
 	private final static String string = "test";
-	
 
-	AtomicTypeTestImmutable test = new AtomicTypeTestImmutable(pBoolean, oBoolean, pByte, oByte, pChar, oChar, pShort, oShort, pInteger, oInteger, pLong, oLong, pFloat, oFloat, pDouble, oDouble, string);
+	AtomicTypeTestImmutable test = new AtomicTypeTestImmutable(pBoolean, oBoolean, pByte, oByte, pChar, oChar, pShort,
+			oShort, pInteger, oInteger, pLong, oLong, pFloat, oFloat, pDouble, oDouble, string);
 
 	PepContext context;
 
@@ -79,7 +79,7 @@ public class AtomicTypeTestImmutableTest {
 		PepDataComponent fieldOBoolean = fields[1];
 		Assertions.assertEquals("oBoolean", fieldOBoolean.name());
 		Assertions.assertEquals(Boolean.class, fieldOBoolean.type());
-		
+
 		PepDataComponent fieldPByte = fields[2];
 		Assertions.assertEquals("pByte", fieldPByte.name());
 		Assertions.assertEquals(byte.class, fieldPByte.type());
@@ -87,15 +87,15 @@ public class AtomicTypeTestImmutableTest {
 		PepDataComponent fieldOByte = fields[3];
 		Assertions.assertEquals("oByte", fieldOByte.name());
 		Assertions.assertEquals(Byte.class, fieldOByte.type());
-		
+
 		PepDataComponent fieldPChar = fields[4];
 		Assertions.assertEquals("pChar", fieldPChar.name());
 		Assertions.assertEquals(char.class, fieldPChar.type());
-		
+
 		PepDataComponent fieldOChar = fields[5];
 		Assertions.assertEquals("oChar", fieldOChar.name());
 		Assertions.assertEquals(Character.class, fieldOChar.type());
-		
+
 		PepDataComponent fieldPShort = fields[6];
 		Assertions.assertEquals("pShort", fieldPShort.name());
 		Assertions.assertEquals(short.class, fieldPShort.type());
@@ -103,7 +103,7 @@ public class AtomicTypeTestImmutableTest {
 		PepDataComponent fieldOShort = fields[7];
 		Assertions.assertEquals("oShort", fieldOShort.name());
 		Assertions.assertEquals(Short.class, fieldOShort.type());
-		
+
 		PepDataComponent fieldPInteger = fields[8];
 		Assertions.assertEquals("pInteger", fieldPInteger.name());
 		Assertions.assertEquals(int.class, fieldPInteger.type());
@@ -111,7 +111,7 @@ public class AtomicTypeTestImmutableTest {
 		PepDataComponent fieldOInteger = fields[9];
 		Assertions.assertEquals("oInteger", fieldOInteger.name());
 		Assertions.assertEquals(Integer.class, fieldOInteger.type());
-		
+
 		PepDataComponent fieldPLong = fields[10];
 		Assertions.assertEquals("pLong", fieldPLong.name());
 		Assertions.assertEquals(long.class, fieldPLong.type());
@@ -119,7 +119,7 @@ public class AtomicTypeTestImmutableTest {
 		PepDataComponent fieldOLong = fields[11];
 		Assertions.assertEquals("oLong", fieldOLong.name());
 		Assertions.assertEquals(Long.class, fieldOLong.type());
-		
+
 		PepDataComponent fieldPFloat = fields[12];
 		Assertions.assertEquals("pFloat", fieldPFloat.name());
 		Assertions.assertEquals(float.class, fieldPFloat.type());
@@ -127,7 +127,7 @@ public class AtomicTypeTestImmutableTest {
 		PepDataComponent fieldOFloat = fields[13];
 		Assertions.assertEquals("oFloat", fieldOFloat.name());
 		Assertions.assertEquals(Float.class, fieldOFloat.type());
-		
+
 		PepDataComponent fieldPDouble = fields[14];
 		Assertions.assertEquals("pDouble", fieldPDouble.name());
 		Assertions.assertEquals(double.class, fieldPDouble.type());
@@ -135,12 +135,11 @@ public class AtomicTypeTestImmutableTest {
 		PepDataComponent fieldODouble = fields[15];
 		Assertions.assertEquals("oDouble", fieldODouble.name());
 		Assertions.assertEquals(Double.class, fieldODouble.type());
-		
+
 		PepDataComponent fieldString = fields[16];
 		Assertions.assertEquals("string", fieldString.name());
 		Assertions.assertEquals(String.class, fieldString.type());
-		
-		
+
 	}
 
 	@Test
@@ -184,7 +183,8 @@ public class AtomicTypeTestImmutableTest {
 		PepMapMapper mapMapper = new PepMapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
-		AtomicTypeTestImmutable object = (AtomicTypeTestImmutable) mapMapper.toObject(AtomicTypeTestImmutable.class, map);
+		AtomicTypeTestImmutable object = (AtomicTypeTestImmutable) mapMapper.toObject(AtomicTypeTestImmutable.class,
+				map);
 
 		// validate result.
 		Assertions.assertNotNull(object);

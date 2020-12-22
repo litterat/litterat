@@ -30,10 +30,9 @@ import io.litterat.pep.mapper.PepArrayMapper;
 import io.litterat.pep.mapper.PepMapMapper;
 import io.litterat.test.pep.data.ArrayPrimitiveTypeTestPojo;
 
-
 public class ArrayPrimitiveTypeTestPojoTest {
 
-	private final static boolean[] pBoolean = new boolean[] {false };
+	private final static boolean[] pBoolean = new boolean[] { false };
 	private final static Boolean[] oBoolean = new Boolean[] { Boolean.TRUE };
 	private final static byte[] pByte = new byte[] { 1 };
 	private final static Byte[] oByte = new Byte[] { Byte.valueOf((byte) 2) };
@@ -44,16 +43,15 @@ public class ArrayPrimitiveTypeTestPojoTest {
 	private final static int[] pInteger = new int[] { 42 };
 	private final static Integer[] oInteger = new Integer[] { Integer.valueOf(6) };
 	private final static long[] pLong = new long[] { 7 };
-	private final static Long[] oLong = new Long[] { Long.valueOf(10l) }; 
-	private final static float[] pFloat = new float[] {12.42f }; 
-	private final static Float[] oFloat = new Float[] {Float.valueOf(13.54f) };
+	private final static Long[] oLong = new Long[] { Long.valueOf(10l) };
+	private final static float[] pFloat = new float[] { 12.42f };
+	private final static Float[] oFloat = new Float[] { Float.valueOf(13.54f) };
 	private final static double[] pDouble = new double[] { 56.34d };
 	private final static Double[] oDouble = new Double[] { Double.valueOf(123.456d) };
 	private final static String[] string = new String[] { "test" };
-	
 
 	final static ArrayPrimitiveTypeTestPojo test = new ArrayPrimitiveTypeTestPojo();
-	
+
 	static {
 		test.setpBoolean(pBoolean);
 		test.setoBoolean(oBoolean);
@@ -95,7 +93,7 @@ public class ArrayPrimitiveTypeTestPojoTest {
 		Assertions.assertEquals(17, fields.length);
 
 		// For POJO these fields are in alpha order.
-		
+
 		PepDataComponent fieldOBoolean = fields[0];
 		Assertions.assertEquals("oBoolean", fieldOBoolean.name());
 		Assertions.assertEquals(Boolean[].class, fieldOBoolean.type());
@@ -103,41 +101,38 @@ public class ArrayPrimitiveTypeTestPojoTest {
 		PepDataComponent fieldOByte = fields[1];
 		Assertions.assertEquals("oByte", fieldOByte.name());
 		Assertions.assertEquals(Byte[].class, fieldOByte.type());
-		
+
 		PepDataComponent fieldOChar = fields[2];
 		Assertions.assertEquals("oChar", fieldOChar.name());
 		Assertions.assertEquals(Character[].class, fieldOChar.type());
-		
+
 		PepDataComponent fieldODouble = fields[3];
 		Assertions.assertEquals("oDouble", fieldODouble.name());
 		Assertions.assertEquals(Double[].class, fieldODouble.type());
-		
+
 		PepDataComponent fieldOFloat = fields[4];
 		Assertions.assertEquals("oFloat", fieldOFloat.name());
 		Assertions.assertEquals(Float[].class, fieldOFloat.type());
-		
+
 		PepDataComponent fieldOInteger = fields[5];
 		Assertions.assertEquals("oInteger", fieldOInteger.name());
 		Assertions.assertEquals(Integer[].class, fieldOInteger.type());
-		
+
 		PepDataComponent fieldOLong = fields[6];
 		Assertions.assertEquals("oLong", fieldOLong.name());
 		Assertions.assertEquals(Long[].class, fieldOLong.type());
-		
+
 		PepDataComponent fieldOShort = fields[7];
 		Assertions.assertEquals("oShort", fieldOShort.name());
 		Assertions.assertEquals(Short[].class, fieldOShort.type());
-		
-		
+
 		PepDataComponent fieldPBoolean = fields[8];
 		Assertions.assertEquals("pBoolean", fieldPBoolean.name());
 		Assertions.assertEquals(boolean[].class, fieldPBoolean.type());
 
-
 		PepDataComponent fieldPByte = fields[9];
 		Assertions.assertEquals("pByte", fieldPByte.name());
 		Assertions.assertEquals(byte[].class, fieldPByte.type());
-
 
 		PepDataComponent fieldPChar = fields[10];
 		Assertions.assertEquals("pChar", fieldPChar.name());
@@ -155,11 +150,9 @@ public class ArrayPrimitiveTypeTestPojoTest {
 		Assertions.assertEquals("pInteger", fieldPInteger.name());
 		Assertions.assertEquals(int[].class, fieldPInteger.type());
 
-
 		PepDataComponent fieldPLong = fields[14];
 		Assertions.assertEquals("pLong", fieldPLong.name());
 		Assertions.assertEquals(long[].class, fieldPLong.type());
-
 
 		PepDataComponent fieldPShort = fields[15];
 		Assertions.assertEquals("pShort", fieldPShort.name());
@@ -168,8 +161,7 @@ public class ArrayPrimitiveTypeTestPojoTest {
 		PepDataComponent fieldString = fields[16];
 		Assertions.assertEquals("string", fieldString.name());
 		Assertions.assertEquals(String[].class, fieldString.type());
-		
-		
+
 	}
 
 	@Test
@@ -213,7 +205,8 @@ public class ArrayPrimitiveTypeTestPojoTest {
 		PepMapMapper mapMapper = new PepMapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
-		ArrayPrimitiveTypeTestPojo object = (ArrayPrimitiveTypeTestPojo) mapMapper.toObject(ArrayPrimitiveTypeTestPojo.class, map);
+		ArrayPrimitiveTypeTestPojo object = (ArrayPrimitiveTypeTestPojo) mapMapper
+				.toObject(ArrayPrimitiveTypeTestPojo.class, map);
 
 		// validate result.
 		Assertions.assertNotNull(object);

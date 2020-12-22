@@ -3,7 +3,7 @@ package io.litterat.test.pep.data;
 import io.litterat.pep.Data;
 
 public class AtomicTypeTestImmutable {
-	
+
 	private final boolean pBoolean;
 	private final Boolean oBoolean;
 	private final byte pByte;
@@ -21,12 +21,11 @@ public class AtomicTypeTestImmutable {
 	private final double pDouble;
 	private final Double oDouble;
 	private final String string;
-	
 
 	@Data
-	public AtomicTypeTestImmutable(boolean pBoolean, Boolean oBoolean, byte pByte, Byte oByte, char pChar, Character oChar, short pShort,
-			Short oShort, int pInteger, Integer oInteger, long pLong, Long oLong, float pFloat, Float oFloat,
-			double pDouble, Double oDouble, String string) {
+	public AtomicTypeTestImmutable(boolean pBoolean, Boolean oBoolean, byte pByte, Byte oByte, char pChar,
+			Character oChar, short pShort, Short oShort, int pInteger, Integer oInteger, long pLong, Long oLong,
+			float pFloat, Float oFloat, double pDouble, Double oDouble, String string) {
 		super();
 		this.pBoolean = pBoolean;
 		this.oBoolean = oBoolean;
@@ -47,7 +46,6 @@ public class AtomicTypeTestImmutable {
 		this.string = string;
 	}
 
-
 	public boolean getpBoolean() {
 		return pBoolean;
 	}
@@ -56,21 +54,18 @@ public class AtomicTypeTestImmutable {
 		return oBoolean;
 	}
 
-
 	public byte getpByte() {
 		return pByte;
 	}
-
 
 	public Byte getoByte() {
 		return oByte;
 	}
 
-
 	public char getpChar() {
 		return pChar;
 	}
-	
+
 	public Character getoChar() {
 		return oChar;
 	}
@@ -79,51 +74,41 @@ public class AtomicTypeTestImmutable {
 		return pShort;
 	}
 
-
 	public Short getoShort() {
 		return oShort;
 	}
-
 
 	public int getpInteger() {
 		return pInteger;
 	}
 
-
 	public Integer getoInteger() {
 		return oInteger;
 	}
-
 
 	public long getpLong() {
 		return pLong;
 	}
 
-
 	public Long getoLong() {
 		return oLong;
 	}
-
 
 	public float getpFloat() {
 		return pFloat;
 	}
 
-
 	public Float getoFloat() {
 		return oFloat;
 	}
-
 
 	public double getpDouble() {
 		return pDouble;
 	}
 
-
 	public Double getoDouble() {
 		return oDouble;
 	}
-
 
 	public String getString() {
 		return string;

@@ -140,8 +140,10 @@ public class JsonMapper {
 			writer.value((Number) object);
 		} else if (object instanceof Boolean) {
 			writer.value((Boolean) object);
+		} else if (object instanceof Character) {
+			writer.value(object.toString());
 		} else {
-			throw new IOException(String.format("Could not write atom ", object.getClass()));
+			throw new IOException(String.format("Could not write atom: %s", object.getClass()));
 		}
 	}
 
@@ -174,15 +176,24 @@ public class JsonMapper {
 				return dataClass.toObject().invoke(readNumber(dataClass, reader));
 
 			case STRING:
+				String v = reader.nextString();
 				if (dataClass.dataClass() == String.class) {
-					return dataClass.toObject().invoke(reader.nextString());
+					return dataClass.toObject().invoke(v);
+				} else if (dataClass.dataClass() == Character.class) {
+					Character c = Character.valueOf(v.toCharArray()[0]);
+					return dataClass.toObject().invoke(c);
+				} else if (dataClass.dataClass() == char.class) {
+					char c = v.toCharArray()[0];
+					return dataClass.toObject().invoke(c);
 				}
-				throw new PepException("expected boolean");
+				throw new PepException(
+						String.format("Could not convert string to %s", dataClass.dataClass().getName()));
 			case BOOLEAN:
 				if (dataClass.dataClass() == boolean.class || dataClass.dataClass() == Boolean.class) {
 					return dataClass.toObject().invoke(reader.nextBoolean());
 				}
-				throw new PepException("expected boolean");
+				throw new PepException(
+						String.format("Could not convert boolean to %s", dataClass.dataClass().getName()));
 			case NULL:
 				reader.nextNull();
 				return null;

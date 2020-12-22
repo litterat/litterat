@@ -32,7 +32,7 @@ import io.litterat.test.pep.data.ArrayPrimitiveTypeTestImmutable;
 
 public class ArrayPrimitiveTypeTestImmutableTest {
 
-	private final static boolean[] pBoolean = new boolean[] {false };
+	private final static boolean[] pBoolean = new boolean[] { false };
 	private final static Boolean[] oBoolean = new Boolean[] { Boolean.TRUE };
 	private final static byte[] pByte = new byte[] { 1 };
 	private final static Byte[] oByte = new Byte[] { Byte.valueOf((byte) 2) };
@@ -43,15 +43,15 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 	private final static int[] pInteger = new int[] { 42 };
 	private final static Integer[] oInteger = new Integer[] { Integer.valueOf(6) };
 	private final static long[] pLong = new long[] { 7 };
-	private final static Long[] oLong = new Long[] { Long.valueOf(10l) }; 
-	private final static float[] pFloat = new float[] {12.42f }; 
-	private final static Float[] oFloat = new Float[] {Float.valueOf(13.54f) };
+	private final static Long[] oLong = new Long[] { Long.valueOf(10l) };
+	private final static float[] pFloat = new float[] { 12.42f };
+	private final static Float[] oFloat = new Float[] { Float.valueOf(13.54f) };
 	private final static double[] pDouble = new double[] { 56.34d };
 	private final static Double[] oDouble = new Double[] { Double.valueOf(123.456d) };
 	private final static String[] string = new String[] { "test" };
-	
 
-	ArrayPrimitiveTypeTestImmutable test = new ArrayPrimitiveTypeTestImmutable(pBoolean, oBoolean, pByte, oByte, pChar, oChar, pShort, oShort, pInteger, oInteger, pLong, oLong, pFloat, oFloat, pDouble, oDouble, string);
+	ArrayPrimitiveTypeTestImmutable test = new ArrayPrimitiveTypeTestImmutable(pBoolean, oBoolean, pByte, oByte, pChar,
+			oChar, pShort, oShort, pInteger, oInteger, pLong, oLong, pFloat, oFloat, pDouble, oDouble, string);
 
 	PepContext context;
 
@@ -80,7 +80,7 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepDataComponent fieldOBoolean = fields[1];
 		Assertions.assertEquals("oBoolean", fieldOBoolean.name());
 		Assertions.assertEquals(Boolean[].class, fieldOBoolean.type());
-		
+
 		PepDataComponent fieldPByte = fields[2];
 		Assertions.assertEquals("pByte", fieldPByte.name());
 		Assertions.assertEquals(byte[].class, fieldPByte.type());
@@ -88,15 +88,15 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepDataComponent fieldOByte = fields[3];
 		Assertions.assertEquals("oByte", fieldOByte.name());
 		Assertions.assertEquals(Byte[].class, fieldOByte.type());
-		
+
 		PepDataComponent fieldPChar = fields[4];
 		Assertions.assertEquals("pChar", fieldPChar.name());
 		Assertions.assertEquals(char[].class, fieldPChar.type());
-		
+
 		PepDataComponent fieldOChar = fields[5];
 		Assertions.assertEquals("oChar", fieldOChar.name());
 		Assertions.assertEquals(Character[].class, fieldOChar.type());
-		
+
 		PepDataComponent fieldPShort = fields[6];
 		Assertions.assertEquals("pShort", fieldPShort.name());
 		Assertions.assertEquals(short[].class, fieldPShort.type());
@@ -104,7 +104,7 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepDataComponent fieldOShort = fields[7];
 		Assertions.assertEquals("oShort", fieldOShort.name());
 		Assertions.assertEquals(Short[].class, fieldOShort.type());
-		
+
 		PepDataComponent fieldPInteger = fields[8];
 		Assertions.assertEquals("pInteger", fieldPInteger.name());
 		Assertions.assertEquals(int[].class, fieldPInteger.type());
@@ -112,7 +112,7 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepDataComponent fieldOInteger = fields[9];
 		Assertions.assertEquals("oInteger", fieldOInteger.name());
 		Assertions.assertEquals(Integer[].class, fieldOInteger.type());
-		
+
 		PepDataComponent fieldPLong = fields[10];
 		Assertions.assertEquals("pLong", fieldPLong.name());
 		Assertions.assertEquals(long[].class, fieldPLong.type());
@@ -120,7 +120,7 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepDataComponent fieldOLong = fields[11];
 		Assertions.assertEquals("oLong", fieldOLong.name());
 		Assertions.assertEquals(Long[].class, fieldOLong.type());
-		
+
 		PepDataComponent fieldPFloat = fields[12];
 		Assertions.assertEquals("pFloat", fieldPFloat.name());
 		Assertions.assertEquals(float[].class, fieldPFloat.type());
@@ -128,7 +128,7 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepDataComponent fieldOFloat = fields[13];
 		Assertions.assertEquals("oFloat", fieldOFloat.name());
 		Assertions.assertEquals(Float[].class, fieldOFloat.type());
-		
+
 		PepDataComponent fieldPDouble = fields[14];
 		Assertions.assertEquals("pDouble", fieldPDouble.name());
 		Assertions.assertEquals(double[].class, fieldPDouble.type());
@@ -136,12 +136,11 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepDataComponent fieldODouble = fields[15];
 		Assertions.assertEquals("oDouble", fieldODouble.name());
 		Assertions.assertEquals(Double[].class, fieldODouble.type());
-		
+
 		PepDataComponent fieldString = fields[16];
 		Assertions.assertEquals("string", fieldString.name());
 		Assertions.assertEquals(String[].class, fieldString.type());
-		
-		
+
 	}
 
 	@Test
@@ -185,7 +184,8 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		PepMapMapper mapMapper = new PepMapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
-		ArrayPrimitiveTypeTestImmutable object = (ArrayPrimitiveTypeTestImmutable) mapMapper.toObject(ArrayPrimitiveTypeTestImmutable.class, map);
+		ArrayPrimitiveTypeTestImmutable object = (ArrayPrimitiveTypeTestImmutable) mapMapper
+				.toObject(ArrayPrimitiveTypeTestImmutable.class, map);
 
 		// validate result.
 		Assertions.assertNotNull(object);

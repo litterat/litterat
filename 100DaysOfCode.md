@@ -9,17 +9,21 @@ Next steps list. A general list of things that could be done next in no particul
  - Possibly refactor PepDataClass to include PepDataTupleClass.
  - Implement the jvm-serializers performance test.
  - Investigate removing the primitive array bridge classes and replace with generated MethodHandles.
- - Review the schema language and look at schema annotations.
+ - Review the schema language and look at schema annotations. 
+ - Review schema arrays and look at multi-dimensional arrays as part of schema design.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Field ordering for POJO.
+ - Dates and timestamps.
 
 ## Day 12 - December 22 - Atomic and Array type testing
 
 Adding test cases for both all primitive types to PEP. This includes both atomic primitives and array primitives to make sure there's no edge cases. 
 
-Found an edge case in the ImmutableFinder where long and double primitive data types take up two slots. The variable indexes in the byte code are not aligned with the parameter count.
+Found an edge case in the ImmutableFinder where long and double primitive data types take up two slots. The variable indexes in the byte code are not aligned with the parameter count. That was reasonably easy to fix.
 
+The other issue that appeared is that the POJO parameter ordering is alpha based because order of methods or fields is not guaranteed in Java. There's an outstanding question on if field order is important for schemas or if this is a file format detail that should be annotated on the record/tuple. Not sure of the answer to this yet. Added to the 'next steps' list to explore later.
 
+Implemented same tests for JSON reader and writer. There's still more work to be done on literat schema before implementing arrays on XPL.
 
 ## Day 11 - December 21 - Build scripts and testing
 
