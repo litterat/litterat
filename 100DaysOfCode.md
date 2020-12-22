@@ -3,6 +3,24 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
+Next steps list. A general list of things that could be done next in no particular order.
+
+ - Deeper looker at defaults for Lists, Sets and other collections.
+ - Possibly refactor PepDataClass to include PepDataTupleClass.
+ - Implement the jvm-serializers performance test.
+ - Investigate removing the primitive array bridge classes and replace with generated MethodHandles.
+ - Review the schema language and look at schema annotations.
+ - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
+ - Field ordering for POJO.
+
+## Day 12 - December 22 - Atomic and Array type testing
+
+Adding test cases for both all primitive types to PEP. This includes both atomic primitives and array primitives to make sure there's no edge cases. 
+
+Found an edge case in the ImmutableFinder where long and double primitive data types take up two slots. The variable indexes in the byte code are not aligned with the parameter count.
+
+
+
 ## Day 11 - December 21 - Build scripts and testing
 
 Continued on today with working out the gradle build system to work nicely with testing and eclipse. All maven publishing has been disabled until more of the library is complete and tested. Both "gradle test" and "gradle eclipse" are both producing the correct output.

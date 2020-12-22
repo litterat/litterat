@@ -21,8 +21,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -151,8 +153,8 @@ public class ImmutableFinder implements ComponentFinder {
 			for (ComponentInfo component : immutableFields) {
 				if (component.getReadMethod() == null) {
 					throw new PepException(String.format(
-							"Failed to match immutable field accessor for class: %s. Add @Field annotations to assist.",
-							clss));
+							"Failed to match immutable field accessor for class: %s. Add @Field annotations to assist. %s",
+							clss, component.getName()));
 				}
 			}
 
@@ -201,6 +203,26 @@ public class ImmutableFinder implements ComponentFinder {
 		boolean foundLoadArg = false;
 		int arg = 0;
 		int argsFound = 0;
+		
+		// Find param load instruction indexes.
+		Map<Integer,Integer> loadIndexToParamMap = new HashMap<>();
+		Class<?>[] paramClasses = constructor.getParameterTypes();
+		int paramCounter = 0;
+		for (int x=0; x<paramClasses.length;x++) {
+			// index is 1 based. increment first.
+			paramCounter++;
+			
+			loadIndexToParamMap.put(paramCounter, x);
+			
+			// primitive longs and doubles take up two slots and move all subsequent params out by one.
+			if (paramClasses[x] == long.class || paramClasses[x] == double.class) {
+				paramCounter++;
+			}
+			
+		}
+		
+		
+		int maxVarLoadInsn = paramCounter;
 
 		ListIterator<AbstractInsnNode> it = method.instructions.iterator();
 		while (it.hasNext()) {
@@ -220,11 +242,16 @@ public class ImmutableFinder implements ComponentFinder {
 			case Opcodes.DLOAD:
 			case Opcodes.FLOAD:
 				VarInsnNode varLoadInsn = (VarInsnNode) insn;
+				if (insn.getOpcode() == Opcodes.DLOAD || insn.getOpcode() == Opcodes.LLOAD) {
+					// doubles and longs take up two slots so need to increment max.
+					maxVarLoadInsn++;
+				}
 
 				// Check if this is being loaded from a parameter variable.
-				if (foundLoadThis & varLoadInsn.var > 0 && varLoadInsn.var <= methodType.getArgumentTypes().length) {
+				if (foundLoadThis & varLoadInsn.var > 0 && varLoadInsn.var <= maxVarLoadInsn) {
 					foundLoadArg = true;
-					arg = varLoadInsn.var - 1;
+					// map back to the correct argument index.
+					arg = loadIndexToParamMap.get( varLoadInsn.var );
 				}
 				break;
 			case Opcodes.PUTFIELD:

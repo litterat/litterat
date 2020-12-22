@@ -32,6 +32,9 @@ public class GetSetFinder implements ComponentFinder {
 
 		List<ComponentInfo> getSetList = new ArrayList<>();
 
+		// https://stackoverflow.com/questions/5001172/java-reflection-getting-fields-and-methods-in-declaration-order/38929813
+		// declared methods are in no particular order and it is not possible to discover it.
+		// Many mention byte code analysis and line number tables, but that is asking for trouble when code is compiled for production.
 		Method[] methods = clss.getDeclaredMethods();
 		for (Method method : methods) {
 
