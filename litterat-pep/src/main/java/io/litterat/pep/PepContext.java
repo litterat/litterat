@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.litterat.pep.describe.DefaultResolver;
@@ -99,6 +100,9 @@ public class PepContext {
 			registerAtom(double.class);
 			registerAtom(Void.class);
 			registerAtom(String.class);
+
+			registerAtom(Date.class);
+
 		} catch (PepException e) {
 			throw new IllegalArgumentException();
 		}

@@ -5,17 +5,22 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 
 Next steps list. A general list of things that could be done next in no particular order.
 
+PEP
  - Deeper looker at defaults for Lists, Sets and other collections.
  - Possibly refactor PepDataClass to include PepDataTupleClass.
- - Implement the jvm-serializers performance test.
  - Investigate removing the primitive array bridge classes and replace with generated MethodHandles.
- - Review the schema language and look at schema annotations. 
- - Review schema arrays and look at multi-dimensional arrays as part of schema design.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
- - Field ordering for POJO.
  - Dates and timestamps.
  - Rename PEP to litterat bind.
  - Create PEP error examples and test edge cases.
+ 
+ Schema
+ - Review the schema language and look at schema annotations. 
+ - Review schema arrays and look at multi-dimensional arrays as part of schema design.
+ 
+ Other
+ - Implement the jvm-serializers performance test.
+ 
  
  Documents to write:
  
@@ -23,7 +28,11 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat PEP end user guide. User guide to using library & examples.
  - Litterat PEP serialization guide. For people writing serialization formats.
  
- 
+## Day 13 - December 23 - Other Atomic types in Java. Dates, timestamps, etc
+
+In dealing with the separation between serialization and PEP, the question of where do atomic types format get specified. Types like UUID have a reasonably standard String format, but also have a binary format. Dates might also have a different format depending on data format. In regards to PEP, it is only important to know that a type is atomic and if there's a conversion. Any format decisions are left to another library. To that end, the first step is to identify all atomic types in the standard java library.
+
+Not a lot of time today, so added a Date test case for PEP. This just confirms that Date objects are atoms in the context of PEP. More effort required to classify java.time and other objects.
 
 ## Day 12 - December 22 - Atomic and Array type testing
 
