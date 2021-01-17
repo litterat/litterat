@@ -28,6 +28,39 @@ PEP
  - Litterat PEP end user guide. User guide to using library & examples.
  - Litterat PEP serialization guide. For people writing serialization formats.
  
+
+## Day 20 - January 17 - More on Atoms
+
+Digging deeper into atoms like real, string and blobs. 
+
+## Day 19 - January 16 - Records
+
+Exploring the concepts of required, optional and default values for record fields. It might be that required, optional and default are all concepts that should be annotations that are kept localised rather than details that might be transferred as part of the meta data. Also started looking at numbers for atoms. 
+ 
+## Day 18 - January 13 - Arrays and Tuples
+
+More documenting litterat-theory rather than writing code. Added definitions for tuples and arrays and explored some of the concepts allowed in JSON Schema arrays. Coming to the conclusion that JSON Schema arrays are very powerful but are an outcome of starting with JavaScript and JSON first and building a schema that suits them rather than starting from a theoretical starting point. It also raises some good questions about how far a schema should implement validation rather than templating.
+
+## Day 17 - January 12 - More theory
+
+Spent the day continuing with the litterat-theory document. Wrote the section on Litterat design requirements. Started working on sections for choice and arrays. The section on arrays has turned out a lot more complex than originally expected. This will require some more thinking about the difference between a tuple and an array. More work is required on naming and definitions for the various types of data structures. There a lot more inconsistencies between various schema languages than expected. Currently mainly looking at XML Schema, JSON Schema, Protobufs and Avro.
+
+## Day 16 - January 11 - Back to work 
+
+After a couple of weeks away from the computer, it's good to be back hitting my head against
+the problems started in December. Spent the day writing the Litterat schema theory document.
+Lots of background reading on Lambda calculus, Context-free grammars, XML Schema and Backus-Naur form. A lot of the background written, but yet to attack the core elements of the design (tuples and arrays). 
+ 
+## Day 15 - December 29 - CLDR
+
+More research into date formats in particular for text based presentation. The [Unicode CLDR](http://cldr.unicode.org/translation/date-time-1/date-time-patterns) is a good place to start. It also looks like the Java 8 java.time date formatting is also [closer to CLDR](https://www.infoq.com/news/2017/02/java9-cldr-ldml/) but not exactly the same. It is also important to note that date formats for common interchange is different to localization. Localization should be left to the visualization and user interface domain rather than be coded into the data interchange domain. Having said that there will always be exceptions. It looks like reference to relevant parts of the Unicode CLDR is a good way to proceed with data formats in general.
+ 
+## Day 14 - December 28 - Annotations
+
+Continuing to think about the relationship of formating meta data and its relationship with the core schema data. For example, a date might be stored internally as a Date object. When serialized to a binary format it might be serialized as a long (milliseconds since epoch), while in JSON there might be a requirement to store it as an ISO string. It may not be good enough to specify a single text and binary format with multiple text formats and multiple binary formats being required depending on the target data. However, there's probably a default text and binary representation. Based on the requirement for dates, the core meta data associated with a date isn't defined by the format. It is that it is a Gregorian date with potential restrictions on range.
+
+Also thinking about how to store the above formatting meta information. Given that the format of data is not an essential part of the meta data, it seems to fit that the format information is really an annotation on the meta data. From a code first point of view the annotation it would be useful to present these annotations through the PepDataClass. By adding an annotation on the annotation it is possible to filter and collect any required annotations through to the interface.
+
 ## Day 13 - December 23 - Other Atomic types in Java. Dates, timestamps, etc
 
 In dealing with the separation between serialization and PEP, the question of where do atomic types format get specified. Types like UUID have a reasonably standard String format, but also have a binary format. Dates might also have a different format depending on data format. In regards to PEP, it is only important to know that a type is atomic and if there's a conversion. Any format decisions are left to another library. To that end, the first step is to identify all atomic types in the standard java library.
@@ -142,7 +175,8 @@ see if that would work correctly. Still more work required on arrays for PepArra
 
 Another possible solution is to provide two interfaces for arrays and allow the underlying data structure to expose either of the interfaces. One interface based on index based accessor (e.g. an array) and the other based on an Iterator (e.g. a Set). From a client it would look like:
 
-PepArrayClass arrayClass = (PepArrayClass) dataClass;
+```
+  PepArrayClass arrayClass = (PepArrayClass) dataClass;
 
  // an int[] can't be cast to an Object[] so can't directly access values.
  Object arrayData = arrayClass.accessor().invoke(object);
@@ -160,6 +194,7 @@ if (arrayClass.isIterator() ) {
    		 writer.invoke( arrayClass.get().invoke( arrayData, x) ); // writer accepts int, String, etc.
    }
 }
+```
 
 Based on the little gained (i.e. iterator not allocated for arrays), this original solution is more consistent. Will continue with that implementation.
 
@@ -173,6 +208,7 @@ The solution needs to be that if a concrete class is provided (e.g. ArrayList) t
 
 Exploring Lists and Arrays today. Currently PEP defines an interaction with Lists/Arrays using Object[]. The accessor for a field returns the Object[]. The constructor takes a count which returns an Object[]. The client code can then iterate over the array to write or read entries. This works, but isn't very efficient as it might allocate and throw away the Object[] as it creates a List<String> for instance. The other problem is that it requires autoboxing for int[] and more duplication. If int[] is the base case and Valhalla isn't available it requires method handles that will allow direct interaction with the Array or List. Reading/Writing an int[] might look as follows:
 
+```
 int[] intArray = create( length );
 for (int x=0; x < length; x++ ) {
    add( intArray, in.readInt() );
@@ -183,9 +219,11 @@ int[] intArray = object.accessor();
 for (int x=0; x< length; x++ ) {
    out.writeInt( get( intArray ) );
 }
+```
 
 To fit within PEP, this should have the same set of MethodHandles as the List<String> which would be:
 
+```
 List<String> stringList = create( length );
 for (int x=0; x<length(stringList); x++ ) {
    add( stringList, in.readString() );
@@ -196,29 +234,34 @@ List<String> stringList = object.accessor();
 for (int x=0; x<length(stringList); x++ ) {
    out.writeString( get( stringList ) );
 }
-
+```
 
 
 There's an implied Iterator concept being created in both of the above examples, but isn't referenced directly. The problem with using an Iterator interface is that it forces basic types to be autoboxed through the interface. One way would be to define a partner iterator. The interface could then be for int[]:
 
+```
 accessor(Object): int[]
 iterator(int[]):IntIterator;
 length(int[]):int
 get(int[], IntIterator): int;
 add(int[], IntIterator, int ): void;
 constructor(int):int[];
+```
 
 This would work using MethodHandles equally for a List. For example List<String>.
 
+```
 accessor(): List<String>
 iterator(List<String>):ListIterator;
 length(List<String>):int
 get(List<String>, ListIterator):String;
 add(List<String>, ListIterator, String): void;
 constructor(int): List<String>;
+```
 
 Implementation client for an array is then the same for both:
 
+```
 PepArrayClass arrayClass = (PepArrayClass) dataClass;
 Object arrayData = arrayClass.accessor().invoke(object);
 int length = arrayClass.length().invoke(arrayData);
@@ -235,6 +278,7 @@ for (int x=0; x<length; x++ ) {
    arrayClass.add().invoke( iterator, in.read(array.type())); // in.read returns int, String, etc.
 }
 return v;
+```
 
 Part way through implementation. Not sure if this will work as expected, so may require changes to interface.
 
