@@ -24,14 +24,58 @@ PEP
  
  Documents to write:
  
- - Litterat PEP theory. Background and theory behind design.
  - Litterat PEP end user guide. User guide to using library & examples.
  - Litterat PEP serialization guide. For people writing serialization formats.
- 
 
-## Day 20 - January 17 - More on Atoms
+## Day 28 - January 26 - What's missing
 
-Digging deeper into atoms like real, string and blobs. 
+After reviewing the theory document, it is clear that the macros and atomic types sections needs more work. In particular the macros section needs to be thought through more. Macros may help with the definition of the meta types and atomic type definitions so its worth exploring the concept further.
+
+## Day 27 - January 25 - More editing
+
+Spent the day ~~being very productive~~ mostly procrastinating. :) Reviewing the atomic type restrictions and trying to write the dates and timestamps section.
+
+## Day 26 - January 24 - First draft
+
+Reading back over theory document. Feels like it could easily expand into a book by researching every small component. There's lots of gaps and would be nice to discuss how the model fits with existing schemas in detail, but that seems like overkill for now. Can easily go back and fill in gaps over time. Added section on macros and namespaces. Still need to write up sections on dates and timestamps.
+
+## Day 25 - January 23 - More rewriting
+
+Further rewriting and editing on the theory document. It will be nice when a first draft is done. :)
+Today was brought to you by [triple j hottest 100](https://en.wikipedia.org/wiki/Triple_J_Hottest_100,_2020) and some late night listening to [Tame Impala](https://en.wikipedia.org/wiki/Tame_Impala) - [Slow Rush](https://en.wikipedia.org/wiki/The_Slow_Rush).
+
+## Day 24 - January 22 - Slow progress on theory
+
+More editing for the theory document. Worked on product types and a start on sum types. The quality and detail doesn't feel high enough, but will focus on good enough. One outcome from today is that litterat-schema should probably be renamed litterat-model. A schema should have syntax and be a physical representation of the model.
+
+## Day 23 - January 21 - More editing
+
+Made some good progress on the theory document introduction. A lot more work to do on the details. A lot more rewriting than I'd like, but nice to get the concepts written.
+
+## Day 22 - January 19 - Consolidation
+
+A lot of thinking about what's next. The investigation into ASN.1 and Algebraic Data Types rounds out the theory aspect of Litterat. However, the litterat-theory document is currently a big jumbled list of thoughts. Next step is some editing and fill in the gaps for the theory document. 
+
+Fell down the Wikipedia hole again looking at various pages. Finding the information presented is not well presented or clear and needs a lot of work. Not a tangent I'm willing to tackle right now. More focus on editing tomorrow.
+
+## Day 21 - January 18 - More on abstract syntax and ASN.1
+
+Spent the day doing more research on ASN.1 and Algebraic Data Types. Can now reduce all data schema design down to the core concepts of Product Type (Record, struct, etc), Sum Type (Union, Choice, OneOf, etc), Arrays (Repeated elements, etc), and Atoms. Everything also goes back to the concept of an "Abstract Syntax" which has a basis in BNF. There's still a lot of work to explore each of the concepts, however, the direction of building an "Abstract Model" by defining abstract data types makes more sense. It might then be possible to import and convert between different schemas.
+
+## Day 20 - January 17 - More on Atoms and Algebraic Data Types
+
+Digging deeper into atoms like real, string and blobs. Spent some time off on a tangent looking at history and background behind Backus Naur Form to see if I can find any underlying theory for "or". There isn't much, but [Tagged Union](https://en.wikipedia.org/wiki/Tagged_union) is closest. But it can be said that the concept of a record breaks BNF "and" and distinct order of elements. An array replaces the * or repeated element concept of BNF. Also looking into Algebraic Data Types which include sum and product types which closely relate to Union and Records.
+
+Interesting reading on [Algebraic Data Types](https://en.wikipedia.org/wiki/Algebraic_data_type) which state "Algebraic data types are highly suited to implementing abstract syntax". The page on [Abstract Syntax](https://en.wikipedia.org/wiki/Abstract_syntax) directly links to [ASN.1](https://en.wikipedia.org/wiki/ASN.1). The ASN.1 has similar goals to Litterat..
+
+   "ASN.1 is visually similar to Augmented Backus-Naur form (ABNF), which is used to define many Internet 
+   protocols like HTTP and SMTP. However, in practice they are quite different: ASN.1 defines a data 
+   structure, which can be encoded in various ways (e.g. JSON, XML, binary). ABNF, on the other hand, defines 
+   the encoding ("syntax") at the same time it defines the data structure ("semantics"). ABNF tends to be 
+   used more frequently for defining textual, human-readable protocols, and generally is not used to define 
+   type-length-value encodings."
+   
+Narrowing in on the concept of defining abstract data types for records (as Product Type) and Tagged Union (as Sum Type) and building out definitions from there.  Also need to define the interactions between received data/schemas and how it joins with receiver schemas to perform validation.
 
 ## Day 19 - January 16 - Records
 

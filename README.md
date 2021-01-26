@@ -19,6 +19,12 @@ This repository contains a number of projects currently under active development
 
 See the readme for each project for more information.
 
+
+## Serialization theory
+
+As part of the development of the libraries, the theory behind serialization was investigated. This was to help create the schema model that underlies the schema design. The document is a work in progress and suggestions are always welcome. You can find it [here](litterat-theory.md).
+
+
 ## License
 
 Litterat projects are available under the Apache 2 License. Please see the LICENSE file for more information.
