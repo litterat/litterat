@@ -27,6 +27,10 @@ PEP
  - Litterat PEP end user guide. User guide to using library & examples.
  - Litterat PEP serialization guide. For people writing serialization formats.
 
+## Day 29 - January 27 - More editing
+
+Not a lot done today. A few edits and drafting an email to describe the work that has been done on theory.
+
 ## Day 28 - January 26 - What's missing
 
 After reviewing the theory document, it is clear that the macros and atomic types sections needs more work. In particular the macros section needs to be thought through more. Macros may help with the definition of the meta types and atomic type definitions so its worth exploring the concept further.

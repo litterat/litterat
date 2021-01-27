@@ -101,11 +101,13 @@ One of the questions I first had was why are product types and sum types all tha
 
     A B 
     
-What follows as the third element? I can state that it will be "A B A", "A B B", or "A B (A or B)". Given only the tokens A and B exist there is no other option. Effectively "A B A" and "A B B" are examples of the product type while "A or B" is the sum type. The number of tokens (atomic types) can be expanded but as long as there's a serial form the options are limited.
+What follows as the third element? I can state that it will be "A B A", "A B B", or "A B (A or B)". Given only the tokens A and B exist there is no other option for a serial form. Effectively "A B A" and "A B B" are examples of the product type while "A or B" is the sum type. The number of tokens (atomic types) can be expanded but as long as there's a serial form the options are limited.
+
+One final option to the question of what follows "A B" is splitting the stream into two directions; this is the annotation use case. The first stream continued with the normal specification, and another stream begins at the same point. This can be thought of as the option, "A B (both A and B)".  While technically, this could be specified as a specialised product type, it is interesting enough that it warrants its own discussion.
 
 The other concept that is prevalent in Backus-Nuar Form and Abstract Syntax is substitution that has its basis in [Context Free Grammars](https://en.wikipedia.org/wiki/Context-free_grammar). The idea that a specification is made up of smaller named rules that use the named rules in different parts of the specification. This gives rise to the concept of a type system and problems of naming and namespaces. It is important to note that the names are metadata for the specification and don't necessarily change the data format. As such, it's possible to use substitution to define rules which may look different but result in the same structure.
 
-A common property of these rules is that they form constructor rules for implementation languages. As such, it is common to see a one to one mapping of a production rule (named rule or type) to a specific type in a language.
+A common property of these production rules (often referred to as type definitions) is that they form constructor patterns for the implementation languages. For instance a rule for a circle includes x,y and radius values and it maps to a class Circle with constructor with the same parameters. As such, it is common to see a one to one mapping of a production rule (named rule or type) to a specific type in a language.
 
 While ASN.1 defines an Abstract Syntax that defines the structure of data that can then be written using a variety of data formats, using the above concepts we can build an Abstract Model that can be used to understand all schemas and data formats. The Abstract Data Model for data serialization can be boiled down to the following underlying concepts:
 
@@ -114,14 +116,11 @@ While ASN.1 defines an Abstract Syntax that defines the structure of data that c
  * Product type : A compound data structure that combines atoms and other types.
  * Sum type : Specify allowed choices between valid types. 
  * Atomic values : the underlying data concepts to be transferred (boolean, numbers, string, dates, etc)
+ * Annotations : Adding another dimension to data schemas. The sticky note of data structures allowing additional information to be associated with specific data.
 
 That's it, there isn't a lot of complexity when you boil down schema design to these fundamental concepts. By exploring each of these concepts in detail, and understanding the extents of each of the concepts, it will be possible to build a better abstract model for serialization.
 
-In addition to the above, there's a couple of more advanced concepts that will also be explored.
-
-  * Complex validation : Adding case statements to product type validation to allow interactions between fields. For example, if a boolean value is true then choose type X from a set of sum types.
-  * Annotations : Adding another dimension to data schemas. The sticky note of data structures allowing additional information to be associated with specific data.
-
+In addition to the above, there's one more advanced concepts that will also be explored. Complex validationa adds case statements to product type validation to allow interactions between fields. For example, if a boolean value is true then choose type X from a set of sum types.
 
 ### Schema reference material
 
@@ -177,7 +176,7 @@ For the purpose of a serialization schema, I'm using  __record__  as the preferr
   * field: A component of a record where the entry is identified using a name and order is not enforced.
   * element: A component of a sequence or tuple where the entry is identified using an index.
   
-I'm going to use the following notation to define a record. this is not intended to be a syntax that will be used in a schema and is intended to used to explroe syntax. A record includes a list of types and names.
+I'm going to use the following notation to define a record. this is not intended to be a syntax that will be used in a schema and is intended to used to explore concepts. A record includes a list of types and names.
  
     circle: record( integer x, integer y, integer radius );
 
