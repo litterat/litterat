@@ -19,9 +19,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.test.pep.data.ImmutableAtom;
-import io.litterat.test.pep.data.SimpleEnum;
-import io.litterat.schema.TypeException;
+import io.litterat.model.TypeException;
+import io.litterat.test.bind.data.ImmutableAtom;
+import io.litterat.test.bind.data.SimpleEnum;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 

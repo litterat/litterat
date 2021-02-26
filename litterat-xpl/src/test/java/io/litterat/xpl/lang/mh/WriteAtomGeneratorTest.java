@@ -20,7 +20,7 @@ import java.lang.invoke.MethodHandle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.schema.TypeLibrary;
+import io.litterat.model.TypeLibrary;
 import io.litterat.xpl.TypeBaseOutput;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.io.ByteArrayBaseInput;

@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.pep.PepContext;
-import io.litterat.pep.PepException;
-import io.litterat.test.pep.data.SimpleUUIDImmutable;
-import io.litterat.test.pep.data.UUIDBridge;
-import io.litterat.schema.TypeException;
-import io.litterat.schema.TypeLibrary;
+import io.litterat.bind.PepContext;
+import io.litterat.bind.PepException;
+import io.litterat.model.TypeException;
+import io.litterat.model.TypeLibrary;
+import io.litterat.test.bind.data.SimpleUUIDImmutable;
+import io.litterat.test.bind.data.UUIDBridge;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.TypeOutputStream;

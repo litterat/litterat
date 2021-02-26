@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.schema.TypeLibrary;
-import io.litterat.schema.types.TypeName;
+import io.litterat.model.TypeLibrary;
+import io.litterat.model.types.TypeName;
 import io.litterat.xpl.Point;
 import io.litterat.xpl.TypeBaseInput;
 import io.litterat.xpl.TypeMap;

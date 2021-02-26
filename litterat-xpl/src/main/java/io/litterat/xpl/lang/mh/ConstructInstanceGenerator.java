@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-import io.litterat.schema.TypeException;
+import io.litterat.model.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.ConstructInstance;
 import io.litterat.xpl.lang.LitteratMachine;

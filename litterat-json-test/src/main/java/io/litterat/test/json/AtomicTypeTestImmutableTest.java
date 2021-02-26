@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.litterat.bind.PepContext;
 import io.litterat.json.JsonMapper;
-import io.litterat.pep.PepContext;
-import io.litterat.test.pep.data.AtomicTypeTestImmutable;
+import io.litterat.test.bind.data.AtomicTypeTestImmutable;
 
 public class AtomicTypeTestImmutableTest {
 

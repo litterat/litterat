@@ -15,7 +15,6 @@ module io.litterat.json {
 
 	exports io.litterat.json;
 
-	requires transitive io.litterat.pep;
-
+	requires transitive io.litterat.bind;
 
 }

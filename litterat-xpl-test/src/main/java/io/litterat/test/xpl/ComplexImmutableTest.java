@@ -20,8 +20,8 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.test.pep.data.ComplexImmutable;
-import io.litterat.schema.TypeException;
+import io.litterat.model.TypeException;
+import io.litterat.test.bind.data.ComplexImmutable;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 

@@ -28,13 +28,13 @@ repositories {
 dependencies {
    //implementation group: 'io.litterat', name: 'pep-java', version: '0.5.0'
    
-   implementation project(":litterat-pep")
+   implementation project(":litterat-bind")
    
    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
+   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
 	
    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 }
 
 java {

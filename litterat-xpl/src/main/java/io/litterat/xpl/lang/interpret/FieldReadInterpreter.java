@@ -17,10 +17,10 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
-import io.litterat.pep.PepDataClass;
-import io.litterat.pep.PepException;
-import io.litterat.schema.TypeException;
-import io.litterat.schema.bind.PepSchemaBinder;
+import io.litterat.bind.PepDataClass;
+import io.litterat.bind.PepException;
+import io.litterat.model.TypeException;
+import io.litterat.model.bind.PepSchemaBinder;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldRead;
 import io.litterat.xpl.lang.LitteratMachine;

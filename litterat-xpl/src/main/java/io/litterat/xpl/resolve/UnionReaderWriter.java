@@ -17,7 +17,7 @@ package io.litterat.xpl.resolve;
 
 import java.io.IOException;
 
-import io.litterat.schema.types.TypeName;
+import io.litterat.model.types.TypeName;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 import io.litterat.xpl.TypeReader;

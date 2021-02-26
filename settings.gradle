@@ -1,9 +1,9 @@
 rootProject.name = 'litterat'
 
-include ':litterat-pep', 
-        ':litterat-pep-test',
+include ':litterat-bind', 
+        ':litterat-bind-test',
+        ':litterat-model',
         ':litterat-json',
         ':litterat-json-test',
-        ':litterat-schema',
-	    ':litterat-xpl',
-	    ':litterat-xpl-test'
+        ':litterat-xpl',
+        ':litterat-xpl-test'

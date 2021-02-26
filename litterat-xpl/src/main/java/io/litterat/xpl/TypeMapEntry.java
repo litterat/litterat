@@ -15,9 +15,9 @@
  */
 package io.litterat.xpl;
 
-import io.litterat.schema.types.Definition;
-import io.litterat.schema.types.TypeName;
-import io.litterat.schema.types.TypeNameDefinition;
+import io.litterat.model.types.Definition;
+import io.litterat.model.types.TypeName;
+import io.litterat.model.types.TypeNameDefinition;
 
 public class TypeMapEntry {
 

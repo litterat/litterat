@@ -13,10 +13,10 @@
  */
 open module io.litterat.test.json {
 
-	requires transitive io.litterat.pep;
-	requires io.litterat.test.pep;
+	requires transitive io.litterat.bind;
+	requires io.litterat.test.bind;
 	requires io.litterat.json;
-	
+
 	requires org.junit.jupiter.api;
-	
-} 
+
+}

@@ -15,8 +15,8 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.pep.Data;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.Data;
+import io.litterat.model.annotation.SchemaType;
 
 @Data
 @SchemaType(namespace = "xpl.lang", name = "slot_reference")

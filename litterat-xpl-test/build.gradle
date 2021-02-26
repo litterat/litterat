@@ -35,18 +35,18 @@ repositories {
 
 dependencies {
 
-   implementation project(":litterat-pep")
-   implementation project(":litterat-schema")
+   implementation project(":litterat-bind")
+   implementation project(":litterat-model")
    implementation project(":litterat-xpl")
    
    // test data
-   implementation project(":litterat-pep-test")
+   implementation project(":litterat-bind-test")
 
    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-   implementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
+   implementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
 	
    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-   implementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+   implementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 	
 }
 
@@ -68,7 +68,7 @@ test {
 }
 
 jacocoTestReport {
-	sourceSets project(':litterat-schema').sourceSets.main
+	sourceSets project(':litterat-model').sourceSets.main
     sourceSets project(':litterat-xpl').sourceSets.main
     
     

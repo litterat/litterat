@@ -35,14 +35,14 @@ repositories {
 
 dependencies {
 
-    implementation project(":litterat-pep")
-    implementation project(":litterat-schema")
+    implementation project(":litterat-bind")
+    implementation project(":litterat-model")
 
 	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
 	
 	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 	
 }
 

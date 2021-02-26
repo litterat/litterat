@@ -28,14 +28,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import io.litterat.bind.PepContext;
+import io.litterat.bind.PepDataArrayClass;
+import io.litterat.bind.PepDataClass;
+import io.litterat.bind.PepDataComponent;
+import io.litterat.bind.PepException;
 import io.litterat.json.parser.JsonReader;
 import io.litterat.json.parser.JsonToken;
 import io.litterat.json.parser.JsonWriter;
-import io.litterat.pep.PepContext;
-import io.litterat.pep.PepDataArrayClass;
-import io.litterat.pep.PepDataClass;
-import io.litterat.pep.PepDataComponent;
-import io.litterat.pep.PepException;
 
 public class JsonMapper {
 	private final PepContext context;

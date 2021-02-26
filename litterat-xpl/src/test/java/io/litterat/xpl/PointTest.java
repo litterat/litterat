@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.schema.TypeException;
+import io.litterat.model.TypeException;
 
 public class PointTest {
 

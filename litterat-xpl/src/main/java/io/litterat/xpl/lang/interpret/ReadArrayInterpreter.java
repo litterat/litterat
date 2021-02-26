@@ -15,7 +15,7 @@
  */
 package io.litterat.xpl.lang.interpret;
 
-import io.litterat.pep.PepDataClass;
+import io.litterat.bind.PepDataClass;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.lang.LitteratMachine;
 import io.litterat.xpl.lang.ReadArray;

@@ -15,17 +15,16 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.pep.Data;
-import io.litterat.schema.TypeException;
-import io.litterat.schema.annotation.SchemaType;
-import io.litterat.schema.types.TypeName;
+import io.litterat.bind.Data;
+import io.litterat.model.TypeException;
+import io.litterat.model.annotation.SchemaType;
+import io.litterat.model.types.TypeName;
 
 /**
- * This is a specialization of the form out.writeX( o.getY() ); where X is the
- * type being written and Y is the field being read from an object. This only
- * applies to primitive types. The getter method handle can either be through a
- * field or method. The writer handle must match the returned type of the
- * getter.
+ * This is a specialization of the form out.writeX( o.getY() ); where X is the type being written
+ * and Y is the field being read from an object. This only applies to primitive types. The getter
+ * method handle can either be through a field or method. The writer handle must match the returned
+ * type of the getter.
  */
 
 @Data

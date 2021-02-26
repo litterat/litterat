@@ -15,13 +15,13 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.pep.Data;
-import io.litterat.schema.TypeException;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.Data;
+import io.litterat.model.TypeException;
+import io.litterat.model.annotation.SchemaType;
 
 /**
- * Not particularly happy with this loop statement. Should revisit when adding
- * things like a binary boolean operator.
+ * Not particularly happy with this loop statement. Should revisit when adding things like a binary
+ * boolean operator.
  */
 
 @Data

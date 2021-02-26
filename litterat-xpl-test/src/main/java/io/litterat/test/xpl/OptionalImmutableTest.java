@@ -21,9 +21,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.pep.PepContext;
-import io.litterat.test.pep.data.OptionalImmutable;
-import io.litterat.schema.TypeException;
+import io.litterat.bind.PepContext;
+import io.litterat.model.TypeException;
+import io.litterat.test.bind.data.OptionalImmutable;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 

@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-import io.litterat.schema.TypeException;
-import io.litterat.schema.TypeLibrary;
-import io.litterat.schema.meta.SchemaTypes;
-import io.litterat.schema.types.TypeName;
+import io.litterat.model.TypeException;
+import io.litterat.model.TypeLibrary;
+import io.litterat.model.meta.SchemaTypes;
+import io.litterat.model.types.TypeName;
 import io.litterat.xpl.io.ByteArrayBaseOutput;
 import io.litterat.xpl.io.ByteBufferBaseOutput;
 import io.litterat.xpl.io.StreamBaseOutput;

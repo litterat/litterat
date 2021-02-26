@@ -15,13 +15,12 @@
  */
 package io.litterat.xpl;
 
-import io.litterat.schema.TypeException;
-import io.litterat.schema.types.TypeName;
+import io.litterat.model.TypeException;
+import io.litterat.model.types.TypeName;
 
 /**
  *
- * The type resolvers job is to map classes between the TypeLibrary and a
- * specific TypeContext.
+ * The type resolvers job is to map classes between the TypeLibrary and a specific TypeContext.
  *
  */
 public interface TypeResolver {

@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.test.pep.data.PrimitiveArray;
-import io.litterat.schema.TypeException;
+import io.litterat.model.TypeException;
+import io.litterat.test.bind.data.PrimitiveArray;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 

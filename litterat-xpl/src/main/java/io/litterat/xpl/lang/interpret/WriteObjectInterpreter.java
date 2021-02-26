@@ -17,7 +17,7 @@ package io.litterat.xpl.lang.interpret;
 
 import java.io.IOException;
 
-import io.litterat.schema.types.TypeName;
+import io.litterat.model.types.TypeName;
 import io.litterat.xpl.TypeOutputStream;
 import io.litterat.xpl.lang.LitteratMachine;
 import io.litterat.xpl.lang.WriteValue;

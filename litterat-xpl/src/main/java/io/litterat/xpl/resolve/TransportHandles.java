@@ -23,9 +23,9 @@ import java.lang.invoke.MethodType;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.litterat.schema.TypeException;
-import io.litterat.schema.TypeLibrary;
-import io.litterat.schema.types.TypeName;
+import io.litterat.model.TypeException;
+import io.litterat.model.TypeLibrary;
+import io.litterat.model.types.TypeName;
 import io.litterat.xpl.TypeBaseInput;
 import io.litterat.xpl.TypeBaseOutput;
 import io.litterat.xpl.TypeInputStream;

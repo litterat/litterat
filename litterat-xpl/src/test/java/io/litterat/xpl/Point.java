@@ -17,8 +17,7 @@ package io.litterat.xpl;
 
 import java.util.Objects;
 
-import io.litterat.pep.Data;
-
+import io.litterat.bind.Data;
 
 public class Point {
 	private final float latitude;
