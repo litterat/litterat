@@ -13,6 +13,8 @@ PEP
  - Dates and timestamps.
  - Rename PEP to litterat bind.
  - Create PEP error examples and test edge cases.
+ - Investigate Union class type.
+ - Rename categories as Record, Union and Array.
  
  Schema
  - Review the schema language and look at schema annotations. 

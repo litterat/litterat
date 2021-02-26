@@ -655,7 +655,7 @@ Many text based schemas and data formats will rely on providing a date pattern o
  
 An issue with specifying date-time formats is which pattern definition to use. The [Unicode CLDR](http://cldr.unicode.org/translation/date-time-1/date-time-patterns) is emerging as the most likely lead for text based date format specifications. ISO8601 formats are likely the better choice for text based interchange patterns.
 
-As dates and timestamps are often encoded using an underlying type (string, int, long) they often don't need their own data type. Avro uses [Logical Types](https://avro.apache.org/docs/1.8.0/spec.html#Logical+Types) to define the dates and timestamps. That's likely a good example of how
+As dates and timestamps are often encoded using an underlying type (string, int, long) they often don't need their own data type. Avro uses [Logical Types](https://avro.apache.org/docs/1.8.0/spec.html#Logical+Types) to define the dates and timestamps.
 
 
 
