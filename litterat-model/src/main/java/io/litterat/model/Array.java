@@ -13,38 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
-
-import java.util.Objects;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
-@SchemaType(namespace = "schema", name = "reference")
-public class Reference implements Element, Definition {
+@Data
+@SchemaType(namespace = "schema", name = "array")
+public class Array implements Element {
 
 	private final TypeName type;
 
-	@Data
-	public Reference(TypeName type) {
-		Objects.requireNonNull(type, "typeName can not be null");
+	public Array(TypeName type) {
 		this.type = type;
-	}
-
-	public Reference(String type) {
-		this.type = new TypeName(type);
-	}
-
-	public Reference(String namespace, String type) {
-		this.type = new TypeName(namespace, type);
 	}
 
 	public TypeName type() {
 		return this.type;
-	}
-
-	@Override
-	public String toString() {
-		return type.toString();
 	}
 }

@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
-@Data
-@SchemaType(namespace = "schema", name = "array")
-public class Array implements Element {
+@SchemaType(namespace = "schema", name = "atom")
+public class Atom implements Definition {
 
-	private final TypeName type;
+	private final AtomAttribute[] attributes;
 
-	public Array(TypeName type) {
-		this.type = type;
+	@Data
+	public Atom(AtomAttribute[] attributes) {
+		this.attributes = attributes;
 	}
 
-	public TypeName type() {
-		return this.type;
+	public AtomAttribute[] attributes() {
+		return attributes;
 	}
+
 }

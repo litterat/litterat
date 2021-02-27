@@ -16,7 +16,7 @@
 package io.litterat.xpl;
 
 import io.litterat.model.TypeException;
-import io.litterat.model.types.TypeName;
+import io.litterat.model.TypeName;
 
 /**
  *

@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
 @Data
-@SchemaType(namespace = "schema", name = "namespace")
-public class Namespace {
+@SchemaType(namespace = "schema", name = "union")
+public class Union implements Definition {
 
-	private final String[] symbols;
+	private final Reference[] map;
 
-	public Namespace(String[] symbols) {
-		this.symbols = symbols;
+	public Union(Reference[] map) {
+		this.map = map;
 	}
 
-	public String[] symbols() {
-		return symbols;
+	public Reference[] map() {
+		return map;
 	}
 }

@@ -22,7 +22,7 @@ import java.lang.invoke.MethodType;
 import io.litterat.bind.PepDataClass;
 import io.litterat.bind.PepException;
 import io.litterat.model.TypeException;
-import io.litterat.model.bind.PepSchemaBinder;
+import io.litterat.model.bind.ModelBinder;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldSet;
 import io.litterat.xpl.lang.LitteratMachine;
@@ -47,7 +47,7 @@ public class FieldSetGenerator implements StatementGenerator {
 			PepDataClass dataClass = typeMap.library().getTypeClass(fieldSet.type());
 
 			// find the getter.
-			return PepSchemaBinder.resolveFieldSetter(dataClass, fieldSet.field());
+			return ModelBinder.resolveFieldSetter(dataClass, fieldSet.field());
 		} catch (PepException e) {
 			throw new TypeException("Failed to get getter", e);
 		}

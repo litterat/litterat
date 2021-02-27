@@ -23,14 +23,14 @@ import java.util.List;
 import io.litterat.bind.PepDataClass;
 import io.litterat.bind.PepDataComponent;
 import io.litterat.bind.PepException;
+import io.litterat.model.Array;
+import io.litterat.model.Definition;
+import io.litterat.model.Field;
+import io.litterat.model.Record;
+import io.litterat.model.Reference;
 import io.litterat.model.TypeException;
 import io.litterat.model.TypeLibrary;
-import io.litterat.model.types.Array;
-import io.litterat.model.types.Definition;
-import io.litterat.model.types.Field;
-import io.litterat.model.types.Record;
-import io.litterat.model.types.Reference;
-import io.litterat.model.types.TypeName;
+import io.litterat.model.TypeName;
 
 /**
  *
@@ -39,7 +39,7 @@ import io.litterat.model.types.TypeName;
  *
  */
 
-public class PepSchemaBinder {
+public class ModelBinder {
 
 	public Definition createDefinition(TypeLibrary library, Class<?> clss) throws TypeException {
 

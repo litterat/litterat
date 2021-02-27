@@ -11,7 +11,6 @@ PEP
  - Investigate removing the primitive array bridge classes and replace with generated MethodHandles.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates and timestamps.
- - Rename PEP to litterat bind.
  - Create PEP error examples and test edge cases.
  - Investigate Union class type.
  - Rename categories as Record, Union and Array.
@@ -28,6 +27,14 @@ PEP
  
  - Litterat PEP end user guide. User guide to using library & examples.
  - Litterat PEP serialization guide. For people writing serialization formats.
+
+## Day 31 - February 27 - Model changes
+
+Refactored the litterat-model moving the types into the main package and writing some documentation.
+
+## Day 30 - February 26 - Back to it.
+
+After a month off, time to make some more progress. Renamed litterat-pep to litterat-bind. Renamed litterat-schema to litterat-model. This is a better reflection of the theory that was previously explored. The litterat-bind is the language binding and is how the model is implemented and realised in the language. The litterat-model is the abstract data model. At some point the model could be expressed as a schema syntax; and should be able to be expressed in different schema syntax such as JSON Schema or XML Schema.
 
 ## Day 29 - January 27 - More editing
 

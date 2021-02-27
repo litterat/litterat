@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
-@SchemaType(namespace = "schema", name = "atom")
-public class Atom implements Definition {
+@Data
+@SchemaType(namespace = "schema", name = "sequence")
+public class Record implements Element, Definition {
 
-	private final AtomAttribute[] attributes;
+	private final Field[] fields;
 
-	@Data
-	public Atom(AtomAttribute[] attributes) {
-		this.attributes = attributes;
+	public Record(Field[] fields) {
+		this.fields = fields;
 	}
 
-	public AtomAttribute[] attributes() {
-		return attributes;
+	public Field[] fields() {
+		return this.fields;
 	}
-
 }

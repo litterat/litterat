@@ -22,7 +22,7 @@ import java.lang.invoke.MethodType;
 import io.litterat.bind.PepDataClass;
 import io.litterat.bind.PepException;
 import io.litterat.model.TypeException;
-import io.litterat.model.bind.PepSchemaBinder;
+import io.litterat.model.bind.ModelBinder;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldRead;
 import io.litterat.xpl.lang.LitteratMachine;
@@ -44,7 +44,7 @@ public class FieldReadGenerator implements ExpressionGenerator {
 			PepDataClass dataClass = typeMap.library().getTypeClass(fieldRead.type());
 
 			// find the getter.
-			return PepSchemaBinder.resolveFieldGetter(dataClass, fieldRead.field());
+			return ModelBinder.resolveFieldGetter(dataClass, fieldRead.field());
 		} catch (PepException e) {
 			throw new TypeException("Failed to get getter", e);
 		}

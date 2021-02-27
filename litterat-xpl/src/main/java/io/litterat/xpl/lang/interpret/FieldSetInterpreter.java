@@ -20,7 +20,7 @@ import java.lang.invoke.MethodHandle;
 import io.litterat.bind.PepDataClass;
 import io.litterat.bind.PepException;
 import io.litterat.model.TypeException;
-import io.litterat.model.bind.PepSchemaBinder;
+import io.litterat.model.bind.ModelBinder;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldSet;
 import io.litterat.xpl.lang.LitteratMachine;
@@ -46,7 +46,7 @@ public class FieldSetInterpreter implements StatementInterpreter {
 		PepDataClass dataClass = typeMap.library().getTypeClass(fieldSet.type());
 
 		// find the getter.
-		return PepSchemaBinder.resolveFieldSetter(dataClass, fieldSet.field());
+		return ModelBinder.resolveFieldSetter(dataClass, fieldSet.field());
 	}
 
 	@Override

@@ -16,8 +16,8 @@
 package io.litterat.xpl.lang;
 
 import io.litterat.bind.Data;
+import io.litterat.model.Signature;
 import io.litterat.model.annotation.SchemaType;
-import io.litterat.model.types.Signature;
 
 @Data
 @SchemaType(namespace = "xpl.lang", name = "lambda")

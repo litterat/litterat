@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
-@Data
-@SchemaType(namespace = "schema", name = "sequence")
-public class Record implements Element, Definition {
+@SchemaType(namespace = "schema", name = "encoding")
+public class Encoding implements Definition {
 
-	private final Field[] fields;
+	private final String encoding;
 
-	public Record(Field[] fields) {
-		this.fields = fields;
+	@Data
+	public Encoding(String encoding) {
+		this.encoding = encoding;
 	}
 
-	public Field[] fields() {
-		return this.fields;
+	public String encoding() {
+		return encoding;
 	}
 }

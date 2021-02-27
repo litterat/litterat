@@ -13,22 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
-@SchemaType(namespace = "schema", name = "encoding")
-public class Encoding implements Definition {
+@SchemaType(namespace = "schema", name = "field")
+public class Field {
 
-	private final String encoding;
+	private final String name;
+	private final Element type;
+	private final boolean optional;
 
 	@Data
-	public Encoding(String encoding) {
-		this.encoding = encoding;
+	public Field(String name, Element type, boolean optional) {
+		this.name = name;
+		this.type = type;
+		this.optional = optional;
 	}
 
-	public String encoding() {
-		return encoding;
+	public Field(String name, Element type) {
+		this(name, type, false);
+	}
+
+	public String name() {
+		return this.name;
+	}
+
+	public Element type() {
+		return this.type;
+	}
+
+	public boolean optional() {
+		return optional;
 	}
 }

@@ -13,38 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
-@SchemaType(namespace = "schema", name = "field")
-public class Field {
+@Data
+@SchemaType(namespace = "schema", name = "envelope")
+public class Envelope {
 
-	private final String name;
 	private final Element type;
-	private final boolean optional;
 
-	@Data
-	public Field(String name, Element type, boolean optional) {
-		this.name = name;
+	public Envelope(Element type) {
 		this.type = type;
-		this.optional = optional;
-	}
-
-	public Field(String name, Element type) {
-		this(name, type, false);
-	}
-
-	public String name() {
-		return this.name;
 	}
 
 	public Element type() {
 		return this.type;
-	}
-
-	public boolean optional() {
-		return optional;
 	}
 }

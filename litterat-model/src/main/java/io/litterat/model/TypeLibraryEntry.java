@@ -16,8 +16,6 @@
 package io.litterat.model;
 
 import io.litterat.bind.PepDataClass;
-import io.litterat.model.types.Definition;
-import io.litterat.model.types.TypeName;
 
 public class TypeLibraryEntry {
 

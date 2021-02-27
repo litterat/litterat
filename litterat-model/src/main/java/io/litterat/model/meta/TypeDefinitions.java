@@ -15,18 +15,18 @@
  */
 package io.litterat.model.meta;
 
-import io.litterat.model.types.Atom;
-import io.litterat.model.types.AtomAttribute;
-import io.litterat.model.types.Definition;
-import io.litterat.model.types.Encoding;
-import io.litterat.model.types.AtomAttribute.AtomBigEndian;
-import io.litterat.model.types.AtomAttribute.AtomFixedLength;
-import io.litterat.model.types.AtomAttribute.AtomIEEE756;
-import io.litterat.model.types.AtomAttribute.AtomInteger;
-import io.litterat.model.types.AtomAttribute.AtomLittleEndian;
-import io.litterat.model.types.AtomAttribute.AtomSigned;
-import io.litterat.model.types.AtomAttribute.AtomUnsigned;
-import io.litterat.model.types.AtomAttribute.AtomVariableLength;
+import io.litterat.model.Atom;
+import io.litterat.model.AtomAttribute;
+import io.litterat.model.Definition;
+import io.litterat.model.Encoding;
+import io.litterat.model.AtomAttribute.AtomBigEndian;
+import io.litterat.model.AtomAttribute.AtomFixedLength;
+import io.litterat.model.AtomAttribute.AtomIEEE756;
+import io.litterat.model.AtomAttribute.AtomInteger;
+import io.litterat.model.AtomAttribute.AtomLittleEndian;
+import io.litterat.model.AtomAttribute.AtomSigned;
+import io.litterat.model.AtomAttribute.AtomUnsigned;
+import io.litterat.model.AtomAttribute.AtomVariableLength;
 
 public class TypeDefinitions {
 

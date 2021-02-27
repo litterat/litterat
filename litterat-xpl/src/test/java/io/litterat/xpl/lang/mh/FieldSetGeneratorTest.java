@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.model.TypeLibrary;
-import io.litterat.model.types.TypeName;
+import io.litterat.model.TypeName;
 import io.litterat.xpl.Point;
 import io.litterat.xpl.TypeBaseInput;
 import io.litterat.xpl.TypeMap;

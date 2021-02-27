@@ -15,14 +15,14 @@
  */
 package io.litterat.model.meta;
 
+import io.litterat.model.Array;
+import io.litterat.model.Definition;
+import io.litterat.model.Field;
+import io.litterat.model.Record;
+import io.litterat.model.Reference;
 import io.litterat.model.TypeLibrary;
-import io.litterat.model.types.Array;
-import io.litterat.model.types.Definition;
-import io.litterat.model.types.Field;
-import io.litterat.model.types.Record;
-import io.litterat.model.types.Reference;
-import io.litterat.model.types.TypeName;
-import io.litterat.model.types.Union;
+import io.litterat.model.TypeName;
+import io.litterat.model.Union;
 
 public class SchemaTypes {
 

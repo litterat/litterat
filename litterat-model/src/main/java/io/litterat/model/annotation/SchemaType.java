@@ -26,7 +26,7 @@ public @interface SchemaType {
 
 	public String namespace() default "";
 
-	// specify the XPL type.
+	// specify the model type.
 	public String name();
 
 }

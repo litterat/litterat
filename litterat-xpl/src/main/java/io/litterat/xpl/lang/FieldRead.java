@@ -17,8 +17,8 @@ package io.litterat.xpl.lang;
 
 import io.litterat.bind.Data;
 import io.litterat.model.TypeException;
+import io.litterat.model.TypeName;
 import io.litterat.model.annotation.SchemaType;
-import io.litterat.model.types.TypeName;
 
 /**
  * This reads a getter from an object.

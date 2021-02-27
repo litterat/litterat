@@ -23,17 +23,9 @@ import io.litterat.bind.PepContext;
 import io.litterat.bind.PepDataClass;
 import io.litterat.bind.PepException;
 import io.litterat.model.annotation.SchemaType;
-import io.litterat.model.bind.PepSchemaBinder;
+import io.litterat.model.bind.ModelBinder;
 import io.litterat.model.meta.SchemaTypes;
 import io.litterat.model.meta.TypeDefinitions;
-import io.litterat.model.types.Array;
-import io.litterat.model.types.Definition;
-import io.litterat.model.types.Element;
-import io.litterat.model.types.Field;
-import io.litterat.model.types.Record;
-import io.litterat.model.types.Reference;
-import io.litterat.model.types.TypeName;
-import io.litterat.model.types.TypeNameDefinition;
 
 public class TypeLibrary {
 
@@ -77,13 +69,13 @@ public class TypeLibrary {
 	private final ConcurrentMap<Class<?>, TypeName> classes;
 
 	// This probably belongs somewhere else.
-	private final PepSchemaBinder binder;
+	private final ModelBinder binder;
 
 	public TypeLibrary(PepContext pepContext) {
 		this.pepContext = pepContext;
 		this.types = new ConcurrentHashMap<>();
 		this.classes = new ConcurrentHashMap<>();
-		this.binder = new PepSchemaBinder();
+		this.binder = new ModelBinder();
 
 		try {
 

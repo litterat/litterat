@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.types;
+package io.litterat.model;
 
 import io.litterat.bind.Data;
 import io.litterat.model.annotation.SchemaType;
 
 @Data
-@SchemaType(namespace = "schema", name = "envelope")
-public class Envelope {
+@SchemaType(namespace = "schema", name = "signature")
+public class Signature {
 
-	private final Element type;
+	private final Reference[] arguments;
+	private final Reference returnType;
 
-	public Envelope(Element type) {
-		this.type = type;
+	public Signature(Reference returnType, Reference... arguments) {
+		this.arguments = arguments;
+		this.returnType = returnType;
 	}
 
-	public Element type() {
-		return this.type;
+	public Reference[] arguments() {
+		return arguments;
+	}
+
+	public Reference returnType() {
+		return returnType;
 	}
 }
