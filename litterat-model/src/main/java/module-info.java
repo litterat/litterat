@@ -17,7 +17,6 @@ module io.litterat.model {
 	exports io.litterat.model.annotation;
 	exports io.litterat.model.bind;
 	exports io.litterat.model.meta;
-	exports io.litterat.model.types;
 
 	requires transitive io.litterat.bind;
 

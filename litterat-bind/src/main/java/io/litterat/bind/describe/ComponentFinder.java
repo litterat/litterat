@@ -18,7 +18,7 @@ package io.litterat.bind.describe;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindException;
 
 /**
  * 
@@ -27,5 +27,5 @@ import io.litterat.bind.PepException;
  */
 public interface ComponentFinder {
 
-	void findComponents(Class<?> clss, Constructor<?> constructor, List<ComponentInfo> fields) throws PepException;
+	void findComponents(Class<?> clss, Constructor<?> constructor, List<ComponentInfo> fields) throws DataBindException;
 }

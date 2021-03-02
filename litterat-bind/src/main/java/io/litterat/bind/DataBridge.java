@@ -17,7 +17,7 @@ package io.litterat.bind;
 
 public interface DataBridge<D, T> {
 
-	public D toData(T b) throws PepException;
+	public D toData(T b) throws DataBindException;
 
-	public T toObject(D s) throws PepException;
+	public T toObject(D s) throws DataBindException;
 }

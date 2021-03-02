@@ -22,11 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataArrayClass;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 
 /**
  * Sample showing how to use the Pep library to convert an Object to/from
@@ -42,9 +42,9 @@ import io.litterat.bind.PepException;
  */
 public class PepArrayMapper {
 
-	private final PepContext context;
+	private final DataBindContext context;
 
-	private final Map<PepDataClass, ArrayFunctions> functionCache;
+	private final Map<DataClassRecord, ArrayFunctions> functionCache;
 
 	private static class ArrayFunctions {
 
@@ -62,13 +62,13 @@ public class PepArrayMapper {
 		}
 	}
 
-	public PepArrayMapper(PepContext context) {
+	public PepArrayMapper(DataBindContext context) {
 		this.context = context;
 		this.functionCache = new HashMap<>();
 
 	}
 
-	private ArrayFunctions getFunctions(PepDataClass dataClass) throws PepException {
+	private ArrayFunctions getFunctions(DataClassRecord dataClass) throws DataBindException {
 		ArrayFunctions af = functionCache.get(dataClass);
 		if (af == null) {
 
@@ -93,7 +93,7 @@ public class PepArrayMapper {
 		return toArray(context.getDescriptor(o.getClass()), o);
 	}
 
-	public Object[] toArray(PepDataClass clss, Object o) throws Throwable {
+	public Object[] toArray(DataClassRecord clss, Object o) throws Throwable {
 		Objects.requireNonNull(o);
 
 		ArrayFunctions af = getFunctions(clss);
@@ -114,7 +114,7 @@ public class PepArrayMapper {
 		return toObject(context.getDescriptor(clss), values);
 	}
 
-	public <T> T toObject(PepDataClass clss, Object[] values) throws Throwable {
+	public <T> T toObject(DataClassRecord clss, Object[] values) throws Throwable {
 		Objects.requireNonNull(clss);
 		Objects.requireNonNull(values);
 
@@ -137,9 +137,9 @@ public class PepArrayMapper {
 	 * @param objectConstructor
 	 * @param fields
 	 * @return a single MethodHandle to generate target object from Object[]
-	 * @throws PepException
+	 * @throws DataBindException
 	 */
-	private MethodHandle createToObjectFunction(PepDataClass dataClass) throws PepException {
+	private MethodHandle createToObjectFunction(DataClassRecord dataClass) throws DataBindException {
 
 		// return MethodHandles.collectArguments(dataClass.toObject(), 0, create);
 
@@ -154,9 +154,9 @@ public class PepArrayMapper {
 
 			result = dataClass.constructor();
 
-			PepDataComponent[] fields = dataClass.dataComponents();
+			DataClassComponent[] fields = dataClass.dataComponents();
 			for (int x = 0; x < dataClass.dataComponents().length; x++) {
-				PepDataComponent field = fields[x];
+				DataClassComponent field = fields[x];
 
 				int inputIndex = x;
 
@@ -166,7 +166,7 @@ public class PepArrayMapper {
 				// () -> inputIndex
 				MethodHandle index = MethodHandles.constant(int.class, inputIndex);
 
-				PepDataClass fieldDataClass = field.dataClass();
+				DataClassRecord fieldDataClass = field.dataClass();
 
 				// (values[]) -> values[inputIndex]
 				MethodHandle arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index);
@@ -207,7 +207,7 @@ public class PepArrayMapper {
 
 			// toObject( Object[] ):<array>
 			try {
-				PepDataArrayClass dataArrayClass = (PepDataArrayClass) dataClass;
+				DataClassArray dataArrayClass = (DataClassArray) dataClass;
 
 				MethodHandle valueToData = createToObjectFunction(dataArrayClass.arrayDataClass());
 
@@ -219,10 +219,10 @@ public class PepArrayMapper {
 				result = result.asType(MethodType.methodType(dataArrayClass.typeClass(), Object.class));
 
 			} catch (NoSuchMethodException | IllegalAccessException e) {
-				throw new PepException("failed to build bridge for array", e);
+				throw new DataBindException("failed to build bridge for array", e);
 			}
 		} else if (dataClass.isBase()) {
-			throw new PepException("not implemented");
+			throw new DataBindException("not implemented");
 		}
 
 		return result;
@@ -243,9 +243,9 @@ public class PepArrayMapper {
 	 *
 	 * @param fields
 	 * @return
-	 * @throws PepException
+	 * @throws DataBindException
 	 */
-	private MethodHandle createToDataFunction(PepDataClass dataClass) throws PepException {
+	private MethodHandle createToDataFunction(DataClassRecord dataClass) throws DataBindException {
 
 		MethodHandle returnArray = null;
 
@@ -273,7 +273,7 @@ public class PepArrayMapper {
 		} else if (dataClass.isArray()) {
 			try {
 
-				PepDataArrayClass arrayClass = (PepDataArrayClass) dataClass;
+				DataClassArray arrayClass = (DataClassArray) dataClass;
 
 				MethodHandle arrayToData = createToDataFunction(arrayClass.arrayDataClass());
 
@@ -285,10 +285,10 @@ public class PepArrayMapper {
 				returnArray = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
 				// fieldBox = MethodHandles.collectArguments(bridgeToData, 0, fieldBox);
 			} catch (NoSuchMethodException | IllegalAccessException e) {
-				throw new PepException("failed to build array bridge", e);
+				throw new DataBindException("failed to build array bridge", e);
 			}
 		} else {
-			throw new PepException("not implemented");
+			throw new DataBindException("not implemented");
 		}
 
 		return returnArray;
@@ -299,9 +299,9 @@ public class PepArrayMapper {
 	 *
 	 * @param fields
 	 * @return
-	 * @throws PepException
+	 * @throws DataBindException
 	 */
-	private MethodHandle createProjectGetters(PepDataClass dataClass) throws PepException {
+	private MethodHandle createProjectGetters(DataClassRecord dataClass) throws DataBindException {
 
 		// (object[]):object[] -> return object[];
 		MethodHandle identity = MethodHandles.identity(Object[].class);
@@ -309,10 +309,10 @@ public class PepArrayMapper {
 		// (Object[], embedClass):object[] -> return object[];
 		MethodHandle result = MethodHandles.dropArguments(identity, 1, dataClass.dataClass());
 
-		PepDataComponent[] fields = dataClass.dataComponents();
+		DataClassComponent[] fields = dataClass.dataComponents();
 		for (int x = 0; x < fields.length; x++) {
 
-			PepDataComponent field = fields[x];
+			DataClassComponent field = fields[x];
 			int outputIndex = x;
 
 			// (value[],x, v) -> value[x] = v
@@ -324,7 +324,7 @@ public class PepArrayMapper {
 			// (value[],v) -> value[inputIndex] = v
 			MethodHandle arrayIndexSetter = MethodHandles.collectArguments(arraySetter, 1, index);
 
-			PepDataClass fieldDataClass = field.dataClass();
+			DataClassRecord fieldDataClass = field.dataClass();
 
 			// (object) -> (Object) object.getter()
 			MethodHandle fieldBox = field.accessor();
@@ -354,10 +354,10 @@ public class PepArrayMapper {
 	// It can be done but is more difficult than above.
 	private class ObjectToArrayBridge {
 
-		private final PepDataArrayClass arrayClass;
+		private final DataClassArray arrayClass;
 		private final MethodHandle dataToObject;
 
-		public ObjectToArrayBridge(PepDataArrayClass fieldDataClass, MethodHandle dataToObject) {
+		public ObjectToArrayBridge(DataClassArray fieldDataClass, MethodHandle dataToObject) {
 			this.arrayClass = fieldDataClass;
 
 			this.dataToObject = MethodHandles.collectArguments(
@@ -367,7 +367,7 @@ public class PepArrayMapper {
 		}
 
 		@SuppressWarnings("unused")
-		public Object[] toData(Object v) throws PepException {
+		public Object[] toData(Object v) throws DataBindException {
 			try {
 
 				Object arrayData = v;
@@ -375,7 +375,7 @@ public class PepArrayMapper {
 				Object[] outputArray = new Object[length];
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					outputArray[x] = dataToObject.invoke(iterator, arrayData);
@@ -384,7 +384,7 @@ public class PepArrayMapper {
 				return outputArray;
 
 			} catch (Throwable e) {
-				throw new PepException("Failed to convert arra", e);
+				throw new DataBindException("Failed to convert arra", e);
 			}
 		}
 
@@ -392,10 +392,10 @@ public class PepArrayMapper {
 
 	private class ArrayToObjectBridge {
 
-		private final PepDataArrayClass arrayClass;
+		private final DataClassArray arrayClass;
 		private final MethodHandle arrayToObject;
 
-		public ArrayToObjectBridge(PepDataArrayClass arrayClass, MethodHandle arrayToObject) {
+		public ArrayToObjectBridge(DataClassArray arrayClass, MethodHandle arrayToObject) {
 			this.arrayClass = arrayClass;
 			this.arrayToObject = arrayToObject;
 
@@ -407,7 +407,7 @@ public class PepArrayMapper {
 		}
 
 		@SuppressWarnings("unused")
-		public Object toObject(Object[] s) throws PepException {
+		public Object toObject(Object[] s) throws DataBindException {
 			try {
 				Object[] inputArray = s;
 
@@ -415,7 +415,7 @@ public class PepArrayMapper {
 				Object arrayData = arrayClass.constructor().invoke(length);
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 
@@ -428,7 +428,7 @@ public class PepArrayMapper {
 
 				return arrayData;
 			} catch (Throwable e) {
-				throw new PepException("Failed to convert arra", e);
+				throw new DataBindException("Failed to convert arra", e);
 			}
 		}
 

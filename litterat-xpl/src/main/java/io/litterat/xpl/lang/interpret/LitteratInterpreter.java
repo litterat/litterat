@@ -19,8 +19,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataBindException;
 import io.litterat.model.Atom;
 import io.litterat.model.Definition;
 import io.litterat.model.Encoding;
@@ -52,13 +52,13 @@ import io.litterat.xpl.lang.WriteValue;
 public class LitteratInterpreter {
 
 	public LambdaFunction compile(TypeMap typeMap, Lambda lambda)
-			throws NoSuchMethodException, IllegalAccessException, PepException, TypeException {
+			throws NoSuchMethodException, IllegalAccessException, DataBindException, TypeException {
 
 		return new LambdaInterpreter(lambda, compileBlock(typeMap, lambda.block()));
 	}
 
 	private BlockInterpreter compileBlock(TypeMap typeMap, Block block)
-			throws NoSuchMethodException, IllegalAccessException, PepException, TypeException {
+			throws NoSuchMethodException, IllegalAccessException, DataBindException, TypeException {
 
 		List<StatementInterpreter> statements = new ArrayList<>();
 		for (Statement statement : block.statements()) {
@@ -70,7 +70,7 @@ public class LitteratInterpreter {
 	}
 
 	private StatementInterpreter compileStatement(TypeMap typeMap, Statement statement)
-			throws NoSuchMethodException, IllegalAccessException, PepException, TypeException {
+			throws NoSuchMethodException, IllegalAccessException, DataBindException, TypeException {
 
 		StatementInterpreter compiledStatement = null;
 		if (statement instanceof FieldSet) {
@@ -123,7 +123,7 @@ public class LitteratInterpreter {
 	}
 
 	private ExpressionInterpreter compileExpression(TypeMap typeMap, Expression expression)
-			throws NoSuchMethodException, IllegalAccessException, PepException, TypeException {
+			throws NoSuchMethodException, IllegalAccessException, DataBindException, TypeException {
 		ExpressionInterpreter compiledExpression = null;
 
 		if (expression instanceof ConstructInstance) {
@@ -176,7 +176,7 @@ public class LitteratInterpreter {
 
 			Class<?> arrayClass = Array
 					.newInstance(typeMap.library().getTypeClass(readArray.array().type()).dataClass(), 0).getClass();
-			PepDataClass pepClass = typeMap.library().pepContext().getDescriptor(arrayClass);
+			DataClassRecord pepClass = typeMap.library().pepContext().getDescriptor(arrayClass);
 
 			compiledExpression = new ReadArrayInterpreter(readArray, pepClass,
 					compileExpression(typeMap, readArray.readExpression()));

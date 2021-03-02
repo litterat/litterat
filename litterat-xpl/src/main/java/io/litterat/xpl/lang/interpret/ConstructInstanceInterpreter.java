@@ -17,7 +17,7 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
-import io.litterat.bind.PepDataClass;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.model.TypeException;
 import io.litterat.model.bind.ModelBinder;
 import io.litterat.xpl.TypeMap;
@@ -37,7 +37,7 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 		this.createInstance = createInstance;
 		this.params = params;
 
-		PepDataClass typeClass = typeMap.library().getTypeClass(createInstance.type());
+		DataClassRecord typeClass = typeMap.library().getTypeClass(createInstance.type());
 		this.constructor = typeClass.constructor();
 		this.toObject = ModelBinder.collectToObject(typeClass);
 	}

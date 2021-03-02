@@ -19,9 +19,9 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataBindException;
 import io.litterat.model.annotation.SchemaType;
 import io.litterat.model.bind.ModelBinder;
 import io.litterat.model.meta.SchemaTypes;
@@ -62,7 +62,7 @@ public class TypeLibrary {
 
 	public static final TypeName STRING = new TypeName("string");
 
-	private final PepContext pepContext;
+	private final DataBindContext pepContext;
 
 	private final ConcurrentMap<TypeName, TypeLibraryEntry> types;
 
@@ -71,7 +71,7 @@ public class TypeLibrary {
 	// This probably belongs somewhere else.
 	private final ModelBinder binder;
 
-	public TypeLibrary(PepContext pepContext) {
+	public TypeLibrary(DataBindContext pepContext) {
 		this.pepContext = pepContext;
 		this.types = new ConcurrentHashMap<>();
 		this.classes = new ConcurrentHashMap<>();
@@ -100,16 +100,16 @@ public class TypeLibrary {
 			register(SchemaTypes.ARRAY, binder.createDefinition(this, Array.class),
 					pepContext.getDescriptor(Array.class));
 
-		} catch (PepException | TypeException e) {
+		} catch (DataBindException | TypeException e) {
 			throw new RuntimeException("Unexpected error", e);
 		}
 	}
 
 	public TypeLibrary() {
-		this(PepContext.builder().build());
+		this(DataBindContext.builder().build());
 	}
 
-	public PepContext pepContext() {
+	public DataBindContext pepContext() {
 		return pepContext;
 	}
 
@@ -118,7 +118,7 @@ public class TypeLibrary {
 		types.putIfAbsent(type, entry);
 	}
 
-	public void register(TypeName type, Definition definition, PepDataClass dataClass) {
+	public void register(TypeName type, Definition definition, DataClassRecord dataClass) {
 
 		TypeLibraryEntry entry = new TypeLibraryEntry(TypeLibraryState.BOUND, type, definition, dataClass);
 
@@ -143,13 +143,13 @@ public class TypeLibrary {
 
 			Class<?> clss = Class.forName(className);
 			try {
-				PepDataClass dataClass = pepContext.getDescriptor(clss);
+				DataClassRecord dataClass = pepContext.getDescriptor(clss);
 				Definition definition = binder.createDefinition(this, clss);
 
 				register(typeName, definition, dataClass);
 
 				return this.types.get(typeName);
-			} catch (PepException e) {
+			} catch (DataBindException e) {
 				throw new TypeException("Failed to get class data", e);
 			}
 
@@ -166,7 +166,7 @@ public class TypeLibrary {
 		return entry.definition();
 	}
 
-	public PepDataClass getTypeClass(TypeName type) throws TypeException {
+	public DataClassRecord getTypeClass(TypeName type) throws TypeException {
 		TypeLibraryEntry entry = this.types.get(type);
 		if (entry == null) {
 			entry = registerOrThrow(type);
@@ -181,11 +181,11 @@ public class TypeLibrary {
 		if (typeName == null) {
 
 			try {
-				PepDataClass dataClass = pepContext.getDescriptor(clss);
+				DataClassRecord dataClass = pepContext.getDescriptor(clss);
 				Definition definition = binder.createDefinition(this, clss);
 				typeName = generateTypeName(clss);
 				register(typeName, definition, dataClass);
-			} catch (PepException e) {
+			} catch (DataBindException e) {
 				throw new TypeException("Failed to get class data", e);
 			}
 

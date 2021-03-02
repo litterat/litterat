@@ -23,7 +23,7 @@ import java.util.Optional;
  * This is analogous to the Java reflection RecordComponent class but for Data classes.
  *
  */
-public class PepDataComponent {
+public class DataClassComponent {
 
 	// constructor index.
 	private final int index;
@@ -34,7 +34,7 @@ public class PepDataComponent {
 	// type of the field
 	private final Class<?> type;
 
-	private final PepDataClass dataClass;
+	private final DataClassRecord dataClass;
 
 	// accessor read handle. signature: type t = object.getT();
 	private final MethodHandle accessor;
@@ -42,7 +42,7 @@ public class PepDataComponent {
 	// setter write handle. signature object.setT( type t);
 	private final Optional<MethodHandle> setter;
 
-	public PepDataComponent(int index, String name, Class<?> type, PepDataClass dataClass, MethodHandle readHandle, MethodHandle setter) {
+	public DataClassComponent(int index, String name, Class<?> type, DataClassRecord dataClass, MethodHandle readHandle, MethodHandle setter) {
 		this.index = index;
 		this.name = name;
 		this.type = type;
@@ -63,7 +63,7 @@ public class PepDataComponent {
 		return type;
 	}
 
-	public PepDataClass dataClass() {
+	public DataClassRecord dataClass() {
 		return dataClass;
 	}
 

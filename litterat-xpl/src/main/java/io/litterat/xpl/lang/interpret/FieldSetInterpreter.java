@@ -17,8 +17,8 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataBindException;
 import io.litterat.model.TypeException;
 import io.litterat.model.bind.ModelBinder;
 import io.litterat.xpl.TypeMap;
@@ -33,17 +33,17 @@ public class FieldSetInterpreter implements StatementInterpreter {
 	private final MethodHandle fieldSetter;
 
 	public FieldSetInterpreter(TypeMap typeMap, FieldSet fieldSet, final ExpressionInterpreter objectExpression,
-			final ExpressionInterpreter valueExpression) throws PepException, TypeException {
+			final ExpressionInterpreter valueExpression) throws DataBindException, TypeException {
 		this.fieldSet = fieldSet;
 		this.objectExpression = objectExpression;
 		this.valueExpression = valueExpression;
 		this.fieldSetter = resolveFieldSetter(typeMap);
 	}
 
-	private MethodHandle resolveFieldSetter(TypeMap typeMap) throws PepException, TypeException {
+	private MethodHandle resolveFieldSetter(TypeMap typeMap) throws DataBindException, TypeException {
 
 		// Get the data class
-		PepDataClass dataClass = typeMap.library().getTypeClass(fieldSet.type());
+		DataClassRecord dataClass = typeMap.library().getTypeClass(fieldSet.type());
 
 		// find the getter.
 		return ModelBinder.resolveFieldSetter(dataClass, fieldSet.field());

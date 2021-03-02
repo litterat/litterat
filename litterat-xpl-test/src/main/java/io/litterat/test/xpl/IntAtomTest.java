@@ -18,7 +18,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
+import io.litterat.bind.DataBindContext;
 import io.litterat.model.TypeException;
 import io.litterat.test.bind.data.IntAtom;
 import io.litterat.test.bind.data.IntAtomData;
@@ -31,7 +31,7 @@ public class IntAtomTest {
 
 	IntAtomData test = new IntAtomData(INT_ATOM_TEST);
 
-	PepContext context;
+	DataBindContext context;
 
 	@Test
 	public void testWriteAndReadMixedImmutable() throws IOException, TypeException {

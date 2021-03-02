@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.PrimitiveArray;
@@ -36,27 +36,27 @@ public class PrimitiveArrayTest {
 
 	PrimitiveArray test = new PrimitiveArray(TEST);
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 	}
 
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		PepDataClass descriptor = context.getDescriptor(PrimitiveArray.class);
+		DataClassRecord descriptor = context.getDescriptor(PrimitiveArray.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(PrimitiveArray.class, descriptor.typeClass());
 		Assertions.assertEquals(PrimitiveArray.class, descriptor.dataClass());
 
-		PepDataComponent[] fields = descriptor.dataComponents();
+		DataClassComponent[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 
-		PepDataComponent field = fields[0];
+		DataClassComponent field = fields[0];
 		Assertions.assertEquals("intArray", field.name());
 		Assertions.assertEquals(int[].class, field.type());
 
@@ -104,7 +104,7 @@ public class PrimitiveArrayTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("intArray", "error");
 
-		Assertions.assertThrows(PepException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(PrimitiveArray.class, map);
 		});
 

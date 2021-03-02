@@ -16,18 +16,18 @@ package io.litterat.bind.describe;
 import java.util.Optional;
 
 import io.litterat.bind.DataBridge;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindException;
 
 public class OptionalBridge<T> implements DataBridge<T, Optional<T>> {
 
 	@Override
-	public T toData(Optional<T> value) throws PepException {
+	public T toData(Optional<T> value) throws DataBindException {
 
 		return value.orElse(null);
 	}
 
 	@Override
-	public Optional<T> toObject(T value) throws PepException {
+	public Optional<T> toObject(T value) throws DataBindException {
 
 		return Optional.ofNullable(value);
 	}

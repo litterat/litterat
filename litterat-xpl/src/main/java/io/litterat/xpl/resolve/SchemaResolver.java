@@ -20,8 +20,8 @@ import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataBindException;
 import io.litterat.model.Array;
 import io.litterat.model.Atom;
 import io.litterat.model.Definition;
@@ -78,7 +78,7 @@ public class SchemaResolver implements TypeResolver {
 		Definition definition = library.getDefinition(name);
 		if (definition instanceof Record) {
 			Record sequence = (Record) definition;
-			PepDataClass dataClass = library.getTypeClass(name);
+			DataClassRecord dataClass = library.getTypeClass(name);
 
 			result = new TypeMapEntry(0, name, definition,
 					generateSequenceReaderConstructor(typeMap, sequence, name, dataClass),
@@ -123,7 +123,7 @@ public class SchemaResolver implements TypeResolver {
 	}
 
 	private static TypeWriter generateSequenceWriter(TypeMap typeMap, Record sequence, TypeName typeName,
-			PepDataClass dataClass) throws TypeException {
+			DataClassRecord dataClass) throws TypeException {
 		try {
 
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
@@ -167,14 +167,14 @@ public class SchemaResolver implements TypeResolver {
 
 			return new LambdaTypeWriter(lambdaFunction, dataClass);
 
-		} catch (NoSuchMethodException | IllegalAccessException | TypeException | PepException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | TypeException | DataBindException e) {
 			throw new TypeException(e);
 		}
 	}
 
 	@SuppressWarnings("unused")
 	private static TypeReader generateSequenceReader(TypeMap typeMap, Record sequence, TypeName typeName,
-			PepDataClass dataClass) throws TypeException {
+			DataClassRecord dataClass) throws TypeException {
 
 		try {
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
@@ -205,14 +205,14 @@ public class SchemaResolver implements TypeResolver {
 
 			return new LambdaTypeReader(lambdaFunction, dataClass);
 
-		} catch (NoSuchMethodException | IllegalAccessException | TypeException | PepException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | TypeException | DataBindException e) {
 			throw new TypeException(e);
 		}
 
 	}
 
 	private static TypeReader generateSequenceReaderConstructor(TypeMap typeMap, Record sequence, TypeName typeName,
-			PepDataClass dataClass) throws TypeException {
+			DataClassRecord dataClass) throws TypeException {
 
 		try {
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
@@ -261,7 +261,7 @@ public class SchemaResolver implements TypeResolver {
 
 			return new LambdaTypeReader(lambdaFunction, dataClass);
 
-		} catch (NoSuchMethodException | IllegalAccessException | PepException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | DataBindException e) {
 			throw new TypeException(e);
 		}
 
@@ -272,7 +272,7 @@ public class SchemaResolver implements TypeResolver {
 		private final LambdaFunction readerLambda;
 		private final MethodHandle toObject;
 
-		public LambdaTypeReader(LambdaFunction reader, PepDataClass dataClass) {
+		public LambdaTypeReader(LambdaFunction reader, DataClassRecord dataClass) {
 			this.readerLambda = reader;
 			this.toObject = dataClass.toObject();
 
@@ -293,7 +293,7 @@ public class SchemaResolver implements TypeResolver {
 		private final LambdaFunction writerLambda;
 		private final MethodHandle toData;
 
-		public LambdaTypeWriter(LambdaFunction writer, PepDataClass dataClass) {
+		public LambdaTypeWriter(LambdaFunction writer, DataClassRecord dataClass) {
 			this.writerLambda = writer;
 			this.toData = dataClass.toData();
 		}

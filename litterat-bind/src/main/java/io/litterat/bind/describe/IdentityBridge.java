@@ -1,7 +1,7 @@
 package io.litterat.bind.describe;
 
 import io.litterat.bind.DataBridge;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindException;
 
 /**
  *
@@ -12,13 +12,13 @@ import io.litterat.bind.PepException;
 public class IdentityBridge implements DataBridge {
 
 	@Override
-	public Object toData(Object b) throws PepException {
+	public Object toData(Object b) throws DataBindException {
 
 		return b;
 	}
 
 	@Override
-	public Object toObject(Object s) throws PepException {
+	public Object toObject(Object s) throws DataBindException {
 		return s;
 	}
 

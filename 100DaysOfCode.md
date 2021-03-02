@@ -30,7 +30,7 @@ PEP
 
 ## Day 31 - February 27 - Model changes
 
-Refactored the litterat-model moving the types into the main package and writing some documentation.
+Refactored the litterat-model moving the types into the main package and writing some documentation. Got reaquainted with the litterat.io website and deployed a few changes via cloudflare.
 
 ## Day 30 - February 26 - Back to it.
 

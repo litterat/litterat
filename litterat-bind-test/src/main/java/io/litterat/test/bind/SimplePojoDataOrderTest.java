@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.SimplePojoDataOrder;
@@ -38,11 +38,11 @@ public class SimplePojoDataOrderTest {
 
 	SimplePojoDataOrder test;
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 
 		test = new SimplePojoDataOrder();
 		test.setA(TEST_A);
@@ -53,30 +53,30 @@ public class SimplePojoDataOrderTest {
 
 	@Test
 	public void checkDescriptor() throws Throwable {
-		PepContext context = new PepContext.Builder().build();
-		PepDataClass descriptor = context.getDescriptor(SimplePojoDataOrder.class);
+		DataBindContext context = new DataBindContext.Builder().build();
+		DataClassRecord descriptor = context.getDescriptor(SimplePojoDataOrder.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(SimplePojoDataOrder.class, descriptor.typeClass());
 		Assertions.assertEquals(SimplePojoDataOrder.class, descriptor.dataClass());
 
-		PepDataComponent[] fields = descriptor.dataComponents();
+		DataClassComponent[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(4, fields.length);
 
-		PepDataComponent fieldX = fields[0];
+		DataClassComponent fieldX = fields[0];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
 
-		PepDataComponent fieldZ = fields[1];
+		DataClassComponent fieldZ = fields[1];
 		Assertions.assertEquals("z", fieldZ.name());
 		Assertions.assertEquals(int.class, fieldZ.type());
 
-		PepDataComponent fieldY = fields[2];
+		DataClassComponent fieldY = fields[2];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
 
-		PepDataComponent fieldA = fields[3];
+		DataClassComponent fieldA = fields[3];
 		Assertions.assertEquals("a", fieldA.name());
 		Assertions.assertEquals(int.class, fieldA.type());
 
@@ -126,7 +126,7 @@ public class SimplePojoDataOrderTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("x", "error");
 
-		Assertions.assertThrows(PepException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(SimplePojoDataOrder.class, map);
 		});
 

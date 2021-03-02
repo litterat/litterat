@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.AtomicTypeTestImmutable;
@@ -52,91 +52,91 @@ public class AtomicTypeTestImmutableTest {
 	AtomicTypeTestImmutable test = new AtomicTypeTestImmutable(pBoolean, oBoolean, pByte, oByte, pChar, oChar, pShort,
 			oShort, pInteger, oInteger, pLong, oLong, pFloat, oFloat, pDouble, oDouble, string);
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 	}
 
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		PepDataClass descriptor = context.getDescriptor(AtomicTypeTestImmutable.class);
+		DataClassRecord descriptor = context.getDescriptor(AtomicTypeTestImmutable.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(AtomicTypeTestImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(AtomicTypeTestImmutable.class, descriptor.dataClass());
 
-		PepDataComponent[] fields = descriptor.dataComponents();
+		DataClassComponent[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(17, fields.length);
 
-		PepDataComponent fieldPBoolean = fields[0];
+		DataClassComponent fieldPBoolean = fields[0];
 		Assertions.assertEquals("pBoolean", fieldPBoolean.name());
 		Assertions.assertEquals(boolean.class, fieldPBoolean.type());
 
-		PepDataComponent fieldOBoolean = fields[1];
+		DataClassComponent fieldOBoolean = fields[1];
 		Assertions.assertEquals("oBoolean", fieldOBoolean.name());
 		Assertions.assertEquals(Boolean.class, fieldOBoolean.type());
 
-		PepDataComponent fieldPByte = fields[2];
+		DataClassComponent fieldPByte = fields[2];
 		Assertions.assertEquals("pByte", fieldPByte.name());
 		Assertions.assertEquals(byte.class, fieldPByte.type());
 
-		PepDataComponent fieldOByte = fields[3];
+		DataClassComponent fieldOByte = fields[3];
 		Assertions.assertEquals("oByte", fieldOByte.name());
 		Assertions.assertEquals(Byte.class, fieldOByte.type());
 
-		PepDataComponent fieldPChar = fields[4];
+		DataClassComponent fieldPChar = fields[4];
 		Assertions.assertEquals("pChar", fieldPChar.name());
 		Assertions.assertEquals(char.class, fieldPChar.type());
 
-		PepDataComponent fieldOChar = fields[5];
+		DataClassComponent fieldOChar = fields[5];
 		Assertions.assertEquals("oChar", fieldOChar.name());
 		Assertions.assertEquals(Character.class, fieldOChar.type());
 
-		PepDataComponent fieldPShort = fields[6];
+		DataClassComponent fieldPShort = fields[6];
 		Assertions.assertEquals("pShort", fieldPShort.name());
 		Assertions.assertEquals(short.class, fieldPShort.type());
 
-		PepDataComponent fieldOShort = fields[7];
+		DataClassComponent fieldOShort = fields[7];
 		Assertions.assertEquals("oShort", fieldOShort.name());
 		Assertions.assertEquals(Short.class, fieldOShort.type());
 
-		PepDataComponent fieldPInteger = fields[8];
+		DataClassComponent fieldPInteger = fields[8];
 		Assertions.assertEquals("pInteger", fieldPInteger.name());
 		Assertions.assertEquals(int.class, fieldPInteger.type());
 
-		PepDataComponent fieldOInteger = fields[9];
+		DataClassComponent fieldOInteger = fields[9];
 		Assertions.assertEquals("oInteger", fieldOInteger.name());
 		Assertions.assertEquals(Integer.class, fieldOInteger.type());
 
-		PepDataComponent fieldPLong = fields[10];
+		DataClassComponent fieldPLong = fields[10];
 		Assertions.assertEquals("pLong", fieldPLong.name());
 		Assertions.assertEquals(long.class, fieldPLong.type());
 
-		PepDataComponent fieldOLong = fields[11];
+		DataClassComponent fieldOLong = fields[11];
 		Assertions.assertEquals("oLong", fieldOLong.name());
 		Assertions.assertEquals(Long.class, fieldOLong.type());
 
-		PepDataComponent fieldPFloat = fields[12];
+		DataClassComponent fieldPFloat = fields[12];
 		Assertions.assertEquals("pFloat", fieldPFloat.name());
 		Assertions.assertEquals(float.class, fieldPFloat.type());
 
-		PepDataComponent fieldOFloat = fields[13];
+		DataClassComponent fieldOFloat = fields[13];
 		Assertions.assertEquals("oFloat", fieldOFloat.name());
 		Assertions.assertEquals(Float.class, fieldOFloat.type());
 
-		PepDataComponent fieldPDouble = fields[14];
+		DataClassComponent fieldPDouble = fields[14];
 		Assertions.assertEquals("pDouble", fieldPDouble.name());
 		Assertions.assertEquals(double.class, fieldPDouble.type());
 
-		PepDataComponent fieldODouble = fields[15];
+		DataClassComponent fieldODouble = fields[15];
 		Assertions.assertEquals("oDouble", fieldODouble.name());
 		Assertions.assertEquals(Double.class, fieldODouble.type());
 
-		PepDataComponent fieldString = fields[16];
+		DataClassComponent fieldString = fields[16];
 		Assertions.assertEquals("string", fieldString.name());
 		Assertions.assertEquals(String.class, fieldString.type());
 
@@ -218,7 +218,7 @@ public class AtomicTypeTestImmutableTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("pBoolean", "error");
 
-		Assertions.assertThrows(PepException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(AtomicTypeTestImmutable.class, map);
 		});
 

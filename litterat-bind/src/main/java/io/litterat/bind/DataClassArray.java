@@ -5,10 +5,52 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Collection;
 
-public class PepDataArrayClass extends PepDataClass {
+/**
+ * 
+ * Represents an Array data class. The Array could be implemented by either a Java array or
+ * collection. This provide an interface made up of MethodHandles to with the array implementation.
+ * 
+ * Extracting the values from an array object:
+ * 
+ * <pre>
+ * DataClassArray arrayClass = (DataClassArray) dataClass;
+ * 
+ * int length = (int) arrayClass.size().invoke(arrayData);
+ * Object[] outputArray = new Object[length];
+ * Object iterator = arrayClass.iterator().invoke(arrayData);
+ * 
+ * DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
+ * 
+ * for (int x = 0; x < length; x++) {
+ * 	Object av = arrayClass.get().invoke(iterator, arrayData);
+ * 	outputArray[x] = toMap(arrayDataClass, av);
+ * }
+ * </pre>
+ * 
+ * Instantiating and loading values to the array:
+ * 
+ * <pre>
+ * DataClassArray arrayClass = (DataClassArray) dataClass;
+ * 
+ * Object[] inputArray = (Object[]) data;
+ * 
+ * int length = inputArray.length; Object arrayData = arrayClass.constructor().invoke(length);
+ * Object iterator = arrayClass.iterator().invoke(arrayData);
+ * 
+ * DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
+ * 
+ * for (int x = 0; x < length; x++) { arrayClass.put().invoke(iterator, arrayData,
+ * toObject(arrayDataClass, inputArray[x])); }
+ * 
+ * v = arrayData;
+ * 
+ * 
+ * 
+ */
+public class DataClassArray extends DataClassRecord {
 
 	// data class.
-	private final PepDataClass arrayDataClass;
+	private final DataClassRecord arrayDataClass;
 
 	// int size( <Array> );
 	private final MethodHandle size;
@@ -22,9 +64,9 @@ public class PepDataArrayClass extends PepDataClass {
 	// <data> get( <Iterator> iterator, <Array> );
 	private final MethodHandle get;
 
-	public PepDataArrayClass(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
-			MethodHandle toData, MethodHandle toObject, PepDataComponent[] fields, DataType dataType,
-			PepDataClass arrayDataClass, Object bridge) throws NoSuchMethodException, IllegalAccessException {
+	public DataClassArray(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
+			MethodHandle toData, MethodHandle toObject, DataClassComponent[] fields, DataType dataType,
+			DataClassRecord arrayDataClass, Object bridge) throws NoSuchMethodException, IllegalAccessException {
 		super(targetType, serialType, creator, constructor, toData, toObject, fields, dataType);
 
 		Class<?> iteratorClass;
@@ -59,7 +101,7 @@ public class PepDataArrayClass extends PepDataClass {
 				MethodType.methodType(bridgeDataClass, iteratorClass, arrayClass)).bindTo(bridge);
 	}
 
-	public PepDataClass arrayDataClass() {
+	public DataClassRecord arrayDataClass() {
 		return arrayDataClass;
 	}
 

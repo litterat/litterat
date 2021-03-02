@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.AtomicDateImmutable;
@@ -36,27 +36,27 @@ public class AtomicDateImmutableTest {
 
 	AtomicDateImmutable test = new AtomicDateImmutable(new Date(TEST_TIMESTAMP));
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 	}
 
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		PepDataClass descriptor = context.getDescriptor(AtomicDateImmutable.class);
+		DataClassRecord descriptor = context.getDescriptor(AtomicDateImmutable.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(AtomicDateImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(AtomicDateImmutable.class, descriptor.dataClass());
 
-		PepDataComponent[] fields = descriptor.dataComponents();
+		DataClassComponent[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 
-		PepDataComponent fieldDate = fields[0];
+		DataClassComponent fieldDate = fields[0];
 		Assertions.assertEquals("date", fieldDate.name());
 		Assertions.assertEquals(Date.class, fieldDate.type());
 
@@ -103,7 +103,7 @@ public class AtomicDateImmutableTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("date", "error");
 
-		Assertions.assertThrows(PepException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(AtomicDateImmutable.class, map);
 		});
 

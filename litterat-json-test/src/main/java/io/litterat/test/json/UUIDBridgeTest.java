@@ -23,8 +23,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
 import io.litterat.json.JsonMapper;
 import io.litterat.test.bind.data.SimpleUUIDImmutable;
 import io.litterat.test.bind.data.UUIDBridge;
@@ -36,11 +36,11 @@ public class UUIDBridgeTest {
 
 	SimpleUUIDImmutable test = new SimpleUUIDImmutable(FIRST_UUID, SECOND_UUID);
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
-	public void setup() throws PepException {
-		context = PepContext.builder().build();
+	public void setup() throws DataBindException {
+		context = DataBindContext.builder().build();
 		context.registerAtom(UUID.class, new UUIDBridge());
 	}
 

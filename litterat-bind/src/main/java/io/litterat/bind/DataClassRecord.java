@@ -24,7 +24,7 @@ import java.util.Optional;
  * pair for use in serialization libraries.
  *
  */
-public class PepDataClass {
+public class DataClassRecord {
 
 	public enum DataType {
 		ATOM, TUPLE, ARRAY, BASE
@@ -49,7 +49,7 @@ public class PepDataClass {
 	private final MethodHandle toObject;
 
 	// All fields in the projected class.
-	private final PepDataComponent[] dataComponents;
+	private final DataClassComponent[] dataComponents;
 
 	// Target class is data. No extract/inject required.
 	private final boolean isData;
@@ -63,8 +63,8 @@ public class PepDataClass {
 	// Base types e.g. interface or abstract classes.
 	private final boolean isBase;
 
-	public PepDataClass(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
-			MethodHandle toData, MethodHandle toObject, PepDataComponent[] fields, DataType dataType) {
+	public DataClassRecord(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
+			MethodHandle toData, MethodHandle toObject, DataClassComponent[] fields, DataType dataType) {
 		this.typeClass = targetType;
 		this.dataClass = serialType;
 		this.dataComponents = fields;
@@ -78,20 +78,20 @@ public class PepDataClass {
 		this.isBase = DataType.BASE == dataType;
 	}
 
-	public PepDataClass(Class<?> targetType, Class<?> serialType, MethodHandle constructor, MethodHandle toData,
-			MethodHandle toObject, PepDataComponent[] fields) {
+	public DataClassRecord(Class<?> targetType, Class<?> serialType, MethodHandle constructor, MethodHandle toData,
+			MethodHandle toObject, DataClassComponent[] fields) {
 		this(targetType, serialType, null, constructor, toData, toObject, fields, DataType.TUPLE);
 	}
 
 	// An Atom uses identity function for toData/toObject and construct.
-	public PepDataClass(Class<?> targetType) {
+	public DataClassRecord(Class<?> targetType) {
 		this(targetType, targetType, null, identity(targetType), identity(targetType), identity(targetType),
-				new PepDataComponent[0], DataType.ATOM);
+				new DataClassComponent[0], DataType.ATOM);
 	}
 
 	// An Atom with conversion functions. e.g. String <--> UUID
-	public PepDataClass(Class<?> targetType, Class<?> dataClass, MethodHandle toData, MethodHandle toObject) {
-		this(targetType, dataClass, null, identity(targetType), toData, toObject, new PepDataComponent[0],
+	public DataClassRecord(Class<?> targetType, Class<?> dataClass, MethodHandle toData, MethodHandle toObject) {
+		this(targetType, dataClass, null, identity(targetType), toData, toObject, new DataClassComponent[0],
 				DataType.ATOM);
 	}
 
@@ -157,7 +157,7 @@ public class PepDataClass {
 	/**
 	 * @return The list of fields and their types returned by the embed function.
 	 */
-	public PepDataComponent[] dataComponents() {
+	public DataClassComponent[] dataComponents() {
 		return dataComponents;
 	}
 

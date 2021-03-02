@@ -20,9 +20,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.model.Array;
 import io.litterat.model.Definition;
 import io.litterat.model.Field;
@@ -46,13 +46,13 @@ public class ModelBinder {
 		try {
 
 			// This might throw an exception.
-			PepDataClass dataClass = library.pepContext().getDescriptor(clss);
+			DataClassRecord dataClass = library.pepContext().getDescriptor(clss);
 
 			if (dataClass.isData()) {
 				List<Field> fields = new ArrayList<>();
 
-				PepDataComponent[] components = dataClass.dataComponents();
-				for (PepDataComponent component : components) {
+				DataClassComponent[] components = dataClass.dataComponents();
+				for (DataClassComponent component : components) {
 					String name = component.name();
 
 					if (component.dataClass().isArray()) {
@@ -79,20 +79,20 @@ public class ModelBinder {
 			} else {
 				throw new TypeException("Could not generate descriptor for " + clss.getName());
 			}
-		} catch (PepException e) {
+		} catch (DataBindException e) {
 			throw new TypeException("Could not get data descriptor for class.", e);
 		}
 
 	}
 
-	public static MethodHandle resolveFieldGetter(PepDataClass dataClass, String field) throws PepException {
+	public static MethodHandle resolveFieldGetter(DataClassRecord dataClass, String field) throws DataBindException {
 
-		for (PepDataComponent component : dataClass.dataComponents()) {
+		for (DataClassComponent component : dataClass.dataComponents()) {
 			if (component.name().equalsIgnoreCase(field)) {
 
 				// Pass the accessor through the toData handle to get the correct data type.
 				// toData will be identity function if no change required.
-				PepDataClass componentClass = component.dataClass();
+				DataClassRecord componentClass = component.dataClass();
 
 				MethodHandle toData = componentClass.toData();
 
@@ -100,19 +100,19 @@ public class ModelBinder {
 			}
 		}
 
-		throw new PepException(
+		throw new DataBindException(
 				String.format("Field '%s' not found in dataClass '%s'", field, dataClass.dataClass().getName()));
 	}
 
-	public static MethodHandle resolveFieldSetter(PepDataClass dataClass, String field) throws PepException {
-		for (PepDataComponent component : dataClass.dataComponents()) {
+	public static MethodHandle resolveFieldSetter(DataClassRecord dataClass, String field) throws DataBindException {
+		for (DataClassComponent component : dataClass.dataComponents()) {
 			if (component.name().equalsIgnoreCase(field)) {
 
-				MethodHandle setter = component.setter().orElseThrow(() -> new PepException("No setter available"));
+				MethodHandle setter = component.setter().orElseThrow(() -> new DataBindException("No setter available"));
 
 				// Pass the object through the toObject method handle to get the correct type
 				// for the setter. toObject will be identity function if no change required.
-				PepDataClass componentClass = component.dataClass();
+				DataClassRecord componentClass = component.dataClass();
 
 				MethodHandle toObject = componentClass.toObject();
 
@@ -120,17 +120,17 @@ public class ModelBinder {
 			}
 		}
 
-		throw new PepException("Field not found");
+		throw new DataBindException("Field not found");
 	}
 
-	public static MethodHandle[] collectToObject(PepDataClass dataClass) {
+	public static MethodHandle[] collectToObject(DataClassRecord dataClass) {
 
 		MethodHandle[] toObject = new MethodHandle[dataClass.dataComponents().length];
 
-		PepDataComponent[] components = dataClass.dataComponents();
+		DataClassComponent[] components = dataClass.dataComponents();
 
 		for (int x = 0; x < components.length; x++) {
-			PepDataComponent component = dataClass.dataComponents()[x];
+			DataClassComponent component = dataClass.dataComponents()[x];
 
 			toObject[x] = component.dataClass().toObject();
 		}

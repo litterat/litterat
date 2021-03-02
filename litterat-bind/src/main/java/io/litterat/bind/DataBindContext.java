@@ -24,20 +24,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import io.litterat.bind.describe.DefaultResolver;
 
-public class PepContext {
+public class DataBindContext {
 
 	// Resolved class information
-	private final ConcurrentHashMap<Type, PepDataClass> descriptors = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Type, DataClassRecord> descriptors = new ConcurrentHashMap<>();
 
 	// Resolver
-	private final PepContextResolver resolver;
+	private final DataBindContextResolver resolver;
 
 	// default resolver
-	private final PepContextResolver defaultResolver;
+	private final DataBindContextResolver defaultResolver;
 
 	public static class Builder {
 
-		PepContextResolver resolver;
+		DataBindContextResolver resolver;
 
 		boolean allowAny = false;
 
@@ -47,7 +47,7 @@ public class PepContext {
 			this.resolver = null;
 		}
 
-		public Builder resolver(PepContextResolver resolver) {
+		public Builder resolver(DataBindContextResolver resolver) {
 			this.resolver = resolver;
 			return this;
 		}
@@ -62,8 +62,8 @@ public class PepContext {
 			return this;
 		}
 
-		public PepContext build() {
-			return new PepContext(this);
+		public DataBindContext build() {
+			return new DataBindContext(this);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class PepContext {
 		return new Builder();
 	}
 
-	private PepContext(Builder builder) {
+	private DataBindContext(Builder builder) {
 
 		this.defaultResolver = new DefaultResolver(builder.allowSerializable, builder.allowAny);
 
@@ -103,32 +103,32 @@ public class PepContext {
 
 			registerAtom(Date.class);
 
-		} catch (PepException e) {
+		} catch (DataBindException e) {
 			throw new IllegalArgumentException();
 		}
 
 	}
 
-	public PepContextResolver defaultResolver() {
+	public DataBindContextResolver defaultResolver() {
 		return defaultResolver;
 	}
 
-	public void registerAtom(Class<?> targetClass) throws PepException {
-		register(targetClass, new PepDataClass(targetClass));
+	public void registerAtom(Class<?> targetClass) throws DataBindException {
+		register(targetClass, new DataClassRecord(targetClass));
 	}
 
-	public PepDataClass getDescriptor(Class<?> targetClass) throws PepException {
+	public DataClassRecord getDescriptor(Class<?> targetClass) throws DataBindException {
 		// Use the erased type if type parameters not provided.
 		return getDescriptor(targetClass, targetClass);
 	}
 
-	public PepDataClass getDescriptor(Class<?> targetClass, Type parameterizedType) throws PepException {
+	public DataClassRecord getDescriptor(Class<?> targetClass, Type parameterizedType) throws DataBindException {
 
-		PepDataClass descriptor = descriptors.get(parameterizedType);
+		DataClassRecord descriptor = descriptors.get(parameterizedType);
 		if (descriptor == null) {
 			descriptor = resolver.resolve(this, targetClass, parameterizedType);
 			if (descriptor == null) {
-				throw new PepException(
+				throw new DataBindException(
 						String.format("Unable to find suitable data descriptor for class: %s", targetClass.getName()));
 			}
 			register(parameterizedType, descriptor);
@@ -137,19 +137,19 @@ public class PepContext {
 		return descriptor;
 	}
 
-	private <T> void checkExists(Type targetClass) throws PepException {
+	private <T> void checkExists(Type targetClass) throws DataBindException {
 		if (descriptors.containsKey(targetClass)) {
-			throw new PepException(String.format("Class already registered: %s", targetClass.getTypeName()));
+			throw new DataBindException(String.format("Class already registered: %s", targetClass.getTypeName()));
 		}
 	}
 
-	public <T> void register(Type targetClass, PepDataClass descriptor) throws PepException {
+	public <T> void register(Type targetClass, DataClassRecord descriptor) throws DataBindException {
 		checkExists(targetClass);
 
 		descriptors.put(targetClass, descriptor);
 	}
 
-	public void registerAtom(Class<?> targetClass, DataBridge<?, ?> bridge) throws PepException {
+	public void registerAtom(Class<?> targetClass, DataBridge<?, ?> bridge) throws DataBindException {
 		checkExists(targetClass);
 
 		Class<?> bridgeClass = bridge.getClass();
@@ -161,9 +161,9 @@ public class PepContext {
 			MethodHandle toData = MethodHandles.publicLookup().unreflect(toDataMethod).bindTo(bridge);
 			MethodHandle toObject = MethodHandles.publicLookup().unreflect(toObjectMethod).bindTo(bridge);
 
-			register(targetClass, new PepDataClass(targetClass, toDataMethod.getReturnType(), toData, toObject));
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | PepException e) {
-			throw new PepException("Failed to register atom bridge", e);
+			register(targetClass, new DataClassRecord(targetClass, toDataMethod.getReturnType(), toData, toObject));
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | DataBindException e) {
+			throw new DataBindException("Failed to register atom bridge", e);
 		}
 
 	}

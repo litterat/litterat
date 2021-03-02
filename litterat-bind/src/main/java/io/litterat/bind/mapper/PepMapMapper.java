@@ -19,11 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataArrayClass;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 
 /**
  *
@@ -33,21 +33,21 @@ import io.litterat.bind.PepException;
  */
 public class PepMapMapper {
 
-	private final PepContext context;
+	private final DataBindContext context;
 
-	public PepMapMapper(PepContext context) {
+	public PepMapMapper(DataBindContext context) {
 		this.context = context;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> toMap(Object object) throws PepException {
+	public Map<String, Object> toMap(Object object) throws DataBindException {
 		Objects.requireNonNull(object);
 
 		return (Map<String, Object>) toMap(context.getDescriptor(object.getClass()), object);
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object toMap(PepDataClass dataClass, Object object) throws PepException {
+	public Object toMap(DataClassRecord dataClass, Object object) throws DataBindException {
 
 		int fieldIndex = 0;
 
@@ -61,15 +61,15 @@ public class PepMapMapper {
 
 				Map<String, Object> map = new HashMap<>();
 
-				PepDataComponent[] fields = dataClass.dataComponents();
+				DataClassComponent[] fields = dataClass.dataComponents();
 				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
-					PepDataComponent field = fields[fieldIndex];
+					DataClassComponent field = fields[fieldIndex];
 
 					Object fv = field.accessor().invoke(data);
 
 					// Recursively convert object to map.
 					if (fv != null) {
-						PepDataClass fieldDataClass = field.dataClass();
+						DataClassRecord fieldDataClass = field.dataClass();
 						fv = toMap(fieldDataClass, fv);
 					}
 
@@ -89,14 +89,14 @@ public class PepMapMapper {
 				}
 			} else if (dataClass.isArray()) {
 
-				PepDataArrayClass arrayClass = (PepDataArrayClass) dataClass;
+				DataClassArray arrayClass = (DataClassArray) dataClass;
 
 				Object arrayData = object;
 				int length = (int) arrayClass.size().invoke(arrayData);
 				Object[] outputArray = new Object[length];
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					Object av = arrayClass.get().invoke(iterator, arrayData);
@@ -109,12 +109,12 @@ public class PepMapMapper {
 			}
 			return v;
 		} catch (Throwable t) {
-			throw new PepException(String.format("Failed to convert %s to Map. Could not convert field %s",
+			throw new DataBindException(String.format("Failed to convert %s to Map. Could not convert field %s",
 					dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
 		}
 	}
 
-	public Object toObject(Class<?> clss, Map<String, Object> map) throws PepException {
+	public Object toObject(Class<?> clss, Map<String, Object> map) throws DataBindException {
 
 		Objects.requireNonNull(clss);
 		Objects.requireNonNull(map);
@@ -123,7 +123,7 @@ public class PepMapMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object toObject(PepDataClass dataClass, Object data) throws PepException {
+	public Object toObject(DataClassRecord dataClass, Object data) throws DataBindException {
 
 		int fieldIndex = 0;
 
@@ -133,16 +133,16 @@ public class PepMapMapper {
 				v = dataClass.toObject().invoke(data);
 			} else if (dataClass.isData()) {
 				Map<String, Object> map = (Map<String, Object>) data;
-				PepDataComponent[] fields = dataClass.dataComponents();
+				DataClassComponent[] fields = dataClass.dataComponents();
 				Object[] construct = new Object[fields.length];
 				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
-					PepDataComponent field = fields[fieldIndex];
+					DataClassComponent field = fields[fieldIndex];
 
 					Object fv = map.get(field.name());
 
 					// Recursively convert maps back to objects.
 					if (fv != null) {
-						PepDataClass fieldDataClass = field.dataClass();
+						DataClassRecord fieldDataClass = field.dataClass();
 
 						fv = toObject(fieldDataClass, fv);
 
@@ -154,7 +154,7 @@ public class PepMapMapper {
 
 				v = dataClass.toObject().invoke(v);
 			} else if (dataClass.isArray()) {
-				PepDataArrayClass arrayClass = (PepDataArrayClass) dataClass;
+				DataClassArray arrayClass = (DataClassArray) dataClass;
 
 				Object[] inputArray = (Object[]) data;
 
@@ -162,7 +162,7 @@ public class PepMapMapper {
 				Object arrayData = arrayClass.constructor().invoke(length);
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					arrayClass.put().invoke(iterator, arrayData, toObject(arrayDataClass, inputArray[x]));
@@ -175,10 +175,10 @@ public class PepMapMapper {
 			return v;
 		} catch (Throwable t) {
 			if (fieldIndex < dataClass.dataComponents().length) {
-				throw new PepException(String.format("Failed to convert Map to %s. Incorrect value for field %s",
+				throw new DataBindException(String.format("Failed to convert Map to %s. Incorrect value for field %s",
 						dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
 			} else {
-				throw new PepException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
+				throw new DataBindException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
 			}
 		}
 

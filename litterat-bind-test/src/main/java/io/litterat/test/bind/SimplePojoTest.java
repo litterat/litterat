@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.SimplePojo;
@@ -36,11 +36,11 @@ public class SimplePojoTest {
 
 	SimplePojo test;
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 
 		test = new SimplePojo();
 		test.setX(TEST_X);
@@ -49,22 +49,22 @@ public class SimplePojoTest {
 
 	@Test
 	public void checkDescriptor() throws Throwable {
-		PepContext context = new PepContext.Builder().build();
-		PepDataClass descriptor = context.getDescriptor(SimplePojo.class);
+		DataBindContext context = new DataBindContext.Builder().build();
+		DataClassRecord descriptor = context.getDescriptor(SimplePojo.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(SimplePojo.class, descriptor.typeClass());
 		Assertions.assertEquals(SimplePojo.class, descriptor.dataClass());
 
-		PepDataComponent[] fields = descriptor.dataComponents();
+		DataClassComponent[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(2, fields.length);
 
-		PepDataComponent fieldX = fields[0];
+		DataClassComponent fieldX = fields[0];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
 
-		PepDataComponent fieldY = fields[1];
+		DataClassComponent fieldY = fields[1];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
 	}
@@ -110,7 +110,7 @@ public class SimplePojoTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("x", "error");
 
-		Assertions.assertThrows(PepException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(SimplePojo.class, map);
 		});
 

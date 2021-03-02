@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
 import io.litterat.model.TypeException;
 import io.litterat.model.TypeLibrary;
 import io.litterat.test.bind.data.SimpleUUIDImmutable;
@@ -44,12 +44,12 @@ public class UUIDBridgeTest {
 	// The TypeMap/library/context combination must be passed in to allow access to
 	// the bridge.
 
-	PepContext context;
+	DataBindContext context;
 	TypeLibrary library;
 
 	@BeforeEach
-	public void setup() throws PepException {
-		context = PepContext.builder().build();
+	public void setup() throws DataBindException {
+		context = DataBindContext.builder().build();
 		context.registerAtom(UUID.class, new UUIDBridge());
 		library = new TypeLibrary(context);
 	}

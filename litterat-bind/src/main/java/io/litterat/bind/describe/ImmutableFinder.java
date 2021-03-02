@@ -38,15 +38,15 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import io.litterat.bind.Field;
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
 
 public class ImmutableFinder implements ComponentFinder {
 
 	@SuppressWarnings("unused")
-	private final PepContext context;
+	private final DataBindContext context;
 
-	public ImmutableFinder(PepContext context) {
+	public ImmutableFinder(DataBindContext context) {
 		this.context = context;
 	}
 
@@ -57,7 +57,7 @@ public class ImmutableFinder implements ComponentFinder {
 	 */
 	@Override
 	public void findComponents(Class<?> clss, Constructor<?> constructor, List<ComponentInfo> fields)
-			throws PepException {
+			throws DataBindException {
 
 		try {
 			Lookup lookup = MethodHandles.publicLookup();
@@ -149,14 +149,14 @@ public class ImmutableFinder implements ComponentFinder {
 
 			// Fail if we didn't find the right number of parameters.
 			if (immutableFields.size() != constructor.getParameterCount()) {
-				throw new PepException(String.format(
+				throw new DataBindException(String.format(
 						"Failed to match immutable fields for class: %s. Add @Field annotations to assist.", clss));
 			}
 
 			// Check all params have valid information.
 			for (ComponentInfo component : immutableFields) {
 				if (component.getReadMethod() == null) {
-					throw new PepException(String.format(
+					throw new DataBindException(String.format(
 							"Failed to match immutable field accessor for class: %s. Add @Field annotations to assist. %s",
 							clss, component.getName()));
 				}
@@ -166,7 +166,7 @@ public class ImmutableFinder implements ComponentFinder {
 			fields.addAll(immutableFields);
 
 		} catch (IOException | NoSuchMethodException | SecurityException | IllegalAccessException e) {
-			throw new PepException("Failed to access class", e);
+			throw new DataBindException("Failed to access class", e);
 		}
 	}
 

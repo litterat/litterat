@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
+import io.litterat.bind.DataBindContext;
 import io.litterat.json.JsonMapper;
 import io.litterat.test.bind.data.AtomicTypeTestPojo;
 
@@ -65,11 +65,11 @@ public class AtomicTypeTestPojoTest {
 		test.setString(string);
 	}
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 	}
 
 	@Test

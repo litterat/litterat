@@ -22,9 +22,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.OptionalImmutable;
@@ -34,27 +34,27 @@ public class OptionalImmutableTest {
 	OptionalImmutable test1 = new OptionalImmutable(Optional.empty());
 	OptionalImmutable test2 = new OptionalImmutable(Optional.of("test"));
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 	}
 
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		PepDataClass descriptor = context.getDescriptor(OptionalImmutable.class);
+		DataClassRecord descriptor = context.getDescriptor(OptionalImmutable.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(OptionalImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(OptionalImmutable.class, descriptor.dataClass());
 
-		PepDataComponent[] fields = descriptor.dataComponents();
+		DataClassComponent[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 
-		PepDataComponent field = fields[0];
+		DataClassComponent field = fields[0];
 		Assertions.assertEquals("optionalString", field.name());
 		Assertions.assertEquals(String.class, field.type());
 

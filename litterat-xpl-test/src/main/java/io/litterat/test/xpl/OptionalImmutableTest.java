@@ -21,7 +21,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
+import io.litterat.bind.DataBindContext;
 import io.litterat.model.TypeException;
 import io.litterat.test.bind.data.OptionalImmutable;
 import io.litterat.xpl.TypeInputStream;
@@ -32,7 +32,7 @@ public class OptionalImmutableTest {
 	OptionalImmutable test1 = new OptionalImmutable(Optional.empty());
 	OptionalImmutable test2 = new OptionalImmutable(Optional.of("test"));
 
-	PepContext context;
+	DataBindContext context;
 
 	@Test
 	public void testWriteAndReadMixedImmutable() throws IOException, TypeException {

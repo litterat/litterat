@@ -42,18 +42,18 @@ import io.litterat.bind.Data;
 import io.litterat.bind.DataBridge;
 import io.litterat.bind.DataOrder;
 import io.litterat.bind.Field;
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepContextResolver;
-import io.litterat.bind.PepDataArrayClass;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindContextResolver;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.ToData;
-import io.litterat.bind.PepDataClass.DataType;
+import io.litterat.bind.DataClassRecord.DataType;
 import io.litterat.bind.array.CollectionArrayBridge;
 import io.litterat.bind.array.PrimitiveBridges;
 
-public class DefaultResolver implements PepContextResolver {
+public class DefaultResolver implements DataBindContextResolver {
 
 	private static final String TODATA_METHOD = "toData";
 	private static final String TOOBJECT_METHOD = "toObject";
@@ -68,8 +68,8 @@ public class DefaultResolver implements PepContextResolver {
 	}
 
 	@Override
-	public PepDataClass resolve(PepContext context, Class<?> targetClass, Type parameterizedType) throws PepException {
-		PepDataClass descriptor = null;
+	public DataClassRecord resolve(DataBindContext context, Class<?> targetClass, Type parameterizedType) throws DataBindException {
+		DataClassRecord descriptor = null;
 
 		if (isBase(targetClass)) {
 			descriptor = resolveBase(context, targetClass);
@@ -80,7 +80,7 @@ public class DefaultResolver implements PepContextResolver {
 		} else if (isTuple(targetClass)) {
 			descriptor = resolveTuple(context, targetClass);
 		} else {
-			throw new PepException(String.format("Unable to find a valid data conversion for class: %s", targetClass));
+			throw new DataBindException(String.format("Unable to find a valid data conversion for class: %s", targetClass));
 		}
 		return descriptor;
 	}
@@ -204,11 +204,11 @@ public class DefaultResolver implements PepContextResolver {
 		return false;
 	}
 
-	private PepDataClass resolveBase(PepContext context, Class<?> targetClass) throws PepException {
+	private DataClassRecord resolveBase(DataBindContext context, Class<?> targetClass) throws DataBindException {
 		MethodHandle identity = MethodHandles.identity(targetClass);
 
 		// TODO It could be useful to map other classes to this data class.
-		return new PepDataClass(targetClass, targetClass, null, null, identity, identity, new PepDataComponent[0],
+		return new DataClassRecord(targetClass, targetClass, null, null, identity, identity, new DataClassComponent[0],
 				DataType.BASE);
 	}
 
@@ -216,9 +216,9 @@ public class DefaultResolver implements PepContextResolver {
 	// parameter as the class will erazed.
 	// The resolution should use a Type which can get the information from the field
 	// or parameter and pass that through.
-	private PepDataClass resolveArray(PepContext context, Class<?> targetClass, Type parameterizedType)
-			throws PepException {
-		PepDataClass descriptor = null;
+	private DataClassRecord resolveArray(DataBindContext context, Class<?> targetClass, Type parameterizedType)
+			throws DataBindException {
+		DataClassRecord descriptor = null;
 
 		try {
 			if (targetClass.isArray()) {
@@ -226,19 +226,19 @@ public class DefaultResolver implements PepContextResolver {
 				MethodHandle constructor = MethodHandles.arrayConstructor(targetClass);
 				MethodHandle identity = MethodHandles.identity(targetClass);
 
-				PepDataClass arrayDataClass = context.getDescriptor(targetClass.getComponentType());
+				DataClassRecord arrayDataClass = context.getDescriptor(targetClass.getComponentType());
 
-				descriptor = new PepDataArrayClass(targetClass, targetClass, null, constructor, identity, identity,
-						new PepDataComponent[0], DataType.ARRAY, arrayDataClass,
+				descriptor = new DataClassArray(targetClass, targetClass, null, constructor, identity, identity,
+						new DataClassComponent[0], DataType.ARRAY, arrayDataClass,
 						PrimitiveBridges.getPrimitiveArrayBridge(targetClass.getComponentType()));
 
 			} else if (Collection.class.isAssignableFrom(targetClass)) {
 
 				if (!(parameterizedType instanceof ParameterizedType)) {
-					throw new PepException("Collection must provide parameterized type information");
+					throw new DataBindException("Collection must provide parameterized type information");
 				}
 
-				PepDataClass arrayDataClass;
+				DataClassRecord arrayDataClass;
 				Type paramType = ((ParameterizedType) parameterizedType).getActualTypeArguments()[0];
 				if (paramType instanceof Class) {
 					arrayDataClass = context.getDescriptor((Class<?>) paramType);
@@ -246,7 +246,7 @@ public class DefaultResolver implements PepContextResolver {
 					ParameterizedType arrayParamType = (ParameterizedType) paramType;
 					arrayDataClass = context.getDescriptor((Class<?>) arrayParamType.getRawType(), arrayParamType);
 				} else {
-					throw new PepException("Unrecognized parameterized type");
+					throw new DataBindException("Unrecognized parameterized type");
 				}
 
 				// TODO Some Collections will not have a size constructor. Fallback and drop the
@@ -264,13 +264,13 @@ public class DefaultResolver implements PepContextResolver {
 				MethodHandle toObject = MethodHandles.identity(targetClass);
 				MethodHandle toData = MethodHandles.identity(targetClass);
 
-				descriptor = new PepDataArrayClass(targetClass, Object[].class, null, constructor, toData, toObject,
-						new PepDataComponent[0], DataType.ARRAY, arrayDataClass, new CollectionArrayBridge());
+				descriptor = new DataClassArray(targetClass, Object[].class, null, constructor, toData, toObject,
+						new DataClassComponent[0], DataType.ARRAY, arrayDataClass, new CollectionArrayBridge());
 
 			}
 
 		} catch (IllegalAccessException | NoSuchMethodException | SecurityException e) {
-			throw new PepException("Failed to get array descriptor", e);
+			throw new DataBindException("Failed to get array descriptor", e);
 		}
 
 		return descriptor;
@@ -287,15 +287,15 @@ public class DefaultResolver implements PepContextResolver {
 		return false;
 	}
 
-	private PepDataClass resolveAtom(PepContext context, Class<?> targetClass) throws PepException {
-		PepDataClass descriptor = null;
+	private DataClassRecord resolveAtom(DataBindContext context, Class<?> targetClass) throws DataBindException {
+		DataClassRecord descriptor = null;
 
 		try {
 			if (targetClass.isPrimitive()) {
 				// primitives should already be registered, but just incase.
 				MethodHandle identity = MethodHandles.identity(targetClass);
-				descriptor = new PepDataClass(targetClass, targetClass, identity, identity, identity,
-						new PepDataComponent[0]);
+				descriptor = new DataClassRecord(targetClass, targetClass, identity, identity, identity,
+						new DataClassComponent[0]);
 			}
 
 			// Check for annotation on constructor.
@@ -305,7 +305,7 @@ public class DefaultResolver implements PepContextResolver {
 				if (pepAtom != null) {
 					Parameter[] params = constructor.getParameters();
 					if (params.length != 1 || !isPrimitive(params[0].getType())) {
-						throw new PepException(String.format("Atom must have single primitive argument", targetClass));
+						throw new DataBindException(String.format("Atom must have single primitive argument", targetClass));
 					}
 
 					Class<?> dataClass = params[0].getType();
@@ -321,8 +321,8 @@ public class DefaultResolver implements PepContextResolver {
 
 					MethodHandle toData = MethodHandles.lookup().unreflect(toDataMethod);
 
-					descriptor = new PepDataClass(targetClass, dataClass, identity, toData, toObject,
-							new PepDataComponent[0]);
+					descriptor = new DataClassRecord(targetClass, dataClass, identity, toData, toObject,
+							new DataClassComponent[0]);
 					break;
 				}
 			}
@@ -335,7 +335,7 @@ public class DefaultResolver implements PepContextResolver {
 				if (Modifier.isStatic(method.getModifiers()) && pepAtom != null) {
 					Parameter[] params = method.getParameters();
 					if (params.length != 1 || !isPrimitive(params[0].getType())) {
-						throw new PepException("Atom static method must have a single primitive value");
+						throw new DataBindException("Atom static method must have a single primitive value");
 					}
 
 					MethodHandle toObject = MethodHandles.publicLookup().unreflect(method);
@@ -349,7 +349,7 @@ public class DefaultResolver implements PepContextResolver {
 						Atom accessorAtom = accessorMethod.getAnnotation(Atom.class);
 						if (accessorAtom != null && !Modifier.isStatic(accessorMethod.getModifiers())) {
 							if (accessorMethod.getReturnType() != param) {
-								throw new PepException(
+								throw new DataBindException(
 										"Atom accessor method must have a single primitive value as same type as static constructor");
 							}
 							toData = MethodHandles.publicLookup().unreflect(accessorMethod);
@@ -359,12 +359,12 @@ public class DefaultResolver implements PepContextResolver {
 					}
 
 					if (toData == null) {
-						throw new PepException("Atom accessor @Atom annotation not found");
+						throw new DataBindException("Atom accessor @Atom annotation not found");
 					}
 
 					MethodHandle identity = MethodHandles.identity(targetClass);
-					descriptor = new PepDataClass(targetClass, param, null, identity, toData, toObject,
-							new PepDataComponent[0], DataType.ATOM);
+					descriptor = new DataClassRecord(targetClass, param, null, identity, toData, toObject,
+							new DataClassComponent[0], DataType.ATOM);
 
 				}
 			}
@@ -385,19 +385,19 @@ public class DefaultResolver implements PepContextResolver {
 						.findVirtual(EnumBridge.class, TODATA_METHOD, MethodType.methodType(String.class, Enum.class))
 						.bindTo(bridge).asType(MethodType.methodType(String.class, targetClass));
 
-				descriptor = new PepDataClass(targetClass, String.class, null, identity, toData, toObject,
-						new PepDataComponent[0], DataType.ATOM);
+				descriptor = new DataClassRecord(targetClass, String.class, null, identity, toData, toObject,
+						new DataClassComponent[0], DataType.ATOM);
 
 			}
-		} catch (SecurityException | IllegalAccessException | NoSuchMethodException | PepException e) {
-			throw new PepException("Failed to get atom descriptor", e);
+		} catch (SecurityException | IllegalAccessException | NoSuchMethodException | DataBindException e) {
+			throw new DataBindException("Failed to get atom descriptor", e);
 		}
 
 		return descriptor;
 	}
 
-	private PepDataClass resolveTuple(PepContext context, Class<?> targetClass) throws PepException {
-		PepDataClass descriptor = null;
+	private DataClassRecord resolveTuple(DataBindContext context, Class<?> targetClass) throws DataBindException {
+		DataClassRecord descriptor = null;
 
 		try {
 			// If the class if exporting/importing a dataclass.
@@ -413,7 +413,7 @@ public class DefaultResolver implements PepContextResolver {
 								.getActualTypeArguments()[0];
 
 						// Recursively get hold of the data class descriptor.
-						PepDataClass tupleData = context.getDescriptor(dataType);
+						DataClassRecord tupleData = context.getDescriptor(dataType);
 
 						// We require that a constructor be present that takes the data class as input.
 						MethodHandle toObject = MethodHandles.publicLookup()
@@ -424,13 +424,13 @@ public class DefaultResolver implements PepContextResolver {
 								.unreflect(targetClass.getMethod(TODATA_METHOD));
 
 						// The constructor and data components are copied from the data class.
-						descriptor = new PepDataClass(targetClass, dataType, tupleData.constructor(), toData, toObject,
+						descriptor = new DataClassRecord(targetClass, dataType, tupleData.constructor(), toData, toObject,
 								tupleData.dataComponents());
 						break;
 					}
 
 					// Should be unreachable code.
-					throw new PepException("Failed to get data descriptor. Failed to find constructor");
+					throw new DataBindException("Failed to get data descriptor. Failed to find constructor");
 				}
 
 			} else {
@@ -461,7 +461,7 @@ public class DefaultResolver implements PepContextResolver {
 				}
 
 				// Prepare the field descriptors.
-				PepDataComponent[] dataComponents = new PepDataComponent[components.size()];
+				DataClassComponent[] dataComponents = new DataClassComponent[components.size()];
 				for (int x = 0; x < components.size(); x++) {
 					ComponentInfo info = components.get(x);
 
@@ -472,7 +472,7 @@ public class DefaultResolver implements PepContextResolver {
 						setter = info.getWriteMethod();
 					}
 
-					PepDataComponent component;
+					DataClassComponent component;
 
 					// Will probably need a more generic way of handling paramterized types.
 					Field fieldAnnotation = info.getField();
@@ -496,7 +496,7 @@ public class DefaultResolver implements PepContextResolver {
 						} else if (bridgeDataType instanceof ParameterizedType) {
 							bridgeDataClass = (Class<?>) ((ParameterizedType) bridgeDataType).getRawType();
 						} else {
-							throw new PepException("Unrecognised Type");
+							throw new DataBindException("Unrecognised Type");
 						}
 
 						if (bridgeObjectType instanceof Class) {
@@ -504,14 +504,14 @@ public class DefaultResolver implements PepContextResolver {
 						} else if (bridgeObjectType instanceof ParameterizedType) {
 							bridgeObjectClass = (Class<?>) ((ParameterizedType) bridgeObjectType).getRawType();
 						} else {
-							throw new PepException("Unrecognised Type");
+							throw new DataBindException("Unrecognised Type");
 						}
 
 						// Recursively get hold of the data class descriptor.
-						PepDataClass tupleData = context.getDescriptor(bridgeDataClass, bridgeDataType);
+						DataClassRecord tupleData = context.getDescriptor(bridgeDataClass, bridgeDataType);
 
 						if (!bridgeObjectClass.isAssignableFrom(info.getType())) {
-							throw new PepException("Bridge object type not assignable from field type");
+							throw new DataBindException("Bridge object type not assignable from field type");
 						}
 
 						// TODO Currently assume Bridge classes have no state. This might need to change
@@ -522,7 +522,7 @@ public class DefaultResolver implements PepContextResolver {
 						try {
 							bridge = bridgeClass.getConstructor().newInstance();
 						} catch (InstantiationException | IllegalArgumentException | InvocationTargetException e) {
-							throw new PepException("Failed to instantiate bridge", e);
+							throw new DataBindException("Failed to instantiate bridge", e);
 						}
 
 						// bridge.toData(dataType):type
@@ -544,13 +544,13 @@ public class DefaultResolver implements PepContextResolver {
 									.asType(MethodType.methodType(info.getType(), bridgeDataClass));
 						}
 
-						component = new PepDataComponent(x, info.getName(), bridgeDataClass, tupleData, accessor,
+						component = new DataClassComponent(x, info.getName(), bridgeDataClass, tupleData, accessor,
 								setter);
 					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
 						Class<?> optionalType = (Class<?>) info.getParamType().getActualTypeArguments()[0];
 
-						PepDataClass dataClass = context.getDescriptor(optionalType);
+						DataClassRecord dataClass = context.getDescriptor(optionalType);
 
 						@SuppressWarnings("rawtypes")
 						OptionalBridge bridge = new OptionalBridge();
@@ -577,15 +577,15 @@ public class DefaultResolver implements PepContextResolver {
 						}
 
 						// TODO the constructor parameter will need to pass through the bridge.
-						component = new PepDataComponent(x, info.getName(), optionalType, dataClass, optionalObject,
+						component = new DataClassComponent(x, info.getName(), optionalType, dataClass, optionalObject,
 								setter);
 
 					} else {
 
-						PepDataClass dataClass = context.getDescriptor(info.getType(),
+						DataClassRecord dataClass = context.getDescriptor(info.getType(),
 								(info.getParamType() != null ? info.getParamType() : info.getType()));
 
-						component = new PepDataComponent(x, info.getName(), info.getType(), dataClass, accessor,
+						component = new DataClassComponent(x, info.getName(), info.getType(), dataClass, accessor,
 								setter);
 					}
 					dataComponents[x] = component;
@@ -608,22 +608,22 @@ public class DefaultResolver implements PepContextResolver {
 					// ignore.
 				}
 
-				descriptor = new PepDataClass(targetClass, targetClass, creator, constructor, toData, toObject,
+				descriptor = new DataClassRecord(targetClass, targetClass, creator, constructor, toData, toObject,
 						dataComponents, DataType.TUPLE);
 			}
-		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | PepException e) {
-			throw new PepException("Failed to get data descriptor", e);
+		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | DataBindException e) {
+			throw new DataBindException("Failed to get data descriptor", e);
 		}
 
 		return descriptor;
 	}
 
-	private void reorderFields(DataOrder dataOrder, List<ComponentInfo> components) throws PepException {
+	private void reorderFields(DataOrder dataOrder, List<ComponentInfo> components) throws DataBindException {
 
 		// Check lengths are ok.
 		String[] fieldOrder = dataOrder.value();
 		if (fieldOrder == null || fieldOrder.length != components.size()) {
-			throw new PepException("DataOrder annotation has different field count to components found in data");
+			throw new DataBindException("DataOrder annotation has different field count to components found in data");
 		}
 
 		// build map of components to select from.
@@ -634,7 +634,7 @@ public class DefaultResolver implements PepContextResolver {
 		List<String> fieldOrderList = List.of(dataOrder.value());
 		for (String field : fieldOrderList) {
 			if (!componentMap.containsKey(field)) {
-				throw new PepException(String.format("DataOrder annotation had no corresponding field '%s'", field));
+				throw new DataBindException(String.format("DataOrder annotation had no corresponding field '%s'", field));
 			}
 		}
 
@@ -652,12 +652,12 @@ public class DefaultResolver implements PepContextResolver {
 	 *
 	 * @param dataClass
 	 * @return
-	 * @throws PepException
+	 * @throws DataBindException
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
 	private Constructor<?> getConstructor(Class<?> dataClass)
-			throws PepException, NoSuchMethodException, SecurityException {
+			throws DataBindException, NoSuchMethodException, SecurityException {
 		Constructor<?>[] constructors = dataClass.getConstructors();
 
 		// only one custructor. this must be it.
@@ -686,12 +686,12 @@ public class DefaultResolver implements PepContextResolver {
 			}
 		}
 
-		throw new PepException("Could not find constructor: " + dataClass);
+		throw new DataBindException("Could not find constructor: " + dataClass);
 
 	}
 
 	private MethodHandle getDataConstructor(Class<?> dataClass)
-			throws PepException, NoSuchMethodException, SecurityException, IllegalAccessException {
+			throws DataBindException, NoSuchMethodException, SecurityException, IllegalAccessException {
 		Constructor<?>[] constructors = dataClass.getConstructors();
 
 		// only one custructor. this must be it.
@@ -718,7 +718,7 @@ public class DefaultResolver implements PepContextResolver {
 			}
 		}
 
-		throw new PepException("Could not find constructor");
+		throw new DataBindException("Could not find constructor");
 
 	}
 
@@ -732,10 +732,10 @@ public class DefaultResolver implements PepContextResolver {
 	 * @return
 	 * @throws IllegalAccessException
 	 * @throws NoSuchMethodException
-	 * @throws PepException
+	 * @throws DataBindException
 	 */
 	private MethodHandle createTupleConstructor(Class<?> dataClass, List<ComponentInfo> fields,
-			MethodHandle dataConstructor) throws IllegalAccessException, NoSuchMethodException, PepException {
+			MethodHandle dataConstructor) throws IllegalAccessException, NoSuchMethodException, DataBindException {
 
 		// Class<?>[] params = new Class[fields.size()];
 		// for (int x = 0; x < fields.size(); x++) {
@@ -771,10 +771,10 @@ public class DefaultResolver implements PepContextResolver {
 	 * @return
 	 * @throws IllegalAccessException
 	 * @throws NoSuchMethodException
-	 * @throws PepException
+	 * @throws DataBindException
 	 */
 	private MethodHandle createEmbedConstructor(Class<?> dataClass, MethodHandle dataConstructor,
-			List<ComponentInfo> fields) throws NoSuchMethodException, IllegalAccessException, PepException {
+			List<ComponentInfo> fields) throws NoSuchMethodException, IllegalAccessException, DataBindException {
 		MethodHandle result = dataConstructor;
 
 		for (int x = 0; x < fields.size(); x++) {
@@ -814,7 +814,7 @@ public class DefaultResolver implements PepContextResolver {
 					} else if (bridgeDataType instanceof ParameterizedType) {
 						bridgeDataClass = (Class<?>) ((ParameterizedType) bridgeDataType).getRawType();
 					} else {
-						throw new PepException("Unrecognised Type");
+						throw new DataBindException("Unrecognised Type");
 					}
 
 					if (bridgeObjectType instanceof Class) {
@@ -822,7 +822,7 @@ public class DefaultResolver implements PepContextResolver {
 					} else if (bridgeObjectType instanceof ParameterizedType) {
 						bridgeObjectClass = (Class<?>) ((ParameterizedType) bridgeObjectType).getRawType();
 					} else {
-						throw new PepException("Unrecognised Type");
+						throw new DataBindException("Unrecognised Type");
 					}
 
 					@SuppressWarnings("rawtypes")
@@ -830,7 +830,7 @@ public class DefaultResolver implements PepContextResolver {
 					try {
 						bridge = bridgeClass.getConstructor().newInstance();
 					} catch (InstantiationException | IllegalArgumentException | InvocationTargetException e) {
-						throw new PepException("Failed to instantiate bridge", e);
+						throw new DataBindException("Failed to instantiate bridge", e);
 					}
 
 					// (values[]) -> values[inputIndex]:optionalType

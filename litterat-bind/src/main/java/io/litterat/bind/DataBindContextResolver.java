@@ -17,7 +17,7 @@ package io.litterat.bind;
 
 import java.lang.reflect.Type;
 
-public interface PepContextResolver {
+public interface DataBindContextResolver {
 
-	PepDataClass resolve(PepContext context, Class<?> clss, Type parameterizedType) throws PepException;
+	DataClassRecord resolve(DataBindContext context, Class<?> clss, Type parameterizedType) throws DataBindException;
 }

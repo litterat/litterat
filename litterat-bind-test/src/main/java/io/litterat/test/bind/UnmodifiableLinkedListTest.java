@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.UnmodifiableLinkedList;
@@ -26,27 +26,27 @@ public class UnmodifiableLinkedListTest {
 
 	UnmodifiableLinkedList test = new UnmodifiableLinkedList(List.of(TEST_ONE, TEST_TWO, TEST_THREE));
 
-	PepContext context;
+	DataBindContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = PepContext.builder().build();
+		context = DataBindContext.builder().build();
 	}
 
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		PepDataClass descriptor = context.getDescriptor(UnmodifiableLinkedList.class);
+		DataClassRecord descriptor = context.getDescriptor(UnmodifiableLinkedList.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.typeClass());
 		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.dataClass());
 
-		PepDataComponent[] fields = descriptor.dataComponents();
+		DataClassComponent[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 
-		PepDataComponent fieldList = fields[0];
+		DataClassComponent fieldList = fields[0];
 		Assertions.assertEquals("list", fieldList.name());
 		Assertions.assertEquals(String[].class, fieldList.type());
 
@@ -110,7 +110,7 @@ public class UnmodifiableLinkedListTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("list", "error");
 
-		Assertions.assertThrows(PepException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(UnmodifiableLinkedList.class, map);
 		});
 

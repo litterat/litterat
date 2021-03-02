@@ -28,45 +28,45 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.litterat.bind.PepContext;
-import io.litterat.bind.PepDataArrayClass;
-import io.litterat.bind.PepDataClass;
-import io.litterat.bind.PepDataComponent;
-import io.litterat.bind.PepException;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataBindException;
 import io.litterat.json.parser.JsonReader;
 import io.litterat.json.parser.JsonToken;
 import io.litterat.json.parser.JsonWriter;
 
 public class JsonMapper {
-	private final PepContext context;
+	private final DataBindContext context;
 
-	public static String toJson(Object object) throws PepException {
+	public static String toJson(Object object) throws DataBindException {
 		StringWriter writer = new StringWriter();
 		JsonMapper mapper = new JsonMapper();
 		mapper.toJson(object, writer);
 		return writer.toString();
 	}
 
-	public static <T> T fromJson(String json, Class<?> clss) throws PepException {
+	public static <T> T fromJson(String json, Class<?> clss) throws DataBindException {
 		StringReader reader = new StringReader(json);
 		JsonMapper mapper = new JsonMapper();
 		return mapper.fromJson(json, clss, reader);
 	}
 
-	public JsonMapper(PepContext context) {
+	public JsonMapper(DataBindContext context) {
 		this.context = context;
 	}
 
 	public JsonMapper() {
-		this(PepContext.builder().build());
+		this(DataBindContext.builder().build());
 	}
 
-	public void toJson(Object object, Writer writer) throws PepException {
-		PepDataClass dataClass = context.getDescriptor(object.getClass());
+	public void toJson(Object object, Writer writer) throws DataBindException {
+		DataClassRecord dataClass = context.getDescriptor(object.getClass());
 		toJson(object, dataClass, new JsonWriter(writer));
 	}
 
-	private void toJson(Object object, PepDataClass dataClass, JsonWriter writer) throws PepException {
+	private void toJson(Object object, DataClassRecord dataClass, JsonWriter writer) throws DataBindException {
 
 		Objects.requireNonNull(object);
 
@@ -82,16 +82,16 @@ public class JsonMapper {
 
 				writer.beginObject();
 
-				PepDataComponent[] fields = dataClass.dataComponents();
+				DataClassComponent[] fields = dataClass.dataComponents();
 
 				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
-					PepDataComponent field = fields[fieldIndex];
+					DataClassComponent field = fields[fieldIndex];
 
 					Object v = field.accessor().invoke(data);
 
 					// Recursively convert object to map.
 					if (v != null) {
-						PepDataClass fieldDataClass = field.dataClass();
+						DataClassRecord fieldDataClass = field.dataClass();
 
 						writer.name(field.name());
 
@@ -109,12 +109,12 @@ public class JsonMapper {
 			} else {
 				writer.beginArray();
 
-				PepDataArrayClass arrayClass = (PepDataArrayClass) dataClass;
+				DataClassArray arrayClass = (DataClassArray) dataClass;
 
 				Object arrayData = object;
 				int length = (int) arrayClass.size().invoke(arrayData);
 				Object iterator = arrayClass.iterator().invoke(arrayData);
-				PepDataClass arrayDataClass = arrayClass.arrayDataClass();
+				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					Object av = arrayClass.get().invoke(iterator, arrayData);
@@ -125,7 +125,7 @@ public class JsonMapper {
 			}
 
 		} catch (Throwable t) {
-			throw new PepException(String.format("Failed to convert %s to Map. Could not convert field %s",
+			throw new DataBindException(String.format("Failed to convert %s to Map. Could not convert field %s",
 					dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
 		}
 	}
@@ -148,24 +148,24 @@ public class JsonMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T fromJson(String json, Class<?> clss, Reader reader) throws PepException {
+	public <T> T fromJson(String json, Class<?> clss, Reader reader) throws DataBindException {
 
-		PepDataClass dataClass = context.getDescriptor(clss);
+		DataClassRecord dataClass = context.getDescriptor(clss);
 
 		return (T) fromJson(dataClass, new JsonReader(reader));
 	}
 
-	private Map<PepDataClass, Map<String, PepDataComponent>> fieldMaps = new HashMap<>();
+	private Map<DataClassRecord, Map<String, DataClassComponent>> fieldMaps = new HashMap<>();
 
-	private Map<String, PepDataComponent> componentMap(PepDataClass dataClass) {
+	private Map<String, DataClassComponent> componentMap(DataClassRecord dataClass) {
 		return fieldMaps.computeIfAbsent(dataClass, (clss) -> {
 			return Arrays.asList(clss.dataComponents()).stream()
-					.collect(Collectors.toMap(PepDataComponent::name, item -> item));
+					.collect(Collectors.toMap(DataClassComponent::name, item -> item));
 		});
 
 	}
 
-	private Object fromJson(PepDataClass dataClass, JsonReader reader) throws PepException {
+	private Object fromJson(DataClassRecord dataClass, JsonReader reader) throws DataBindException {
 
 		try {
 
@@ -186,13 +186,13 @@ public class JsonMapper {
 					char c = v.toCharArray()[0];
 					return dataClass.toObject().invoke(c);
 				}
-				throw new PepException(
+				throw new DataBindException(
 						String.format("Could not convert string to %s", dataClass.dataClass().getName()));
 			case BOOLEAN:
 				if (dataClass.dataClass() == boolean.class || dataClass.dataClass() == Boolean.class) {
 					return dataClass.toObject().invoke(reader.nextBoolean());
 				}
-				throw new PepException(
+				throw new DataBindException(
 						String.format("Could not convert boolean to %s", dataClass.dataClass().getName()));
 			case NULL:
 				reader.nextNull();
@@ -206,7 +206,7 @@ public class JsonMapper {
 
 				reader.beginObject();
 
-				PepDataComponent[] fields = dataClass.dataComponents();
+				DataClassComponent[] fields = dataClass.dataComponents();
 				Object[] construct = new Object[fields.length];
 
 				while (reader.hasNext()) {
@@ -214,7 +214,7 @@ public class JsonMapper {
 					String name = reader.nextName();
 
 					// Find the name in the fields.
-					PepDataComponent field = componentMap(dataClass).get(name);
+					DataClassComponent field = componentMap(dataClass).get(name);
 					Objects.requireNonNull(field,
 							String.format("field %s not found in class", name, dataClass.dataClass()));
 
@@ -236,13 +236,13 @@ public class JsonMapper {
 
 				reader.beginArray();
 
-				PepDataArrayClass arrayDataClass = (PepDataArrayClass) dataClass;
+				DataClassArray arrayDataClass = (DataClassArray) dataClass;
 
 				// Token based reader needs to read everything in the array before creating.
 				// TODO could potentially provide meta data saying if the collection type is
 				// static or dynamic.
 				// A dynamic sized collection could be created and then have each added.
-				PepDataClass arrayValueClass = arrayDataClass.arrayDataClass();
+				DataClassRecord arrayValueClass = arrayDataClass.arrayDataClass();
 				List<Object> list = new ArrayList<Object>();
 				while (reader.hasNext()) {
 					list.add(fromJson(arrayValueClass, reader));
@@ -275,11 +275,11 @@ public class JsonMapper {
 			}
 
 		} catch (Throwable t) {
-			throw new PepException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
+			throw new DataBindException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
 		}
 	}
 
-	Object readNumber(PepDataClass dataClass, JsonReader reader) throws IOException {
+	Object readNumber(DataClassRecord dataClass, JsonReader reader) throws IOException {
 		Class<?> clss = dataClass.dataClass();
 		if (clss == Integer.class || clss == int.class) {
 			return reader.nextInt();

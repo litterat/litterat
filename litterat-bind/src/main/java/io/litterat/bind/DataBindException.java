@@ -15,15 +15,15 @@
  */
 package io.litterat.bind;
 
-public class PepException extends Exception {
+public class DataBindException extends Exception {
 
 	private static final long serialVersionUID = 2297416016162178731L;
 
-	public PepException(String message, Throwable cause) {
+	public DataBindException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public PepException(String message) {
+	public DataBindException(String message) {
 		super(message);
 	}
 }
