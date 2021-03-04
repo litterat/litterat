@@ -23,9 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.MixedImmutableDataOrder;
@@ -51,7 +51,7 @@ public class MixedImmutableDataOrderTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		DataClassRecord descriptor = context.getDescriptor(MixedImmutableDataOrder.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(MixedImmutableDataOrder.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(MixedImmutableDataOrder.class, descriptor.typeClass());

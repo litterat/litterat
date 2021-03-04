@@ -15,7 +15,7 @@
  */
 package io.litterat.xpl.lang.interpret;
 
-import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassArray;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.lang.LitteratMachine;
 import io.litterat.xpl.lang.ReadArray;
@@ -25,11 +25,11 @@ public class ReadArrayInterpreter implements ExpressionInterpreter {
 	@SuppressWarnings("unused")
 	private final ReadArray readArray;
 
-	private final DataClassRecord arrayClass;
+	private final DataClassArray arrayClass;
 
 	private final ExpressionInterpreter readElement;
 
-	public ReadArrayInterpreter(ReadArray readArray, DataClassRecord arrayClass, ExpressionInterpreter readElement) {
+	public ReadArrayInterpreter(ReadArray readArray, DataClassArray arrayClass, ExpressionInterpreter readElement) {
 
 		this.readArray = readArray;
 		this.arrayClass = arrayClass;

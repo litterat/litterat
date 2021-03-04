@@ -15,16 +15,16 @@
  */
 package io.litterat.model;
 
-import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClass;
 
 public class TypeLibraryEntry {
 
 	final TypeLibraryState state;
 	final TypeName name;
 	final Definition definition;
-	final DataClassRecord clss;
+	final DataClass clss;
 
-	public TypeLibraryEntry(TypeLibraryState state, TypeName name, Definition definition, DataClassRecord clss) {
+	public TypeLibraryEntry(TypeLibraryState state, TypeName name, Definition definition, DataClass clss) {
 		this.state = state;
 		this.name = name;
 		this.definition = definition;
@@ -39,7 +39,7 @@ public class TypeLibraryEntry {
 		return name;
 	}
 
-	public DataClassRecord typeClass() {
+	public DataClass typeClass() {
 		return clss;
 	}
 

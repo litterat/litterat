@@ -19,5 +19,5 @@ import java.lang.reflect.Type;
 
 public interface DataBindContextResolver {
 
-	DataClassRecord resolve(DataBindContext context, Class<?> clss, Type parameterizedType) throws DataBindException;
+	DataClass resolve(DataBindContext context, Class<?> clss, Type parameterizedType) throws DataBindException;
 }

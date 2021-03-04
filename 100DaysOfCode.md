@@ -7,13 +7,11 @@ Next steps list. A general list of things that could be done next in no particul
 
 PEP
  - Deeper looker at defaults for Lists, Sets and other collections.
- - Possibly refactor PepDataClass to include PepDataTupleClass.
  - Investigate removing the primitive array bridge classes and replace with generated MethodHandles.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates and timestamps.
  - Create PEP error examples and test edge cases.
  - Investigate Union class type.
- - Rename categories as Record, Union and Array.
  
  Schema
  - Review the schema language and look at schema annotations. 
@@ -24,9 +22,20 @@ PEP
  
  
  Documents to write:
- 
  - Litterat PEP end user guide. User guide to using library & examples.
  - Litterat PEP serialization guide. For people writing serialization formats.
+
+## Day 34 - March 4 - More work on the DataClass
+
+Need to be more careful with casting the DataClass after separating out the DataClassRecord.
+
+## Day 33 - March 3 - Refactoring the PepDataClass
+
+Refactored the PepDataClass to DataClass and separated the DataClassRecord, DataClassArray and DataClassUnion. This is aligning better with the Litterat theory. The union type is going to be more difficult to implement.
+
+## Day 32 - March 2 - More refactoring
+
+Refactored the class names in litterat-bind to fit the naming model better. Starting investigating how union types might fit within Java.
 
 ## Day 31 - February 27 - Model changes
 

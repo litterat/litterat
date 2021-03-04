@@ -9,9 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.ListOfString;
@@ -36,7 +36,7 @@ public class ListOfStringTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		DataClassRecord descriptor = context.getDescriptor(ListOfString.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(ListOfString.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(ListOfString.class, descriptor.typeClass());

@@ -23,28 +23,28 @@ import java.util.Map;
 import java.util.Objects;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 
 /**
- * Sample showing how to use the Pep library to convert an Object to/from
- * Object[]
+ * Sample showing how to use the Pep library to convert an Object to/from Object[]
  *
- * This is intentionally using MethodHandles throughout to demonstrate
- * pre-building method handles for each type. This is the method likely to be
- * used by serialization libraries to improve performance.
+ * This is intentionally using MethodHandles throughout to demonstrate pre-building method handles
+ * for each type. This is the method likely to be used by serialization libraries to improve
+ * performance.
  *
- * TODO add try/catch/throw around conversions TODO deal with arrays TODO deal
- * with null values correctly
+ * TODO add try/catch/throw around conversions TODO deal with arrays TODO deal with null values
+ * correctly
  *
  */
 public class PepArrayMapper {
 
 	private final DataBindContext context;
 
-	private final Map<DataClassRecord, ArrayFunctions> functionCache;
+	private final Map<DataClass, ArrayFunctions> functionCache;
 
 	private static class ArrayFunctions {
 
@@ -68,7 +68,7 @@ public class PepArrayMapper {
 
 	}
 
-	private ArrayFunctions getFunctions(DataClassRecord dataClass) throws DataBindException {
+	private ArrayFunctions getFunctions(DataClass dataClass) throws DataBindException {
 		ArrayFunctions af = functionCache.get(dataClass);
 		if (af == null) {
 
@@ -82,8 +82,7 @@ public class PepArrayMapper {
 	}
 
 	/**
-	 * Convenience function. Takes the target object of this descriptor and return
-	 * an object array.
+	 * Convenience function. Takes the target object of this descriptor and return an object array.
 	 *
 	 * @param o target object instance to project to object[]
 	 * @return values from target object
@@ -93,7 +92,7 @@ public class PepArrayMapper {
 		return toArray(context.getDescriptor(o.getClass()), o);
 	}
 
-	public Object[] toArray(DataClassRecord clss, Object o) throws Throwable {
+	public Object[] toArray(DataClass clss, Object o) throws Throwable {
 		Objects.requireNonNull(o);
 
 		ArrayFunctions af = getFunctions(clss);
@@ -103,8 +102,8 @@ public class PepArrayMapper {
 	}
 
 	/**
-	 * Convenience function. Takes an array of values based on the field types and
-	 * returns the target object.
+	 * Convenience function. Takes an array of values based on the field types and returns the target
+	 * object.
 	 *
 	 * @param values object values to embed into target object.
 	 * @return recreated target object.
@@ -114,7 +113,7 @@ public class PepArrayMapper {
 		return toObject(context.getDescriptor(clss), values);
 	}
 
-	public <T> T toObject(DataClassRecord clss, Object[] values) throws Throwable {
+	public <T> T toObject(DataClass clss, Object[] values) throws Throwable {
 		Objects.requireNonNull(clss);
 		Objects.requireNonNull(values);
 
@@ -125,12 +124,10 @@ public class PepArrayMapper {
 	}
 
 	/**
-	 * Creates the embed method handle. Will create the serial instance, call
-	 * setters, and class the embed method handle to create the target object in a
-	 * single call. This is equivalent to:
+	 * Creates the embed method handle. Will create the serial instance, call setters, and class the
+	 * embed method handle to create the target object in a single call. This is equivalent to:
 	 *
-	 * // fields mapped as required from value array. T t = new EmbedClass(
-	 * values[0], values[1], ... );
+	 * // fields mapped as required from value array. T t = new EmbedClass( values[0], values[1], ... );
 	 *
 	 * // calls the embed function on the object. return toObject( t );
 	 *
@@ -139,7 +136,7 @@ public class PepArrayMapper {
 	 * @return a single MethodHandle to generate target object from Object[]
 	 * @throws DataBindException
 	 */
-	private MethodHandle createToObjectFunction(DataClassRecord dataClass) throws DataBindException {
+	private MethodHandle createToObjectFunction(DataClass dataClass) throws DataBindException {
 
 		// return MethodHandles.collectArguments(dataClass.toObject(), 0, create);
 
@@ -150,12 +147,13 @@ public class PepArrayMapper {
 			// identity( dataObject ):dataObject
 			result = dataClass.toObject().asType(dataClass.toObject().type().changeParameterType(0, Object.class));
 
-		} else if (dataClass.isData()) {
+		} else if (dataClass.isRecord()) {
+			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
-			result = dataClass.constructor();
+			result = dataClassRecord.constructor();
 
-			DataClassComponent[] fields = dataClass.dataComponents();
-			for (int x = 0; x < dataClass.dataComponents().length; x++) {
+			DataClassComponent[] fields = dataClassRecord.dataComponents();
+			for (int x = 0; x < dataClassRecord.dataComponents().length; x++) {
 				DataClassComponent field = fields[x];
 
 				int inputIndex = x;
@@ -166,7 +164,7 @@ public class PepArrayMapper {
 				// () -> inputIndex
 				MethodHandle index = MethodHandles.constant(int.class, inputIndex);
 
-				DataClassRecord fieldDataClass = field.dataClass();
+				DataClass fieldDataClass = field.dataClass();
 
 				// (values[]) -> values[inputIndex]
 				MethodHandle arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index);
@@ -221,7 +219,7 @@ public class PepArrayMapper {
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				throw new DataBindException("failed to build bridge for array", e);
 			}
-		} else if (dataClass.isBase()) {
+		} else if (dataClass.isUnion()) {
 			throw new DataBindException("not implemented");
 		}
 
@@ -229,41 +227,41 @@ public class PepArrayMapper {
 	}
 
 	/**
-	 * create project takes a target object and returns an Object[] of values. Not
-	 * yet complete. Haven't worked out how to re-use the Object[] in return value.
+	 * create project takes a target object and returns an Object[] of values. Not yet complete. Haven't
+	 * worked out how to re-use the Object[] in return value.
 	 *
-	 * // Project the instance to the embedded version. EmbeddedClass e =
-	 * project.invoke(o)
+	 * // Project the instance to the embedded version. EmbeddedClass e = project.invoke(o)
 	 *
-	 * // Extract the values from the projected object. Object[] values = new
-	 * Object[fields.length];
+	 * // Extract the values from the projected object. Object[] values = new Object[fields.length];
 	 *
-	 * // Call the various accessors to fill in the array and return values. return
-	 * getter.invoke(e, values );
+	 * // Call the various accessors to fill in the array and return values. return getter.invoke(e,
+	 * values );
 	 *
 	 * @param fields
 	 * @return
 	 * @throws DataBindException
 	 */
-	private MethodHandle createToDataFunction(DataClassRecord dataClass) throws DataBindException {
+	private MethodHandle createToDataFunction(DataClass dataClass) throws DataBindException {
 
 		MethodHandle returnArray = null;
 
 		if (dataClass.isAtom()) {
 			returnArray = dataClass.toData();
-		} else if (dataClass.isData()) {
+		} else if (dataClass.isRecord()) {
+
+			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
 			// (int):Object[] -> new Object[int]
 			MethodHandle createArray = MethodHandles.arrayConstructor(Object[].class);
 
 			// (int):length -> fields.length
-			MethodHandle index = MethodHandles.constant(int.class, dataClass.dataComponents().length);
+			MethodHandle index = MethodHandles.constant(int.class, dataClassRecord.dataComponents().length);
 
 			// ():Object[] -> new Object[fields.length]
 			MethodHandle arrayCreate = MethodHandles.collectArguments(createArray, 0, index);
 
 			// (Object[],serialClass):void -> getters(Object[],serialClass)
-			MethodHandle getters = createProjectGetters(dataClass);
+			MethodHandle getters = createProjectGetters(dataClassRecord);
 
 			// (Object[],targetClass):void -> getters(Object[], project(targetClass))
 			MethodHandle projectGetters = MethodHandles.collectArguments(getters, 1, dataClass.toData());
@@ -271,6 +269,7 @@ public class PepArrayMapper {
 			// ():Object[] -> return new Object[fields.length];
 			returnArray = MethodHandles.collectArguments(projectGetters, 0, arrayCreate);
 		} else if (dataClass.isArray()) {
+
 			try {
 
 				DataClassArray arrayClass = (DataClassArray) dataClass;
@@ -324,7 +323,7 @@ public class PepArrayMapper {
 			// (value[],v) -> value[inputIndex] = v
 			MethodHandle arrayIndexSetter = MethodHandles.collectArguments(arraySetter, 1, index);
 
-			DataClassRecord fieldDataClass = field.dataClass();
+			DataClass fieldDataClass = field.dataClass();
 
 			// (object) -> (Object) object.getter()
 			MethodHandle fieldBox = field.accessor();
@@ -375,7 +374,7 @@ public class PepArrayMapper {
 				Object[] outputArray = new Object[length];
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
+				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					outputArray[x] = dataToObject.invoke(iterator, arrayData);
@@ -415,7 +414,7 @@ public class PepArrayMapper {
 				Object arrayData = arrayClass.constructor().invoke(length);
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
+				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 

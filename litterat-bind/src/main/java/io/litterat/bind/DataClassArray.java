@@ -8,7 +8,8 @@ import java.util.Collection;
 /**
  * 
  * Represents an Array data class. The Array could be implemented by either a Java array or
- * collection. This provide an interface made up of MethodHandles to with the array implementation.
+ * collection. This provide an interface made up of MethodHandles to interact with the array
+ * implementation.
  * 
  * Extracting the values from an array object:
  * 
@@ -31,26 +32,38 @@ import java.util.Collection;
  * 
  * <pre>
  * DataClassArray arrayClass = (DataClassArray) dataClass;
- * 
  * Object[] inputArray = (Object[]) data;
  * 
- * int length = inputArray.length; Object arrayData = arrayClass.constructor().invoke(length);
+ * int length = inputArray.length;
+ * Object arrayData = arrayClass.constructor().invoke(length);
  * Object iterator = arrayClass.iterator().invoke(arrayData);
  * 
  * DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
  * 
- * for (int x = 0; x < length; x++) { arrayClass.put().invoke(iterator, arrayData,
- * toObject(arrayDataClass, inputArray[x])); }
+ * for (int x = 0; x < length; x++) {
+ * 	arrayClass.put().invoke(iterator, arrayData, toObject(arrayDataClass, inputArray[x]));
+ * }
  * 
  * v = arrayData;
+ * </pre>
  * 
- * 
+ * The MethodHandle signatures are:
+ * <ul>
+ * <li>constructor( int size ):Array;
+ * <li>size( Array ):int;
+ * <li>iterator( Array ):Iterator;
+ * <li>put( Iterator, Array, Value ):void;
+ * <li>get( Iterator, Array ):value;
+ * </ul>
  * 
  */
-public class DataClassArray extends DataClassRecord {
+public class DataClassArray extends DataClass {
 
 	// data class.
-	private final DataClassRecord arrayDataClass;
+	private final DataClass arrayDataClass;
+
+	// <Array> constructor( int size );
+	private final MethodHandle constructor;
 
 	// int size( <Array> );
 	private final MethodHandle size;
@@ -64,14 +77,16 @@ public class DataClassArray extends DataClassRecord {
 	// <data> get( <Iterator> iterator, <Array> );
 	private final MethodHandle get;
 
-	public DataClassArray(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
-			MethodHandle toData, MethodHandle toObject, DataClassComponent[] fields, DataType dataType,
-			DataClassRecord arrayDataClass, Object bridge) throws NoSuchMethodException, IllegalAccessException {
-		super(targetType, serialType, creator, constructor, toData, toObject, fields, dataType);
+	public DataClassArray(Class<?> targetType, Class<?> serialType, MethodHandle constructor, MethodHandle toData,
+			MethodHandle toObject, DataClass arrayDataClass, Object bridge)
+			throws NoSuchMethodException, IllegalAccessException {
+		super(targetType, serialType, toData, toObject, DataClassType.ARRAY);
 
 		Class<?> iteratorClass;
 		Class<?> arrayClass = targetType;
 		this.arrayDataClass = arrayDataClass;
+		this.constructor = constructor;
+
 		Class<?> bridgeDataClass = arrayDataClass.typeClass();
 		if (Collection.class.isAssignableFrom(targetType)) {
 			arrayClass = Collection.class;
@@ -101,7 +116,14 @@ public class DataClassArray extends DataClassRecord {
 				MethodType.methodType(bridgeDataClass, iteratorClass, arrayClass)).bindTo(bridge);
 	}
 
-	public DataClassRecord arrayDataClass() {
+	/**
+	 * @return A MethodHandle that creates the array. constructor(int size):type;
+	 */
+	public MethodHandle constructor() {
+		return constructor;
+	}
+
+	public DataClass arrayDataClass() {
 		return arrayDataClass;
 	}
 

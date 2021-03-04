@@ -39,17 +39,19 @@ import java.util.stream.Collectors;
 
 import io.litterat.bind.Atom;
 import io.litterat.bind.Data;
-import io.litterat.bind.DataBridge;
-import io.litterat.bind.DataOrder;
-import io.litterat.bind.Field;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindContextResolver;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataBridge;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClass.DataClassType;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
+import io.litterat.bind.DataOrder;
+import io.litterat.bind.Field;
 import io.litterat.bind.ToData;
-import io.litterat.bind.DataClassRecord.DataType;
 import io.litterat.bind.array.CollectionArrayBridge;
 import io.litterat.bind.array.PrimitiveBridges;
 
@@ -68,24 +70,26 @@ public class DefaultResolver implements DataBindContextResolver {
 	}
 
 	@Override
-	public DataClassRecord resolve(DataBindContext context, Class<?> targetClass, Type parameterizedType) throws DataBindException {
-		DataClassRecord descriptor = null;
+	public DataClass resolve(DataBindContext context, Class<?> targetClass, Type parameterizedType)
+			throws DataBindException {
+		DataClass descriptor = null;
 
-		if (isBase(targetClass)) {
-			descriptor = resolveBase(context, targetClass);
+		if (isUnion(targetClass)) {
+			descriptor = resolveUnion(context, targetClass);
 		} else if (isArray(targetClass)) {
 			descriptor = resolveArray(context, targetClass, parameterizedType);
 		} else if (isAtom(targetClass)) {
 			descriptor = resolveAtom(context, targetClass);
-		} else if (isTuple(targetClass)) {
-			descriptor = resolveTuple(context, targetClass);
+		} else if (isRecord(targetClass)) {
+			descriptor = resolveRecord(context, targetClass);
 		} else {
-			throw new DataBindException(String.format("Unable to find a valid data conversion for class: %s", targetClass));
+			throw new DataBindException(
+					String.format("Unable to find a valid data conversion for class: %s", targetClass));
 		}
 		return descriptor;
 	}
 
-	private boolean isBase(Class<?> targetClass) {
+	private boolean isUnion(Class<?> targetClass) {
 		if (targetClass.isInterface() && !Collection.class.isAssignableFrom(targetClass)) {
 			return true;
 		}
@@ -107,7 +111,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		return false;
 	}
 
-	private boolean isTuple(Class<?> targetClass) {
+	private boolean isRecord(Class<?> targetClass) {
 
 		// if class has annotation this is a tuple.
 		Data pepData = targetClass.getAnnotation(Data.class);
@@ -204,21 +208,20 @@ public class DefaultResolver implements DataBindContextResolver {
 		return false;
 	}
 
-	private DataClassRecord resolveBase(DataBindContext context, Class<?> targetClass) throws DataBindException {
+	private DataClassUnion resolveUnion(DataBindContext context, Class<?> targetClass) throws DataBindException {
 		MethodHandle identity = MethodHandles.identity(targetClass);
 
 		// TODO It could be useful to map other classes to this data class.
-		return new DataClassRecord(targetClass, targetClass, null, null, identity, identity, new DataClassComponent[0],
-				DataType.BASE);
+		return new DataClassUnion(targetClass, targetClass, identity, identity);
 	}
 
 	// TODO If the targetClass is a Collection it isn't possible get the generic
 	// parameter as the class will erazed.
 	// The resolution should use a Type which can get the information from the field
 	// or parameter and pass that through.
-	private DataClassRecord resolveArray(DataBindContext context, Class<?> targetClass, Type parameterizedType)
+	private DataClassArray resolveArray(DataBindContext context, Class<?> targetClass, Type parameterizedType)
 			throws DataBindException {
-		DataClassRecord descriptor = null;
+		DataClassArray descriptor = null;
 
 		try {
 			if (targetClass.isArray()) {
@@ -226,11 +229,10 @@ public class DefaultResolver implements DataBindContextResolver {
 				MethodHandle constructor = MethodHandles.arrayConstructor(targetClass);
 				MethodHandle identity = MethodHandles.identity(targetClass);
 
-				DataClassRecord arrayDataClass = context.getDescriptor(targetClass.getComponentType());
+				DataClass arrayDataClass = context.getDescriptor(targetClass.getComponentType());
 
-				descriptor = new DataClassArray(targetClass, targetClass, null, constructor, identity, identity,
-						new DataClassComponent[0], DataType.ARRAY, arrayDataClass,
-						PrimitiveBridges.getPrimitiveArrayBridge(targetClass.getComponentType()));
+				descriptor = new DataClassArray(targetClass, targetClass, constructor, identity, identity,
+						arrayDataClass, PrimitiveBridges.getPrimitiveArrayBridge(targetClass.getComponentType()));
 
 			} else if (Collection.class.isAssignableFrom(targetClass)) {
 
@@ -238,7 +240,7 @@ public class DefaultResolver implements DataBindContextResolver {
 					throw new DataBindException("Collection must provide parameterized type information");
 				}
 
-				DataClassRecord arrayDataClass;
+				DataClass arrayDataClass;
 				Type paramType = ((ParameterizedType) parameterizedType).getActualTypeArguments()[0];
 				if (paramType instanceof Class) {
 					arrayDataClass = context.getDescriptor((Class<?>) paramType);
@@ -264,8 +266,8 @@ public class DefaultResolver implements DataBindContextResolver {
 				MethodHandle toObject = MethodHandles.identity(targetClass);
 				MethodHandle toData = MethodHandles.identity(targetClass);
 
-				descriptor = new DataClassArray(targetClass, Object[].class, null, constructor, toData, toObject,
-						new DataClassComponent[0], DataType.ARRAY, arrayDataClass, new CollectionArrayBridge());
+				descriptor = new DataClassArray(targetClass, Object[].class, constructor, toData, toObject,
+						arrayDataClass, new CollectionArrayBridge());
 
 			}
 
@@ -287,8 +289,8 @@ public class DefaultResolver implements DataBindContextResolver {
 		return false;
 	}
 
-	private DataClassRecord resolveAtom(DataBindContext context, Class<?> targetClass) throws DataBindException {
-		DataClassRecord descriptor = null;
+	private DataClass resolveAtom(DataBindContext context, Class<?> targetClass) throws DataBindException {
+		DataClass descriptor = null;
 
 		try {
 			if (targetClass.isPrimitive()) {
@@ -305,7 +307,8 @@ public class DefaultResolver implements DataBindContextResolver {
 				if (pepAtom != null) {
 					Parameter[] params = constructor.getParameters();
 					if (params.length != 1 || !isPrimitive(params[0].getType())) {
-						throw new DataBindException(String.format("Atom must have single primitive argument", targetClass));
+						throw new DataBindException(
+								String.format("Atom must have single primitive argument", targetClass));
 					}
 
 					Class<?> dataClass = params[0].getType();
@@ -362,9 +365,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						throw new DataBindException("Atom accessor @Atom annotation not found");
 					}
 
-					MethodHandle identity = MethodHandles.identity(targetClass);
-					descriptor = new DataClassRecord(targetClass, param, null, identity, toData, toObject,
-							new DataClassComponent[0], DataType.ATOM);
+					descriptor = new DataClass(targetClass, param, toData, toObject, DataClassType.ATOM);
 
 				}
 			}
@@ -376,8 +377,6 @@ public class DefaultResolver implements DataBindContextResolver {
 
 				EnumBridge bridge = new EnumBridge(targetClass);
 
-				MethodHandle identity = MethodHandles.identity(targetClass);
-
 				MethodHandle toObject = MethodHandles.lookup()
 						.findVirtual(EnumBridge.class, TOOBJECT_METHOD, MethodType.methodType(Enum.class, String.class))
 						.bindTo(bridge).asType(MethodType.methodType(targetClass, String.class));
@@ -385,8 +384,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						.findVirtual(EnumBridge.class, TODATA_METHOD, MethodType.methodType(String.class, Enum.class))
 						.bindTo(bridge).asType(MethodType.methodType(String.class, targetClass));
 
-				descriptor = new DataClassRecord(targetClass, String.class, null, identity, toData, toObject,
-						new DataClassComponent[0], DataType.ATOM);
+				descriptor = new DataClass(targetClass, String.class, toData, toObject);
 
 			}
 		} catch (SecurityException | IllegalAccessException | NoSuchMethodException | DataBindException e) {
@@ -396,7 +394,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		return descriptor;
 	}
 
-	private DataClassRecord resolveTuple(DataBindContext context, Class<?> targetClass) throws DataBindException {
+	private DataClassRecord resolveRecord(DataBindContext context, Class<?> targetClass) throws DataBindException {
 		DataClassRecord descriptor = null;
 
 		try {
@@ -413,7 +411,8 @@ public class DefaultResolver implements DataBindContextResolver {
 								.getActualTypeArguments()[0];
 
 						// Recursively get hold of the data class descriptor.
-						DataClassRecord tupleData = context.getDescriptor(dataType);
+						// Might need to revisit this. Expecting a record and while throw if it isn't. :(
+						DataClassRecord tupleData = (DataClassRecord) context.getDescriptor(dataType);
 
 						// We require that a constructor be present that takes the data class as input.
 						MethodHandle toObject = MethodHandles.publicLookup()
@@ -424,8 +423,8 @@ public class DefaultResolver implements DataBindContextResolver {
 								.unreflect(targetClass.getMethod(TODATA_METHOD));
 
 						// The constructor and data components are copied from the data class.
-						descriptor = new DataClassRecord(targetClass, dataType, tupleData.constructor(), toData, toObject,
-								tupleData.dataComponents());
+						descriptor = new DataClassRecord(targetClass, dataType, tupleData.constructor(), toData,
+								toObject, tupleData.dataComponents());
 						break;
 					}
 
@@ -508,7 +507,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						}
 
 						// Recursively get hold of the data class descriptor.
-						DataClassRecord tupleData = context.getDescriptor(bridgeDataClass, bridgeDataType);
+						DataClass tupleData = context.getDescriptor(bridgeDataClass, bridgeDataType);
 
 						if (!bridgeObjectClass.isAssignableFrom(info.getType())) {
 							throw new DataBindException("Bridge object type not assignable from field type");
@@ -550,7 +549,7 @@ public class DefaultResolver implements DataBindContextResolver {
 
 						Class<?> optionalType = (Class<?>) info.getParamType().getActualTypeArguments()[0];
 
-						DataClassRecord dataClass = context.getDescriptor(optionalType);
+						DataClass dataClass = context.getDescriptor(optionalType);
 
 						@SuppressWarnings("rawtypes")
 						OptionalBridge bridge = new OptionalBridge();
@@ -582,7 +581,7 @@ public class DefaultResolver implements DataBindContextResolver {
 
 					} else {
 
-						DataClassRecord dataClass = context.getDescriptor(info.getType(),
+						DataClass dataClass = context.getDescriptor(info.getType(),
 								(info.getParamType() != null ? info.getParamType() : info.getType()));
 
 						component = new DataClassComponent(x, info.getName(), info.getType(), dataClass, accessor,
@@ -609,7 +608,7 @@ public class DefaultResolver implements DataBindContextResolver {
 				}
 
 				descriptor = new DataClassRecord(targetClass, targetClass, creator, constructor, toData, toObject,
-						dataComponents, DataType.TUPLE);
+						dataComponents);
 			}
 		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | DataBindException e) {
 			throw new DataBindException("Failed to get data descriptor", e);
@@ -634,7 +633,8 @@ public class DefaultResolver implements DataBindContextResolver {
 		List<String> fieldOrderList = List.of(dataOrder.value());
 		for (String field : fieldOrderList) {
 			if (!componentMap.containsKey(field)) {
-				throw new DataBindException(String.format("DataOrder annotation had no corresponding field '%s'", field));
+				throw new DataBindException(
+						String.format("DataOrder annotation had no corresponding field '%s'", field));
 			}
 		}
 

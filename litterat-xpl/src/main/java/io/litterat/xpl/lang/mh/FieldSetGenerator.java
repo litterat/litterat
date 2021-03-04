@@ -19,8 +19,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.model.TypeException;
 import io.litterat.model.bind.ModelBinder;
 import io.litterat.xpl.TypeMap;
@@ -44,7 +44,7 @@ public class FieldSetGenerator implements StatementGenerator {
 
 		try {
 			// Get the data class
-			DataClassRecord dataClass = typeMap.library().getTypeClass(fieldSet.type());
+			DataClassRecord dataClass = (DataClassRecord) typeMap.library().getTypeClass(fieldSet.type());
 
 			// find the getter.
 			return ModelBinder.resolveFieldSetter(dataClass, fieldSet.field());

@@ -20,15 +20,15 @@ import java.util.Map;
 import java.util.Objects;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 
 /**
  *
- * Sample showing how to use the Pep library to convert an Object to/from
- * Map<String,Object>
+ * Sample showing how to use the Pep library to convert an Object to/from Map<String,Object>
  *
  */
 public class PepMapMapper {
@@ -47,29 +47,30 @@ public class PepMapMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object toMap(DataClassRecord dataClass, Object object) throws DataBindException {
+	public Object toMap(DataClass dataClass, Object object) throws DataBindException {
 
 		int fieldIndex = 0;
 
 		try {
 			Object v = null;
 			if (dataClass.isAtom()) {
-				v = dataClass.toData().invoke(object);
-			} else if (dataClass.isData()) {
-
-				Object data = dataClass.toData().invoke(object);
+				DataClass dataAtom = dataClass;
+				v = dataAtom.toData().invoke(object);
+			} else if (dataClass.isRecord()) {
+				DataClassRecord dataRecord = (DataClassRecord) dataClass;
+				Object data = dataRecord.toData().invoke(object);
 
 				Map<String, Object> map = new HashMap<>();
 
-				DataClassComponent[] fields = dataClass.dataComponents();
-				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
+				DataClassComponent[] fields = dataRecord.dataComponents();
+				for (fieldIndex = 0; fieldIndex < dataRecord.dataComponents().length; fieldIndex++) {
 					DataClassComponent field = fields[fieldIndex];
 
 					Object fv = field.accessor().invoke(data);
 
 					// Recursively convert object to map.
 					if (fv != null) {
-						DataClassRecord fieldDataClass = field.dataClass();
+						DataClass fieldDataClass = field.dataClass();
 						fv = toMap(fieldDataClass, fv);
 					}
 
@@ -78,7 +79,7 @@ public class PepMapMapper {
 
 				v = map;
 
-			} else if (dataClass.isBase()) {
+			} else if (dataClass.isUnion()) {
 				// An interface needs to know the type being written so it can be picked up by
 				// the reader later.
 				v = toMap(object);
@@ -88,7 +89,6 @@ public class PepMapMapper {
 					baseMap.put("type", object.getClass().getName());
 				}
 			} else if (dataClass.isArray()) {
-
 				DataClassArray arrayClass = (DataClassArray) dataClass;
 
 				Object arrayData = object;
@@ -96,7 +96,7 @@ public class PepMapMapper {
 				Object[] outputArray = new Object[length];
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
+				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					Object av = arrayClass.get().invoke(iterator, arrayData);
@@ -109,8 +109,7 @@ public class PepMapMapper {
 			}
 			return v;
 		} catch (Throwable t) {
-			throw new DataBindException(String.format("Failed to convert %s to Map. Could not convert field %s",
-					dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
+			throw new DataBindException(String.format("Failed to convert %s to Map", dataClass.typeClass()), t);
 		}
 	}
 
@@ -123,26 +122,28 @@ public class PepMapMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object toObject(DataClassRecord dataClass, Object data) throws DataBindException {
+	public Object toObject(DataClass dataClass, Object data) throws DataBindException {
 
 		int fieldIndex = 0;
 
 		try {
 			Object v = null;
 			if (dataClass.isAtom()) {
-				v = dataClass.toObject().invoke(data);
-			} else if (dataClass.isData()) {
+				DataClass dataAtom = dataClass;
+				v = dataAtom.toObject().invoke(data);
+			} else if (dataClass.isRecord()) {
+				DataClassRecord dataRecord = (DataClassRecord) dataClass;
 				Map<String, Object> map = (Map<String, Object>) data;
-				DataClassComponent[] fields = dataClass.dataComponents();
+				DataClassComponent[] fields = dataRecord.dataComponents();
 				Object[] construct = new Object[fields.length];
-				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
+				for (fieldIndex = 0; fieldIndex < dataRecord.dataComponents().length; fieldIndex++) {
 					DataClassComponent field = fields[fieldIndex];
 
 					Object fv = map.get(field.name());
 
 					// Recursively convert maps back to objects.
 					if (fv != null) {
-						DataClassRecord fieldDataClass = field.dataClass();
+						DataClass fieldDataClass = field.dataClass();
 
 						fv = toObject(fieldDataClass, fv);
 
@@ -150,9 +151,9 @@ public class PepMapMapper {
 					construct[fieldIndex] = fv;
 				}
 
-				v = dataClass.constructor().invoke(construct);
+				v = dataRecord.constructor().invoke(construct);
 
-				v = dataClass.toObject().invoke(v);
+				v = dataRecord.toObject().invoke(v);
 			} else if (dataClass.isArray()) {
 				DataClassArray arrayClass = (DataClassArray) dataClass;
 
@@ -162,7 +163,7 @@ public class PepMapMapper {
 				Object arrayData = arrayClass.constructor().invoke(length);
 				Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
+				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					arrayClass.put().invoke(iterator, arrayData, toObject(arrayDataClass, inputArray[x]));
@@ -174,12 +175,7 @@ public class PepMapMapper {
 			}
 			return v;
 		} catch (Throwable t) {
-			if (fieldIndex < dataClass.dataComponents().length) {
-				throw new DataBindException(String.format("Failed to convert Map to %s. Incorrect value for field %s",
-						dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
-			} else {
-				throw new DataBindException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
-			}
+			throw new DataBindException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
 		}
 
 	}

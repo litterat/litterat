@@ -20,9 +20,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.model.Array;
 import io.litterat.model.Definition;
 import io.litterat.model.Field;
@@ -46,12 +47,13 @@ public class ModelBinder {
 		try {
 
 			// This might throw an exception.
-			DataClassRecord dataClass = library.pepContext().getDescriptor(clss);
+			DataClass dataClass = library.pepContext().getDescriptor(clss);
 
-			if (dataClass.isData()) {
+			if (dataClass.isRecord()) {
+				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 				List<Field> fields = new ArrayList<>();
 
-				DataClassComponent[] components = dataClass.dataComponents();
+				DataClassComponent[] components = dataClassRecord.dataComponents();
 				for (DataClassComponent component : components) {
 					String name = component.name();
 
@@ -92,7 +94,7 @@ public class ModelBinder {
 
 				// Pass the accessor through the toData handle to get the correct data type.
 				// toData will be identity function if no change required.
-				DataClassRecord componentClass = component.dataClass();
+				DataClass componentClass = component.dataClass();
 
 				MethodHandle toData = componentClass.toData();
 
@@ -108,11 +110,12 @@ public class ModelBinder {
 		for (DataClassComponent component : dataClass.dataComponents()) {
 			if (component.name().equalsIgnoreCase(field)) {
 
-				MethodHandle setter = component.setter().orElseThrow(() -> new DataBindException("No setter available"));
+				MethodHandle setter = component.setter()
+						.orElseThrow(() -> new DataBindException("No setter available"));
 
 				// Pass the object through the toObject method handle to get the correct type
 				// for the setter. toObject will be identity function if no change required.
-				DataClassRecord componentClass = component.dataClass();
+				DataClass componentClass = component.dataClass();
 
 				MethodHandle toObject = componentClass.toObject();
 

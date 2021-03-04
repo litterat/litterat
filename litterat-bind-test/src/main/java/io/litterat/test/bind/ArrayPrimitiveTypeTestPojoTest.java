@@ -23,9 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.ArrayPrimitiveTypeTestPojo;
@@ -82,7 +82,7 @@ public class ArrayPrimitiveTypeTestPojoTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		DataClassRecord descriptor = context.getDescriptor(ArrayPrimitiveTypeTestPojo.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(ArrayPrimitiveTypeTestPojo.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(ArrayPrimitiveTypeTestPojo.class, descriptor.typeClass());

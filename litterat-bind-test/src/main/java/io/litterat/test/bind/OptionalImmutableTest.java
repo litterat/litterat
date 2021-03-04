@@ -23,8 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.OptionalImmutable;
@@ -44,7 +44,7 @@ public class OptionalImmutableTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		DataClassRecord descriptor = context.getDescriptor(OptionalImmutable.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(OptionalImmutable.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(OptionalImmutable.class, descriptor.typeClass());

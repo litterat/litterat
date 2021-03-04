@@ -22,9 +22,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.SimpleImmutable;
@@ -46,7 +46,7 @@ public class SimpleImmutableTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		DataClassRecord descriptor = context.getDescriptor(SimpleImmutable.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(SimpleImmutable.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(SimpleImmutable.class, descriptor.typeClass());

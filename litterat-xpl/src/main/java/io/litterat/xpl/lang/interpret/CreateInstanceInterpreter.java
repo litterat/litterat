@@ -17,6 +17,8 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.model.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.CreateInstance;
@@ -29,7 +31,13 @@ public class CreateInstanceInterpreter implements ExpressionInterpreter {
 
 	public CreateInstanceInterpreter(final TypeMap typeMap, final CreateInstance createInstance) throws TypeException {
 		this.createInstance = createInstance;
-		this.constructor = typeMap.library().getTypeClass(createInstance.type()).creator().orElseThrow();
+
+		DataClass dataClass = typeMap.library().getTypeClass(createInstance.type());
+		if (dataClass instanceof DataClassRecord) {
+			this.constructor = ((DataClassRecord) dataClass).creator().orElseThrow();
+		} else {
+			throw new TypeException("Type not a record type");
+		}
 	}
 
 	@Override

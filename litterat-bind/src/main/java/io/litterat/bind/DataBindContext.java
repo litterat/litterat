@@ -27,7 +27,7 @@ import io.litterat.bind.describe.DefaultResolver;
 public class DataBindContext {
 
 	// Resolved class information
-	private final ConcurrentHashMap<Type, DataClassRecord> descriptors = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Type, DataClass> descriptors = new ConcurrentHashMap<>();
 
 	// Resolver
 	private final DataBindContextResolver resolver;
@@ -114,17 +114,17 @@ public class DataBindContext {
 	}
 
 	public void registerAtom(Class<?> targetClass) throws DataBindException {
-		register(targetClass, new DataClassRecord(targetClass));
+		register(targetClass, new DataClass(targetClass));
 	}
 
-	public DataClassRecord getDescriptor(Class<?> targetClass) throws DataBindException {
+	public DataClass getDescriptor(Class<?> targetClass) throws DataBindException {
 		// Use the erased type if type parameters not provided.
 		return getDescriptor(targetClass, targetClass);
 	}
 
-	public DataClassRecord getDescriptor(Class<?> targetClass, Type parameterizedType) throws DataBindException {
+	public DataClass getDescriptor(Class<?> targetClass, Type parameterizedType) throws DataBindException {
 
-		DataClassRecord descriptor = descriptors.get(parameterizedType);
+		DataClass descriptor = descriptors.get(parameterizedType);
 		if (descriptor == null) {
 			descriptor = resolver.resolve(this, targetClass, parameterizedType);
 			if (descriptor == null) {
@@ -143,7 +143,7 @@ public class DataBindContext {
 		}
 	}
 
-	public <T> void register(Type targetClass, DataClassRecord descriptor) throws DataBindException {
+	public <T> void register(Type targetClass, DataClass descriptor) throws DataBindException {
 		checkExists(targetClass);
 
 		descriptors.put(targetClass, descriptor);
@@ -161,7 +161,7 @@ public class DataBindContext {
 			MethodHandle toData = MethodHandles.publicLookup().unreflect(toDataMethod).bindTo(bridge);
 			MethodHandle toObject = MethodHandles.publicLookup().unreflect(toObjectMethod).bindTo(bridge);
 
-			register(targetClass, new DataClassRecord(targetClass, toDataMethod.getReturnType(), toData, toObject));
+			register(targetClass, new DataClass(targetClass, toDataMethod.getReturnType(), toData, toObject));
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | DataBindException e) {
 			throw new DataBindException("Failed to register atom bridge", e);
 		}

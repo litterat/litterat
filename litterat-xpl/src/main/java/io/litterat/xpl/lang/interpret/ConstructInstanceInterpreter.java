@@ -37,7 +37,7 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 		this.createInstance = createInstance;
 		this.params = params;
 
-		DataClassRecord typeClass = typeMap.library().getTypeClass(createInstance.type());
+		DataClassRecord typeClass = (DataClassRecord) typeMap.library().getTypeClass(createInstance.type());
 		this.constructor = typeClass.constructor();
 		this.toObject = ModelBinder.collectToObject(typeClass);
 	}

@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
 import io.litterat.model.annotation.SchemaType;
 import io.litterat.model.bind.ModelBinder;
 import io.litterat.model.meta.SchemaTypes;
@@ -118,7 +118,7 @@ public class TypeLibrary {
 		types.putIfAbsent(type, entry);
 	}
 
-	public void register(TypeName type, Definition definition, DataClassRecord dataClass) {
+	public void register(TypeName type, Definition definition, DataClass dataClass) {
 
 		TypeLibraryEntry entry = new TypeLibraryEntry(TypeLibraryState.BOUND, type, definition, dataClass);
 
@@ -143,7 +143,7 @@ public class TypeLibrary {
 
 			Class<?> clss = Class.forName(className);
 			try {
-				DataClassRecord dataClass = pepContext.getDescriptor(clss);
+				DataClass dataClass = pepContext.getDescriptor(clss);
 				Definition definition = binder.createDefinition(this, clss);
 
 				register(typeName, definition, dataClass);
@@ -166,7 +166,7 @@ public class TypeLibrary {
 		return entry.definition();
 	}
 
-	public DataClassRecord getTypeClass(TypeName type) throws TypeException {
+	public DataClass getTypeClass(TypeName type) throws TypeException {
 		TypeLibraryEntry entry = this.types.get(type);
 		if (entry == null) {
 			entry = registerOrThrow(type);
@@ -181,7 +181,7 @@ public class TypeLibrary {
 		if (typeName == null) {
 
 			try {
-				DataClassRecord dataClass = pepContext.getDescriptor(clss);
+				DataClass dataClass = pepContext.getDescriptor(clss);
 				Definition definition = binder.createDefinition(this, clss);
 				typeName = generateTypeName(clss);
 				register(typeName, definition, dataClass);

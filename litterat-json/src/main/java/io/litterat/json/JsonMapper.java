@@ -29,10 +29,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.json.parser.JsonReader;
 import io.litterat.json.parser.JsonToken;
 import io.litterat.json.parser.JsonWriter;
@@ -62,11 +63,11 @@ public class JsonMapper {
 	}
 
 	public void toJson(Object object, Writer writer) throws DataBindException {
-		DataClassRecord dataClass = context.getDescriptor(object.getClass());
+		DataClass dataClass = context.getDescriptor(object.getClass());
 		toJson(object, dataClass, new JsonWriter(writer));
 	}
 
-	private void toJson(Object object, DataClassRecord dataClass, JsonWriter writer) throws DataBindException {
+	private void toJson(Object object, DataClass dataClass, JsonWriter writer) throws DataBindException {
 
 		Objects.requireNonNull(object);
 
@@ -78,20 +79,20 @@ public class JsonMapper {
 
 			if (dataClass.isAtom()) {
 				writeAtom(data, writer);
-			} else if (dataClass.isData()) {
-
+			} else if (dataClass.isRecord()) {
+				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 				writer.beginObject();
 
-				DataClassComponent[] fields = dataClass.dataComponents();
+				DataClassComponent[] fields = dataClassRecord.dataComponents();
 
-				for (fieldIndex = 0; fieldIndex < dataClass.dataComponents().length; fieldIndex++) {
+				for (fieldIndex = 0; fieldIndex < dataClassRecord.dataComponents().length; fieldIndex++) {
 					DataClassComponent field = fields[fieldIndex];
 
 					Object v = field.accessor().invoke(data);
 
 					// Recursively convert object to map.
 					if (v != null) {
-						DataClassRecord fieldDataClass = field.dataClass();
+						DataClass fieldDataClass = field.dataClass();
 
 						writer.name(field.name());
 
@@ -114,7 +115,7 @@ public class JsonMapper {
 				Object arrayData = object;
 				int length = (int) arrayClass.size().invoke(arrayData);
 				Object iterator = arrayClass.iterator().invoke(arrayData);
-				DataClassRecord arrayDataClass = arrayClass.arrayDataClass();
+				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
 					Object av = arrayClass.get().invoke(iterator, arrayData);
@@ -125,8 +126,7 @@ public class JsonMapper {
 			}
 
 		} catch (Throwable t) {
-			throw new DataBindException(String.format("Failed to convert %s to Map. Could not convert field %s",
-					dataClass.typeClass(), dataClass.dataComponents()[fieldIndex].name()), t);
+			throw new DataBindException(String.format("Failed to convert %s to Map.", dataClass.typeClass()), t);
 		}
 	}
 
@@ -150,7 +150,7 @@ public class JsonMapper {
 	@SuppressWarnings("unchecked")
 	public <T> T fromJson(String json, Class<?> clss, Reader reader) throws DataBindException {
 
-		DataClassRecord dataClass = context.getDescriptor(clss);
+		DataClass dataClass = context.getDescriptor(clss);
 
 		return (T) fromJson(dataClass, new JsonReader(reader));
 	}
@@ -165,7 +165,7 @@ public class JsonMapper {
 
 	}
 
-	private Object fromJson(DataClassRecord dataClass, JsonReader reader) throws DataBindException {
+	private Object fromJson(DataClass dataClass, JsonReader reader) throws DataBindException {
 
 		try {
 
@@ -200,13 +200,15 @@ public class JsonMapper {
 
 			case BEGIN_OBJECT:
 
-				if (!dataClass.isData()) {
+				if (!dataClass.isRecord()) {
 					throw new IllegalStateException();
 				}
 
 				reader.beginObject();
 
-				DataClassComponent[] fields = dataClass.dataComponents();
+				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
+
+				DataClassComponent[] fields = dataClassRecord.dataComponents();
 				Object[] construct = new Object[fields.length];
 
 				while (reader.hasNext()) {
@@ -214,7 +216,7 @@ public class JsonMapper {
 					String name = reader.nextName();
 
 					// Find the name in the fields.
-					DataClassComponent field = componentMap(dataClass).get(name);
+					DataClassComponent field = componentMap(dataClassRecord).get(name);
 					Objects.requireNonNull(field,
 							String.format("field %s not found in class", name, dataClass.dataClass()));
 
@@ -224,7 +226,7 @@ public class JsonMapper {
 
 				reader.endObject();
 
-				Object data = dataClass.constructor().invoke(construct);
+				Object data = dataClassRecord.constructor().invoke(construct);
 
 				return dataClass.toObject().invoke(data);
 
@@ -242,7 +244,7 @@ public class JsonMapper {
 				// TODO could potentially provide meta data saying if the collection type is
 				// static or dynamic.
 				// A dynamic sized collection could be created and then have each added.
-				DataClassRecord arrayValueClass = arrayDataClass.arrayDataClass();
+				DataClass arrayValueClass = arrayDataClass.arrayDataClass();
 				List<Object> list = new ArrayList<Object>();
 				while (reader.hasNext()) {
 					list.add(fromJson(arrayValueClass, reader));
@@ -279,7 +281,7 @@ public class JsonMapper {
 		}
 	}
 
-	Object readNumber(DataClassRecord dataClass, JsonReader reader) throws IOException {
+	Object readNumber(DataClass dataClass, JsonReader reader) throws IOException {
 		Class<?> clss = dataClass.dataClass();
 		if (clss == Integer.class || clss == int.class) {
 			return reader.nextInt();

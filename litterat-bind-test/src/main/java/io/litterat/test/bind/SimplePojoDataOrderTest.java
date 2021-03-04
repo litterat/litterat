@@ -22,9 +22,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.SimplePojoDataOrder;
@@ -54,7 +54,7 @@ public class SimplePojoDataOrderTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 		DataBindContext context = new DataBindContext.Builder().build();
-		DataClassRecord descriptor = context.getDescriptor(SimplePojoDataOrder.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(SimplePojoDataOrder.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(SimplePojoDataOrder.class, descriptor.typeClass());

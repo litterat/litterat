@@ -34,15 +34,16 @@ public class DataClassComponent {
 	// type of the field
 	private final Class<?> type;
 
-	private final DataClassRecord dataClass;
+	private final DataClass dataClass;
 
 	// accessor read handle. signature: type t = object.getT();
 	private final MethodHandle accessor;
-	
+
 	// setter write handle. signature object.setT( type t);
 	private final Optional<MethodHandle> setter;
 
-	public DataClassComponent(int index, String name, Class<?> type, DataClassRecord dataClass, MethodHandle readHandle, MethodHandle setter) {
+	public DataClassComponent(int index, String name, Class<?> type, DataClass dataClass, MethodHandle readHandle,
+			MethodHandle setter) {
 		this.index = index;
 		this.name = name;
 		this.type = type;
@@ -63,7 +64,7 @@ public class DataClassComponent {
 		return type;
 	}
 
-	public DataClassRecord dataClass() {
+	public DataClass dataClass() {
 		return dataClass;
 	}
 

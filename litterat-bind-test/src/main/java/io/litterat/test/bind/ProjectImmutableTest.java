@@ -23,9 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.ProjectImmutable;
@@ -47,7 +47,7 @@ public class ProjectImmutableTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 		DataBindContext context = new DataBindContext.Builder().build();
-		DataClassRecord descriptor = context.getDescriptor(ProjectImmutable.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(ProjectImmutable.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(ProjectImmutable.class, descriptor.typeClass());

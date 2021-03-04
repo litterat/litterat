@@ -19,8 +19,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassArray;
 import io.litterat.model.Atom;
 import io.litterat.model.Definition;
 import io.litterat.model.Encoding;
@@ -176,7 +176,7 @@ public class LitteratInterpreter {
 
 			Class<?> arrayClass = Array
 					.newInstance(typeMap.library().getTypeClass(readArray.array().type()).dataClass(), 0).getClass();
-			DataClassRecord pepClass = typeMap.library().pepContext().getDescriptor(arrayClass);
+			DataClassArray pepClass = (DataClassArray) typeMap.library().pepContext().getDescriptor(arrayClass);
 
 			compiledExpression = new ReadArrayInterpreter(readArray, pepClass,
 					compileExpression(typeMap, readArray.readExpression()));

@@ -19,6 +19,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.model.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.ConstructInstance;
@@ -34,7 +36,14 @@ public class ConstructInstanceGenerator implements ExpressionGenerator {
 			ExpressionGenerator[] params) throws TypeException {
 		this.createInstance = createInstance;
 		this.params = params;
-		this.constructor = typeMap.library().getTypeClass(createInstance.type()).constructor();
+
+		DataClass dataClass = typeMap.library().getTypeClass(createInstance.type());
+		if (dataClass instanceof DataClassRecord) {
+			this.constructor = ((DataClassRecord) dataClass).constructor();
+		} else {
+			throw new TypeException("Type not a record type");
+		}
+
 	}
 
 	@Override

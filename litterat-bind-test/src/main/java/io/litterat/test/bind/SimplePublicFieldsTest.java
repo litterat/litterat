@@ -22,9 +22,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassComponent;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
 import io.litterat.test.bind.data.SimplePublicFields;
@@ -50,7 +50,7 @@ public class SimplePublicFieldsTest {
 	@Test
 	public void checkDescriptor() throws Throwable {
 
-		DataClassRecord descriptor = context.getDescriptor(SimplePublicFields.class);
+		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(SimplePublicFields.class);
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(SimplePublicFields.class, descriptor.typeClass());
