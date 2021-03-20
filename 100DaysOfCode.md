@@ -5,15 +5,16 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 
 Next steps list. A general list of things that could be done next in no particular order.
 
-PEP
+ litterat-bind
  - Deeper looker at defaults for Lists, Sets and other collections.
  - Investigate removing the primitive array bridge classes and replace with generated MethodHandles.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
- - Dates and timestamps.
- - Create PEP error examples and test edge cases.
+ - Dates, timestamps and other atoms.
+ - Create bind error examples and test edge cases.
  - Investigate Union class type.
+ - Decide if DataClassComponent needs a boolean isRequired attribute.
  
- Schema
+ litterat-schema
  - Review the schema language and look at schema annotations. 
  - Review schema arrays and look at multi-dimensional arrays as part of schema design.
  
@@ -22,8 +23,164 @@ PEP
  
  
  Documents to write:
- - Litterat PEP end user guide. User guide to using library & examples.
- - Litterat PEP serialization guide. For people writing serialization formats.
+ - Litterat bind end user guide. User guide to using library & examples.
+ - Litterat serialization guide. For people writing serialization formats.
+
+## Day 37 - March 17 - More research into union mismatch
+
+Listened to the [Inside Java podcast episode 14](https://inside.java/2021/03/08/podcast-014/) where Julia Boes and Chris Hegarty discussed Java record serialization. This got me to take another look at records and how they map to the theory. An important point about records is that they are final and cannot be extended. This means the Vehicle example below is not possible to model with Records without introducing an interface. The other point is that the [Sealed classes JEP360](https://openjdk.java.net/jeps/360) discusses using sealed interface with records. This is a great example of a union with different record objects. The example from the JEP:
+
+```java
+public sealed interface Expr
+    permits ConstantExpr, PlusExpr, TimesExpr, NegExpr {...}
+
+public record ConstantExpr(int i)       implements Expr {...}
+public record PlusExpr(Expr a, Expr b)  implements Expr {...}
+public record TimesExpr(Expr a, Expr b) implements Expr {...}
+public record NegExpr(Expr e)           implements Expr {...}
+```
+
+Another nice feature that will be interesting for serialization is currently a [draft JEP for frozen arrays](http://openjdk.java.net/jeps/8261099). Combined with Records and sealed interfaces it allows the creation of a fully 'final' object graph.
+
+This still doesn't solve the Vehicle example. If this problem was written with records it starts with:
+
+```java
+public record Vehicle(String make, String model, int year);
+public record Manifest(Date manifestDate, Vehicle[] vehicles);
+```
+
+which translates to the schema:
+
+    vehicle: record( string make, string model, int year );
+    manifest: record( date manifestDate, vehicles array( vehicle ) );
+
+After introducing additional Vehicle types:
+
+```
+public sealed interface Vehicle permits GenericVehicle, Car, Truck {..}
+public record GenericVehicle(String make, String model, int year);
+public record Car(String make, String model, int year, int doors, int horsePower);
+public record Truck(String make, String model, int year, int wheels, int numberOfAxles);
+public record Manifest(Date manifestDate, Vehicle[] vehicles);
+```
+
+Lets assume that there's a big code base and it is easier to change the name of the record Vehicle to GenericVehicle than it is to give a new interface name.
+
+The above translates to the schema:
+
+    vehicle: union( genericVehicle, car, truck );
+    genericVehicle: record( string make, string model, int year );
+    car: record( string make, string model, int year, int doors, int horsePower );
+    truck: record( string make, string model, int year, int wheels, int numberOfAxles );
+    manifest: record( date manifestDate, vehicles array( vehicle ) );
+    
+This all works, however, the problem now is that data written with the original code needs to be able to read by the new code. There needs to be some way to tell the genericVehicle to alias the original vehicle type. The simple answer is to add another rule for vehicle:
+
+    vehicle: genericVehicle;
+    
+Reading old data simply matches against the old rule and new data can match against the union. This solution gives more weight to the idea of just not allowing extends for data classes.
+
+
+## Day 36 - March 15 - Union base classes
+
+Another interesting example of unions not mapping well to Java is base classes. Take for example:
+
+```java
+class Vehicle {
+   private final String make;
+   private final String model;
+   private final int year;
+   
+   ... constructor and getters ...
+}
+
+class Manifest {
+   private final Date manifestDate;
+   private final List<Vehicle> vehicles;
+   
+   ... constructor and getters ...
+}
+```
+
+We can this this maps to a grammar something like:
+
+    vehicle: record( string make, string model, int year );
+    manifest: record( date manifestDate, vehicles array( vehicle ) );
+  
+However, if a developer chooses to extend the vehicle class and create subclasses like Car and Truck you end up with:
+
+```java
+class Car extends Vehicle {
+   private final int doors;
+   private final int horsePower;
+}
+
+class Truck extends Vehicle {
+   private final int wheels;
+   private final int numberOfAxles;
+}
+```
+
+If Vehicle is not abstract or doesn't protect the constructor, it means all three classes of Vehicle, Car and Truck can now
+be used. When it comes to mapping to a data model, Vehicle is now both a record and union. Using a grammar notation you might have:
+
+    vehicle: union( record( string make, string model, int year), car, truck );
+    car: record( string make, string model, int year, int doors, int horsePower );
+    truck: record( string make, string model, int year, int wheels, int numberOfAxles );
+    manifest: record( date manifestDate, vehicles array( vehicle ) );
+  
+It's tempting to introduce an "extends" concept to remove the repeated elements. It's also an interesting idea to split the
+vehicle into a union and define another entry for something like vehicle_base. There's no exact match so something has to change in the theory or to throw an exception when this situation is encountered. 
+
+These problems brings back some subtle differences between serialization and data interchange. Serialization is about extracting data from an existing object graph, while data interchange is about sharing and agreeing the structure of data. There's a lot of overlap and ideally the two converge, however, in situations like the above a choice needs to be made about which is more important.
+
+Combined with the concept of embedded unions, it shows a few ways in which object oriented designs don't translate well to the simplistic model of records and unions currently defined by the theory. In the case of embedded unions they don't translate well to Java classes, while, base classes do not translate well from Java classes to theory. 
+  
+
+## Day 35 - March 10 - Anonymous/Embedded unions
+
+For embedded unions a record type will contain only one value of two possible types as well as other record field values. This could be represented as:
+
+    my_record: record( fieldA int, fieldB union( int | string ) );
+ 
+In this made up syntax the type my_record has two fields. fieldA is and int and fieldB is either an int or a string. This could be represented in Java (or other class based system) as:
+ 
+ 
+ ```java
+ class MyRecord {
+ 
+   int fieldA;
+   int fieldBInt;
+   String fieldBString;
+ }
+ ```
+ 
+When creating a MethodHandle constructor or getter for the DataClassRecord, what's the preferred constructor parameters and what special considerations does an implementer need to perform to call the constructor?
+
+    option 1: constructor( int fieldA, int fieldBInt, String fieldBString );
+  
+For the first option the caller must check each field and if a union is found expand the types.
+
+    option 2: constructor( int fieldA, int fieldBInt )
+            constructor( int fieldA, String fieldBString )
+            
+For the second option the caller must find the correct constructor in a list. The number of constructors would multiply for each union type provided in the record structure.
+
+    option 3: constructor( int fieldA, Object/? fieldB )
+  
+For the third option, an object is specified and potential autoboxing is required. It also adds to the complexity of the constructor to correctly set the right field. It is worth checking if the MethodHandle signature polymorphism allows fieldB to be either an int or String without autoboxing.
+
+The third option is preferred as it is closer to the in data representation and aligns better with the DataClassComponent. It does mean that DataClassUnion would be used for Interfaces and Abstract parent classes and require another DataUnion type to represent anonymous unions.
+
+The other issue is how to implement a getter. Even if its possible to return an int or String from a synthetic getter the value can not be assigned to a variable. The value could be passed directly to another MethodHandle as an input.
+
+Researching Union type and found the [serde.rs](https://serde.rs/) serialization framework for Rust. A good example of mapping a union type to JSON with options of "Externaly tagged","Internally tagged", "Adjacently tagged", and "Untagged" as ways to represent a union. Four different ways to map shows that there's a mismatch between the type systems ability to represent the concept. It's also interesting that serde.rs uses "Enum" as the keyword for a union type. There's a lot of mismatch between keywords and their meaning between languages and protocols.
+
+
+
+## Day 34 - March 8 - Exploring union type
+
+DataClassUnion represents a union type and is one of the more difficult concepts to map between data and object oriented models. A union type can be represented as either an interface, abstract class, or an embedded union. An embedded union is where a class has two or more fields where only one value can be present. Embedded unions complicate the concept of Record constructors and requires a more thought going into how to set/get the union value through a projected embedded pair type interface.
 
 ## Day 34 - March 4 - More work on the DataClass
 

@@ -98,7 +98,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		if (Modifier.isAbstract(targetClass.getModifiers())) {
 
 			if (targetClass.isArray()) {
-				// this is classed as an array, not a base
+				// this is classed as an array, not a union.
 				return false;
 			} else if (Collection.class.isAssignableFrom(targetClass)) {
 				// this is classed as an array, not an interface.
@@ -269,6 +269,8 @@ public class DefaultResolver implements DataBindContextResolver {
 				descriptor = new DataClassArray(targetClass, Object[].class, constructor, toData, toObject,
 						arrayDataClass, new CollectionArrayBridge());
 
+			} else {
+				throw new DataBindException("Not recognised array class");
 			}
 
 		} catch (IllegalAccessException | NoSuchMethodException | SecurityException e) {

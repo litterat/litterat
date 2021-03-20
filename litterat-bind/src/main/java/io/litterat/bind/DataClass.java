@@ -22,9 +22,11 @@ public class DataClass {
 	private final Class<?> dataClass;
 
 	// Method handle to convert object to data object.
+	// Converts from typeClass -> dataClasss.
 	private final MethodHandle toData;
 
 	// Method handle to convert data object to target object.
+	// Converts from dataClass -> typeClass.
 	private final MethodHandle toObject;
 
 	// The data class type.

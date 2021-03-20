@@ -52,7 +52,7 @@ public class DataClassRecord extends DataClass {
 	}
 
 	/**
-	 * @return A MethodHandle that has the signature T embed(Object[] values).
+	 * @return A MethodHandle that has the signature T constructor(Object[] values).
 	 */
 	public MethodHandle constructor() {
 		return constructor;
