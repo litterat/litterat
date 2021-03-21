@@ -25,9 +25,6 @@ plugins {
     id 'eclipse'
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
-
 repositories {
     mavenCentral()
 }
@@ -39,6 +36,9 @@ dependencies {
 
 java {
    modularity.inferModulePath = true
+   
+   sourceCompatibility = JavaVersion.VERSION_11
+   targetCompatibility = JavaVersion.VERSION_11
 }
 
 
