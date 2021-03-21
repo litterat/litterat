@@ -1,7 +1,6 @@
 package io.litterat.bind;
 
 import java.lang.invoke.MethodHandle;
-import java.util.List;
 
 /**
  * 
@@ -17,16 +16,26 @@ import java.util.List;
  */
 public class DataClassUnion extends DataClass {
 
-	private List<DataClass> componentTypes;
+	private DataClass[] componentTypes;
 
 	public DataClassUnion(Class<?> targetType, Class<?> serialType, MethodHandle toData, MethodHandle toObject) {
 		super(targetType, serialType, toData, toObject, DataClassType.UNION);
 
-		componentTypes = List.of();
+		componentTypes = null;
 	}
 
-	List<DataClass> components() {
+	public DataClass[] components() {
 		return componentTypes;
+	}
+
+	/**
+	 * As different implementations of an interface or abstract class will get loaded at different times
+	 * the list of union types will not all be known at startup. Therefore it needs to be possible to
+	 * add additional implementations to the list. One of the reasons why sealed classes are a better
+	 * choice.
+	 */
+	public synchronized void addDataClass(DataClass unionClass) {
+
 	}
 
 }

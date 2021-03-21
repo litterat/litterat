@@ -11,8 +11,7 @@ Next steps list. A general list of things that could be done next in no particul
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
- - Investigate Union class type.
- - Decide if DataClassComponent needs a boolean isRequired attribute.
+ - Implement Annotation interface
  
  litterat-schema
  - Review the schema language and look at schema annotations. 
@@ -25,6 +24,50 @@ Next steps list. A general list of things that could be done next in no particul
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
+
+## Day 39 - March 21 - Clarity on union problem
+
+Finally coming to a landing on how to treat the mismatch between Java parent classes mapping to Records and Unions. Given the example of a Vehicle which has two subclasses Car and Truck, then if there's a List<Vehicle> then serialization should ignore Car and Truck object types and just serialize Vehicle as a record. This is most likely not what the programmer will want, but it won't take long to realise that Vehicle should be an interface rather than a base class. The concrete example is:
+
+```java
+class Vehicle {
+   private final String make;
+   private final String model;
+   private final int year;
+   
+   ... constructor and getters ...
+}
+
+class Car extends Vehicle {
+   private final int horsePower;
+}
+
+class Truck extends Vehicle {
+   private final int numberOfAxles;
+}
+
+class Manifest {
+   private final Date manifestDate;
+   private final List<Vehicle> vehicles;
+   
+   ... constructor and getters ...
+}
+```
+
+When serializing Manifest, because vehicles is a List<Vehicle> and Vehicle is a Record type then the solution is to not write out hoursePower or numberOfAxles from Car and Truck types. This will result in a schema like:
+
+    vehicle: record( string make, string model, int year );
+    manifest: record( date manifestDate, vehicles array( vehicle ) );
+
+During Class binding when Car or Truck are found a warning should be output as the extend another Record type and have no interface or abstract parent class.
+
+The other issue of an embedded union still has no great solution if/until Java was to create an actual Union type. After searching on how JAXB deals with this, I found [this](https://www.eclipse.org/eclipselink/documentation/2.5/moxy/special_schema_types002.htm) example where a union of String and Decimal used an Object type. This is probably the best short term option. This is a lower priority capability for now.
+
+Another task on the list was 'Decide if DataClassComponent needs a boolean isRequired attribute'. Given the litterat model Field object has this attribute it isn't needed in the bind library. The bind library is the mapping to the language and the Java language doesn't have this concept so it should not be included.
+
+## Day 38 - March 20 - Back to Amber
+
+Captured some of the problems and [went back](https://mail.openjdk.java.net/pipermail/amber-dev/2021-March/006971.html) to the Java Amber dev mailing list. The main question I'd like answered is if there will be a union type in the future. Writing the post has helped to get some of my thoughts in order.
 
 ## Day 37 - March 17 - More research into union mismatch
 
