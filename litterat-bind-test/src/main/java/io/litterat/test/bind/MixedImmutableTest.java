@@ -57,7 +57,7 @@ public class MixedImmutableTest {
 		Assertions.assertEquals(MixedImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(MixedImmutable.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(3, fields.length);
 

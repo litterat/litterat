@@ -56,7 +56,7 @@ public class SimplePojoTest {
 		Assertions.assertEquals(SimplePojo.class, descriptor.typeClass());
 		Assertions.assertEquals(SimplePojo.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(2, fields.length);
 

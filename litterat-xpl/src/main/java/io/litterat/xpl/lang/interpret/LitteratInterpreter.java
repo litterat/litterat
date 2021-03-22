@@ -175,7 +175,7 @@ public class LitteratInterpreter {
 			//
 
 			Class<?> arrayClass = Array
-					.newInstance(typeMap.library().getTypeClass(readArray.array().type()).dataClass(), 0).getClass();
+					.newInstance(typeMap.library().getTypeClass(readArray.array().type()).typeClass(), 0).getClass();
 			DataClassArray pepClass = (DataClassArray) typeMap.library().pepContext().getDescriptor(arrayClass);
 
 			compiledExpression = new ReadArrayInterpreter(readArray, pepClass,

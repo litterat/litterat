@@ -52,7 +52,7 @@ public class PrimitiveArrayTest {
 		Assertions.assertEquals(PrimitiveArray.class, descriptor.typeClass());
 		Assertions.assertEquals(PrimitiveArray.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 

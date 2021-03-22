@@ -123,7 +123,7 @@ public class TypeLibrary {
 		TypeLibraryEntry entry = new TypeLibraryEntry(TypeLibraryState.BOUND, type, definition, dataClass);
 
 		types.putIfAbsent(type, entry);
-		classes.putIfAbsent(dataClass.dataClass(), type);
+		classes.putIfAbsent(dataClass.typeClass(), type);
 	}
 
 	/**

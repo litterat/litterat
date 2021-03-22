@@ -60,7 +60,7 @@ public class SimplePojoDataOrderTest {
 		Assertions.assertEquals(SimplePojoDataOrder.class, descriptor.typeClass());
 		Assertions.assertEquals(SimplePojoDataOrder.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(4, fields.length);
 

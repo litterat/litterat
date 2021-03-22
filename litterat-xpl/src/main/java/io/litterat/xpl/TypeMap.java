@@ -95,7 +95,7 @@ public class TypeMap {
 			typeNames.put(entry.typeName(), entry);
 
 			// Atomic types will duplicate entries. First one wins.
-			classes.putIfAbsent(library.getTypeClass(entry.typeName()).dataClass(), entry);
+			classes.putIfAbsent(library.getTypeClass(entry.typeName()).typeClass(), entry);
 
 			return entry;
 		}

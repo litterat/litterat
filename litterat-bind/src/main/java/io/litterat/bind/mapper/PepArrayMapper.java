@@ -24,8 +24,9 @@ import java.util.Objects;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 
@@ -142,18 +143,19 @@ public class PepArrayMapper {
 
 		MethodHandle result = null;
 		if (dataClass.isAtom()) {
-
+			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
 			// Use identity here because calling function wraps the toObject method.
 			// identity( dataObject ):dataObject
-			result = dataClass.toObject().asType(dataClass.toObject().type().changeParameterType(0, Object.class));
+			result = dataClassAtom.toObject()
+					.asType(dataClassAtom.toObject().type().changeParameterType(0, Object.class));
 
 		} else if (dataClass.isRecord()) {
 			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
 			result = dataClassRecord.constructor();
 
-			DataClassField[] fields = dataClassRecord.dataComponents();
-			for (int x = 0; x < dataClassRecord.dataComponents().length; x++) {
+			DataClassField[] fields = dataClassRecord.fields();
+			for (int x = 0; x < dataClassRecord.fields().length; x++) {
 				DataClassField field = fields[x];
 
 				int inputIndex = x;
@@ -197,7 +199,7 @@ public class PepArrayMapper {
 			}
 
 			// (Object[]) -> toObject( ctor(Object[]).setValues(Object[]) )
-			result = MethodHandles.collectArguments(dataClass.toObject(), 0, result);
+			result = MethodHandles.collectArguments(dataClassRecord.toObject(), 0, result);
 
 			result = result.asType(result.type().changeReturnType(dataClass.typeClass()));
 
@@ -246,7 +248,9 @@ public class PepArrayMapper {
 		MethodHandle returnArray = null;
 
 		if (dataClass.isAtom()) {
-			returnArray = dataClass.toData();
+			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
+
+			returnArray = dataClassAtom.toData();
 		} else if (dataClass.isRecord()) {
 
 			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
@@ -255,7 +259,7 @@ public class PepArrayMapper {
 			MethodHandle createArray = MethodHandles.arrayConstructor(Object[].class);
 
 			// (int):length -> fields.length
-			MethodHandle index = MethodHandles.constant(int.class, dataClassRecord.dataComponents().length);
+			MethodHandle index = MethodHandles.constant(int.class, dataClassRecord.fields().length);
 
 			// ():Object[] -> new Object[fields.length]
 			MethodHandle arrayCreate = MethodHandles.collectArguments(createArray, 0, index);
@@ -264,7 +268,7 @@ public class PepArrayMapper {
 			MethodHandle getters = createProjectGetters(dataClassRecord);
 
 			// (Object[],targetClass):void -> getters(Object[], project(targetClass))
-			MethodHandle projectGetters = MethodHandles.collectArguments(getters, 1, dataClass.toData());
+			MethodHandle projectGetters = MethodHandles.collectArguments(getters, 1, dataClassRecord.toData());
 
 			// ():Object[] -> return new Object[fields.length];
 			returnArray = MethodHandles.collectArguments(projectGetters, 0, arrayCreate);
@@ -308,7 +312,7 @@ public class PepArrayMapper {
 		// (Object[], embedClass):object[] -> return object[];
 		MethodHandle result = MethodHandles.dropArguments(identity, 1, dataClass.dataClass());
 
-		DataClassField[] fields = dataClass.dataComponents();
+		DataClassField[] fields = dataClass.fields();
 		for (int x = 0; x < fields.length; x++) {
 
 			DataClassField field = fields[x];

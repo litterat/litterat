@@ -44,8 +44,8 @@ import io.litterat.bind.DataBindContextResolver;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataBridge;
 import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClass.DataClassType;
 import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
@@ -209,10 +209,9 @@ public class DefaultResolver implements DataBindContextResolver {
 	}
 
 	private DataClassUnion resolveUnion(DataBindContext context, Class<?> targetClass) throws DataBindException {
-		MethodHandle identity = MethodHandles.identity(targetClass);
 
 		// TODO It could be useful to map other classes to this data class.
-		return new DataClassUnion(targetClass, targetClass, identity, identity);
+		return new DataClassUnion(targetClass);
 	}
 
 	// TODO If the targetClass is a Collection it isn't possible get the generic
@@ -367,7 +366,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						throw new DataBindException("Atom accessor @Atom annotation not found");
 					}
 
-					descriptor = new DataClass(targetClass, param, toData, toObject, DataClassType.ATOM);
+					descriptor = new DataClassAtom(targetClass, param, toData, toObject);
 
 				}
 			}
@@ -386,7 +385,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						.findVirtual(EnumBridge.class, TODATA_METHOD, MethodType.methodType(String.class, Enum.class))
 						.bindTo(bridge).asType(MethodType.methodType(String.class, targetClass));
 
-				descriptor = new DataClass(targetClass, String.class, toData, toObject);
+				descriptor = new DataClassAtom(targetClass, String.class, toData, toObject);
 
 			}
 		} catch (SecurityException | IllegalAccessException | NoSuchMethodException | DataBindException e) {
@@ -426,7 +425,7 @@ public class DefaultResolver implements DataBindContextResolver {
 
 						// The constructor and data components are copied from the data class.
 						descriptor = new DataClassRecord(targetClass, dataType, tupleData.constructor(), toData,
-								toObject, tupleData.dataComponents());
+								toObject, tupleData.fields());
 						break;
 					}
 
@@ -545,8 +544,7 @@ public class DefaultResolver implements DataBindContextResolver {
 									.asType(MethodType.methodType(info.getType(), bridgeDataClass));
 						}
 
-						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, accessor,
-								setter);
+						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, accessor, setter);
 					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
 						Class<?> optionalType = (Class<?>) info.getParamType().getActualTypeArguments()[0];
@@ -586,8 +584,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						DataClass dataClass = context.getDescriptor(info.getType(),
 								(info.getParamType() != null ? info.getParamType() : info.getType()));
 
-						component = new DataClassField(x, info.getName(), info.getType(), dataClass, accessor,
-								setter);
+						component = new DataClassField(x, info.getName(), info.getType(), dataClass, accessor, setter);
 					}
 					dataComponents[x] = component;
 				}

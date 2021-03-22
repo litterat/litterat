@@ -88,7 +88,7 @@ public class ArrayPrimitiveTypeTestPojoTest {
 		Assertions.assertEquals(ArrayPrimitiveTypeTestPojo.class, descriptor.typeClass());
 		Assertions.assertEquals(ArrayPrimitiveTypeTestPojo.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(17, fields.length);
 

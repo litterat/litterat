@@ -114,7 +114,7 @@ public class DataBindContext {
 	}
 
 	public void registerAtom(Class<?> targetClass) throws DataBindException {
-		register(targetClass, new DataClass(targetClass));
+		register(targetClass, new DataClassAtom(targetClass));
 	}
 
 	public DataClass getDescriptor(Class<?> targetClass) throws DataBindException {
@@ -161,7 +161,7 @@ public class DataBindContext {
 			MethodHandle toData = MethodHandles.publicLookup().unreflect(toDataMethod).bindTo(bridge);
 			MethodHandle toObject = MethodHandles.publicLookup().unreflect(toObjectMethod).bindTo(bridge);
 
-			register(targetClass, new DataClass(targetClass, toDataMethod.getReturnType(), toData, toObject));
+			register(targetClass, new DataClassAtom(targetClass, toDataMethod.getReturnType(), toData, toObject));
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | DataBindException e) {
 			throw new DataBindException("Failed to register atom bridge", e);
 		}

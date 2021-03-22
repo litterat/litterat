@@ -22,8 +22,10 @@ import java.util.List;
 
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 import io.litterat.model.Array;
 import io.litterat.model.Definition;
 import io.litterat.model.Field;
@@ -53,24 +55,35 @@ public class ModelBinder {
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 				List<Field> fields = new ArrayList<>();
 
-				DataClassField[] components = dataClassRecord.dataComponents();
-				for (DataClassField component : components) {
-					String name = component.name();
+				DataClassField[] dataFields = dataClassRecord.fields();
+				for (DataClassField dataClassField : dataFields) {
+					String name = dataClassField.name();
 
-					if (component.dataClass().isArray()) {
+					DataClass fieldDataClass = dataClassField.dataClass();
+					if (fieldDataClass.isArray()) {
 
-						TypeName typeName = library.getTypeName(component.dataClass().typeClass().getComponentType());
+						TypeName typeName = library
+								.getTypeName(dataClassField.dataClass().typeClass().getComponentType());
 
 						fields.add(new Field(name, new Array(typeName)));
 
-					} else {
+					} else if (fieldDataClass.isAtom() || fieldDataClass.isRecord()) {
+						DataClassAtom fieldDataClassAtom = (DataClassAtom) fieldDataClass;
 
-						TypeName typeName = library.getTypeName(component.dataClass().dataClass());
+						TypeName typeName = library.getTypeName(fieldDataClassAtom.dataClass());
 
 						// TODO - What about optional?
 
 						fields.add(new Field(name, new Reference(typeName), false));
 
+					} else if (fieldDataClass.isUnion()) {
+						DataClassUnion fieldDataClassUnion = (DataClassUnion) fieldDataClass;
+
+						TypeName typeName = library.getTypeName(fieldDataClassUnion.typeClass());
+
+						// TODO - What about optional?
+
+						fields.add(new Field(name, new Reference(typeName), false));
 					}
 				}
 
@@ -89,16 +102,19 @@ public class ModelBinder {
 
 	public static MethodHandle resolveFieldGetter(DataClassRecord dataClass, String field) throws DataBindException {
 
-		for (DataClassField component : dataClass.dataComponents()) {
+		for (DataClassField component : dataClass.fields()) {
 			if (component.name().equalsIgnoreCase(field)) {
 
 				// Pass the accessor through the toData handle to get the correct data type.
 				// toData will be identity function if no change required.
 				DataClass componentClass = component.dataClass();
+				if (componentClass instanceof DataClassAtom || componentClass instanceof DataClassRecord) {
+					MethodHandle toData = ((DataClassAtom) componentClass).toData();
 
-				MethodHandle toData = componentClass.toData();
-
-				return MethodHandles.filterArguments(toData, 0, component.accessor());
+					return MethodHandles.filterArguments(toData, 0, component.accessor());
+				} else {
+					return component.accessor();
+				}
 			}
 		}
 
@@ -107,7 +123,7 @@ public class ModelBinder {
 	}
 
 	public static MethodHandle resolveFieldSetter(DataClassRecord dataClass, String field) throws DataBindException {
-		for (DataClassField component : dataClass.dataComponents()) {
+		for (DataClassField component : dataClass.fields()) {
 			if (component.name().equalsIgnoreCase(field)) {
 
 				MethodHandle setter = component.setter()
@@ -116,10 +132,13 @@ public class ModelBinder {
 				// Pass the object through the toObject method handle to get the correct type
 				// for the setter. toObject will be identity function if no change required.
 				DataClass componentClass = component.dataClass();
+				if (componentClass instanceof DataClassAtom || componentClass instanceof DataClassRecord) {
+					MethodHandle toObject = ((DataClassAtom) componentClass).toObject();
 
-				MethodHandle toObject = componentClass.toObject();
-
-				return MethodHandles.filterArguments(setter, 0, toObject);
+					return MethodHandles.filterArguments(setter, 0, toObject);
+				} else {
+					return setter;
+				}
 			}
 		}
 
@@ -128,14 +147,20 @@ public class ModelBinder {
 
 	public static MethodHandle[] collectToObject(DataClassRecord dataClass) {
 
-		MethodHandle[] toObject = new MethodHandle[dataClass.dataComponents().length];
+		MethodHandle[] toObject = new MethodHandle[dataClass.fields().length];
 
-		DataClassField[] components = dataClass.dataComponents();
+		DataClassField[] fields = dataClass.fields();
 
-		for (int x = 0; x < components.length; x++) {
-			DataClassField component = dataClass.dataComponents()[x];
+		for (int x = 0; x < fields.length; x++) {
+			DataClassField field = dataClass.fields()[x];
+			DataClass fieldDataClass = field.dataClass();
 
-			toObject[x] = component.dataClass().toObject();
+			if (fieldDataClass.isAtom() || fieldDataClass.isRecord()) {
+				DataClassAtom fieldAtom = (DataClassAtom) fieldDataClass;
+				toObject[x] = fieldAtom.toObject();
+			} else {
+				toObject[x] = MethodHandles.identity(field.dataClass().typeClass());
+			}
 		}
 
 		return toObject;

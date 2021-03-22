@@ -30,8 +30,9 @@ import java.util.stream.Collectors;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.json.parser.JsonReader;
@@ -75,17 +76,22 @@ public class JsonMapper {
 
 		try {
 
-			Object data = dataClass.toData().invoke(object);
-
 			if (dataClass.isAtom()) {
+				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
+
+				Object data = dataClassAtom.toData().invoke(object);
+
 				writeAtom(data, writer);
 			} else if (dataClass.isRecord()) {
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
+
+				Object data = dataClassRecord.toData().invoke(object);
+
 				writer.beginObject();
 
-				DataClassField[] fields = dataClassRecord.dataComponents();
+				DataClassField[] fields = dataClassRecord.fields();
 
-				for (fieldIndex = 0; fieldIndex < dataClassRecord.dataComponents().length; fieldIndex++) {
+				for (fieldIndex = 0; fieldIndex < dataClassRecord.fields().length; fieldIndex++) {
 					DataClassField field = fields[fieldIndex];
 
 					Object v = field.accessor().invoke(data);
@@ -96,12 +102,7 @@ public class JsonMapper {
 
 						writer.name(field.name());
 
-						if (fieldDataClass.isAtom()) {
-							v = fieldDataClass.toData().invoke(v);
-							writeAtom(v, writer);
-						} else {
-							toJson(v, fieldDataClass, writer);
-						}
+						toJson(v, fieldDataClass, writer);
 					}
 
 				}
@@ -159,8 +160,7 @@ public class JsonMapper {
 
 	private Map<String, DataClassField> componentMap(DataClassRecord dataClass) {
 		return fieldMaps.computeIfAbsent(dataClass, (clss) -> {
-			return Arrays.asList(clss.dataComponents()).stream()
-					.collect(Collectors.toMap(DataClassField::name, item -> item));
+			return Arrays.asList(clss.fields()).stream().collect(Collectors.toMap(DataClassField::name, item -> item));
 		});
 
 	}
@@ -173,27 +173,31 @@ public class JsonMapper {
 			switch (token) {
 
 			case NUMBER:
-				return dataClass.toObject().invoke(readNumber(dataClass, reader));
+				// This needs to be more defensive. Currently assumes NUMBER, STRING and BOOLEAN are Atoms.
+				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
+				return dataClassAtom.toObject().invoke(readNumber(dataClassAtom, reader));
 
 			case STRING:
+				dataClassAtom = (DataClassAtom) dataClass;
 				String v = reader.nextString();
-				if (dataClass.dataClass() == String.class) {
-					return dataClass.toObject().invoke(v);
-				} else if (dataClass.dataClass() == Character.class) {
+				if (dataClassAtom.dataClass() == String.class) {
+					return dataClassAtom.toObject().invoke(v);
+				} else if (dataClassAtom.dataClass() == Character.class) {
 					Character c = Character.valueOf(v.toCharArray()[0]);
-					return dataClass.toObject().invoke(c);
-				} else if (dataClass.dataClass() == char.class) {
+					return dataClassAtom.toObject().invoke(c);
+				} else if (dataClassAtom.dataClass() == char.class) {
 					char c = v.toCharArray()[0];
-					return dataClass.toObject().invoke(c);
+					return dataClassAtom.toObject().invoke(c);
 				}
 				throw new DataBindException(
-						String.format("Could not convert string to %s", dataClass.dataClass().getName()));
+						String.format("Could not convert string to %s", dataClassAtom.dataClass().getName()));
 			case BOOLEAN:
-				if (dataClass.dataClass() == boolean.class || dataClass.dataClass() == Boolean.class) {
-					return dataClass.toObject().invoke(reader.nextBoolean());
+				dataClassAtom = (DataClassAtom) dataClass;
+				if (dataClassAtom.dataClass() == boolean.class || dataClassAtom.dataClass() == Boolean.class) {
+					return dataClassAtom.toObject().invoke(reader.nextBoolean());
 				}
 				throw new DataBindException(
-						String.format("Could not convert boolean to %s", dataClass.dataClass().getName()));
+						String.format("Could not convert boolean to %s", dataClassAtom.dataClass().getName()));
 			case NULL:
 				reader.nextNull();
 				return null;
@@ -208,7 +212,7 @@ public class JsonMapper {
 
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
-				DataClassField[] fields = dataClassRecord.dataComponents();
+				DataClassField[] fields = dataClassRecord.fields();
 				Object[] construct = new Object[fields.length];
 
 				while (reader.hasNext()) {
@@ -218,7 +222,7 @@ public class JsonMapper {
 					// Find the name in the fields.
 					DataClassField field = componentMap(dataClassRecord).get(name);
 					Objects.requireNonNull(field,
-							String.format("field %s not found in class", name, dataClass.dataClass()));
+							String.format("field %s not found in class", name, dataClassRecord.dataClass()));
 
 					construct[field.index()] = fromJson(field.dataClass(), reader);
 
@@ -228,7 +232,7 @@ public class JsonMapper {
 
 				Object data = dataClassRecord.constructor().invoke(construct);
 
-				return dataClass.toObject().invoke(data);
+				return dataClassRecord.toObject().invoke(data);
 
 			case BEGIN_ARRAY:
 
@@ -281,7 +285,7 @@ public class JsonMapper {
 		}
 	}
 
-	Object readNumber(DataClass dataClass, JsonReader reader) throws IOException {
+	Object readNumber(DataClassAtom dataClass, JsonReader reader) throws IOException {
 		Class<?> clss = dataClass.dataClass();
 		if (clss == Integer.class || clss == int.class) {
 			return reader.nextInt();

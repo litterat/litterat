@@ -22,7 +22,7 @@ import java.util.Optional;
  * A DataClassRecord provides a descriptor for record data classes projected/embedded pair for use
  * in serialization libraries.
  */
-public class DataClassRecord extends DataClass {
+public class DataClassRecord extends DataClassAtom {
 
 	// Optional empty constructor for data object.
 	private final Optional<MethodHandle> creator;
@@ -31,13 +31,13 @@ public class DataClassRecord extends DataClass {
 	private final MethodHandle constructor;
 
 	// All fields in the projected class.
-	private final DataClassField[] dataComponents;
+	private final DataClassField[] fields;
 
 	public DataClassRecord(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
 			MethodHandle toData, MethodHandle toObject, DataClassField[] fields) {
 		super(targetType, serialType, toData, toObject, DataClassType.RECORD);
 
-		this.dataComponents = fields;
+		this.fields = fields;
 		this.creator = Optional.ofNullable(creator);
 		this.constructor = constructor;
 	}
@@ -61,8 +61,8 @@ public class DataClassRecord extends DataClass {
 	/**
 	 * @return The list of fields and their types returned by the embed function.
 	 */
-	public DataClassField[] dataComponents() {
-		return dataComponents;
+	public DataClassField[] fields() {
+		return fields;
 	}
 
 }

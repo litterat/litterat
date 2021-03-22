@@ -52,7 +52,7 @@ public class SimpleImmutableDataOrderTest {
 		Assertions.assertEquals(SimpleImmutableDataOrder.class, descriptor.typeClass());
 		Assertions.assertEquals(SimpleImmutableDataOrder.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(2, fields.length);
 

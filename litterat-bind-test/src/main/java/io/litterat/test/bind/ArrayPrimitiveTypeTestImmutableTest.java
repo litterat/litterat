@@ -69,7 +69,7 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		Assertions.assertEquals(ArrayPrimitiveTypeTestImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(ArrayPrimitiveTypeTestImmutable.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(17, fields.length);
 

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.model.Array;
 import io.litterat.model.Atom;
@@ -79,7 +78,7 @@ public class SchemaResolver implements TypeResolver {
 		Definition definition = library.getDefinition(name);
 		if (definition instanceof Record) {
 			Record sequence = (Record) definition;
-			DataClass dataClass = library.getTypeClass(name);
+			DataClassRecord dataClass = (DataClassRecord) library.getTypeClass(name);
 
 			result = new TypeMapEntry(0, name, definition,
 					generateSequenceReaderConstructor(typeMap, sequence, name, dataClass),
@@ -124,12 +123,12 @@ public class SchemaResolver implements TypeResolver {
 	}
 
 	private static TypeWriter generateSequenceWriter(TypeMap typeMap, Record sequence, TypeName typeName,
-			DataClass dataClass) throws TypeException {
+			DataClassRecord dataClass) throws TypeException {
 		try {
 
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
 
-			int varObject = slots.getSlot(dataClass.dataClass());
+			int varObject = slots.getSlot(dataClass.typeClass());
 
 			List<Statement> statements = new ArrayList<>();
 			for (Field field : sequence.fields()) {
@@ -142,7 +141,7 @@ public class SchemaResolver implements TypeResolver {
 
 					Array array = (Array) field.type();
 
-					Class<?> arrayClss = typeMap.library().getTypeClass(array.type()).dataClass();
+					Class<?> arrayClss = typeMap.library().getTypeClass(array.type()).typeClass();
 					int loopSlot = slots.getSlot(arrayClss);
 					Expression readField = new FieldRead(new SlotReference(varObject), typeName, field.name());
 					Statement writeElement = new WriteValue(array.type(), new SlotReference(loopSlot));
@@ -213,7 +212,7 @@ public class SchemaResolver implements TypeResolver {
 	}
 
 	private static TypeReader generateSequenceReaderConstructor(TypeMap typeMap, Record sequence, TypeName typeName,
-			DataClass dataClass) throws TypeException {
+			DataClassRecord dataClass) throws TypeException {
 
 		try {
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
@@ -273,7 +272,7 @@ public class SchemaResolver implements TypeResolver {
 		private final LambdaFunction readerLambda;
 		private final MethodHandle toObject;
 
-		public LambdaTypeReader(LambdaFunction reader, DataClass dataClass) {
+		public LambdaTypeReader(LambdaFunction reader, DataClassRecord dataClass) {
 			this.readerLambda = reader;
 			this.toObject = dataClass.toObject();
 
@@ -294,7 +293,7 @@ public class SchemaResolver implements TypeResolver {
 		private final LambdaFunction writerLambda;
 		private final MethodHandle toData;
 
-		public LambdaTypeWriter(LambdaFunction writer, DataClass dataClass) {
+		public LambdaTypeWriter(LambdaFunction writer, DataClassRecord dataClass) {
 			this.writerLambda = writer;
 			this.toData = dataClass.toData();
 		}

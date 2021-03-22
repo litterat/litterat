@@ -42,7 +42,7 @@ public class UnmodifiableLinkedListTest {
 		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.typeClass());
 		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 

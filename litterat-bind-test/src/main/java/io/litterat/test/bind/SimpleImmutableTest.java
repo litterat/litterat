@@ -52,7 +52,7 @@ public class SimpleImmutableTest {
 		Assertions.assertEquals(SimpleImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(SimpleImmutable.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(2, fields.length);
 

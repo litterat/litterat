@@ -1,7 +1,5 @@
 package io.litterat.bind;
 
-import java.lang.invoke.MethodHandle;
-
 /**
  * 
  * A Union data class is tagged union type. It can be represented in a number of ways in Java:
@@ -18,8 +16,8 @@ public class DataClassUnion extends DataClass {
 
 	private DataClass[] componentTypes;
 
-	public DataClassUnion(Class<?> targetType, Class<?> serialType, MethodHandle toData, MethodHandle toObject) {
-		super(targetType, serialType, toData, toObject, DataClassType.UNION);
+	public DataClassUnion(Class<?> targetType) {
+		super(targetType, DataClassType.UNION);
 
 		componentTypes = null;
 	}

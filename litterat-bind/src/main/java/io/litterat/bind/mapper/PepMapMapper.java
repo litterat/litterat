@@ -21,8 +21,9 @@ import java.util.Objects;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 
@@ -54,16 +55,16 @@ public class PepMapMapper {
 		try {
 			Object v = null;
 			if (dataClass.isAtom()) {
-				DataClass dataAtom = dataClass;
-				v = dataAtom.toData().invoke(object);
+				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
+				v = dataClassAtom.toData().invoke(object);
 			} else if (dataClass.isRecord()) {
 				DataClassRecord dataRecord = (DataClassRecord) dataClass;
 				Object data = dataRecord.toData().invoke(object);
 
 				Map<String, Object> map = new HashMap<>();
 
-				DataClassField[] fields = dataRecord.dataComponents();
-				for (fieldIndex = 0; fieldIndex < dataRecord.dataComponents().length; fieldIndex++) {
+				DataClassField[] fields = dataRecord.fields();
+				for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
 					DataClassField field = fields[fieldIndex];
 
 					Object fv = field.accessor().invoke(data);
@@ -129,14 +130,14 @@ public class PepMapMapper {
 		try {
 			Object v = null;
 			if (dataClass.isAtom()) {
-				DataClass dataAtom = dataClass;
-				v = dataAtom.toObject().invoke(data);
+				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
+				v = dataClassAtom.toObject().invoke(data);
 			} else if (dataClass.isRecord()) {
 				DataClassRecord dataRecord = (DataClassRecord) dataClass;
 				Map<String, Object> map = (Map<String, Object>) data;
-				DataClassField[] fields = dataRecord.dataComponents();
+				DataClassField[] fields = dataRecord.fields();
 				Object[] construct = new Object[fields.length];
-				for (fieldIndex = 0; fieldIndex < dataRecord.dataComponents().length; fieldIndex++) {
+				for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
 					DataClassField field = fields[fieldIndex];
 
 					Object fv = map.get(field.name());

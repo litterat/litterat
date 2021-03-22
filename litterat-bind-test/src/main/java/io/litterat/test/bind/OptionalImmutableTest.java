@@ -50,7 +50,7 @@ public class OptionalImmutableTest {
 		Assertions.assertEquals(OptionalImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(OptionalImmutable.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 

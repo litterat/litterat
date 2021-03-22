@@ -80,7 +80,7 @@ public class DataClassArray extends DataClass {
 	public DataClassArray(Class<?> targetType, Class<?> serialType, MethodHandle constructor, MethodHandle toData,
 			MethodHandle toObject, DataClass arrayDataClass, Object bridge)
 			throws NoSuchMethodException, IllegalAccessException {
-		super(targetType, serialType, toData, toObject, DataClassType.ARRAY);
+		super(targetType, DataClassType.ARRAY);
 
 		Class<?> iteratorClass;
 		Class<?> arrayClass = targetType;

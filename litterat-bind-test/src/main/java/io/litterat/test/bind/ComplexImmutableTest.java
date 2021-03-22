@@ -52,7 +52,7 @@ public class ComplexImmutableTest {
 		Assertions.assertEquals(ComplexImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(ComplexImmutable.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(2, fields.length);
 
