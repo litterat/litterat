@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
@@ -57,19 +57,19 @@ public class MixedImmutableTest {
 		Assertions.assertEquals(MixedImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(MixedImmutable.class, descriptor.dataClass());
 
-		DataClassComponent[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(3, fields.length);
 
-		DataClassComponent fieldX = fields[0];
+		DataClassField fieldX = fields[0];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
 
-		DataClassComponent fieldY = fields[1];
+		DataClassField fieldY = fields[1];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
 
-		DataClassComponent fieldLoc = fields[2];
+		DataClassField fieldLoc = fields[2];
 		Assertions.assertEquals("location", fieldLoc.name());
 		Assertions.assertEquals(String.class, fieldLoc.type());
 	}

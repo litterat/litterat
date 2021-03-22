@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
@@ -52,11 +52,11 @@ public class AtomicDateImmutableTest {
 		Assertions.assertEquals(AtomicDateImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(AtomicDateImmutable.class, descriptor.dataClass());
 
-		DataClassComponent[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 
-		DataClassComponent fieldDate = fields[0];
+		DataClassField fieldDate = fields[0];
 		Assertions.assertEquals("date", fieldDate.name());
 		Assertions.assertEquals(Date.class, fieldDate.type());
 

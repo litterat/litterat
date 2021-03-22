@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
@@ -42,11 +42,11 @@ public class UnmodifiableLinkedListTest {
 		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.typeClass());
 		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.dataClass());
 
-		DataClassComponent[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 
-		DataClassComponent fieldList = fields[0];
+		DataClassField fieldList = fields[0];
 		Assertions.assertEquals("list", fieldList.name());
 		Assertions.assertEquals(String[].class, fieldList.type());
 

@@ -31,10 +31,10 @@ public class DataClassRecord extends DataClass {
 	private final MethodHandle constructor;
 
 	// All fields in the projected class.
-	private final DataClassComponent[] dataComponents;
+	private final DataClassField[] dataComponents;
 
 	public DataClassRecord(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
-			MethodHandle toData, MethodHandle toObject, DataClassComponent[] fields) {
+			MethodHandle toData, MethodHandle toObject, DataClassField[] fields) {
 		super(targetType, serialType, toData, toObject, DataClassType.RECORD);
 
 		this.dataComponents = fields;
@@ -43,7 +43,7 @@ public class DataClassRecord extends DataClass {
 	}
 
 	public DataClassRecord(Class<?> targetType, Class<?> serialType, MethodHandle constructor, MethodHandle toData,
-			MethodHandle toObject, DataClassComponent[] fields) {
+			MethodHandle toObject, DataClassField[] fields) {
 		this(targetType, serialType, null, constructor, toData, toObject, fields);
 	}
 
@@ -61,7 +61,7 @@ public class DataClassRecord extends DataClass {
 	/**
 	 * @return The list of fields and their types returned by the embed function.
 	 */
-	public DataClassComponent[] dataComponents() {
+	public DataClassField[] dataComponents() {
 		return dataComponents;
 	}
 

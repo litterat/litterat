@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
@@ -50,11 +50,11 @@ public class OptionalImmutableTest {
 		Assertions.assertEquals(OptionalImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(OptionalImmutable.class, descriptor.dataClass());
 
-		DataClassComponent[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(1, fields.length);
 
-		DataClassComponent field = fields[0];
+		DataClassField field = fields[0];
 		Assertions.assertEquals("optionalString", field.name());
 		Assertions.assertEquals(String.class, field.type());
 

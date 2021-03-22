@@ -23,7 +23,7 @@ import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 
 /**
@@ -62,9 +62,9 @@ public class PepMapMapper {
 
 				Map<String, Object> map = new HashMap<>();
 
-				DataClassComponent[] fields = dataRecord.dataComponents();
+				DataClassField[] fields = dataRecord.dataComponents();
 				for (fieldIndex = 0; fieldIndex < dataRecord.dataComponents().length; fieldIndex++) {
-					DataClassComponent field = fields[fieldIndex];
+					DataClassField field = fields[fieldIndex];
 
 					Object fv = field.accessor().invoke(data);
 
@@ -134,10 +134,10 @@ public class PepMapMapper {
 			} else if (dataClass.isRecord()) {
 				DataClassRecord dataRecord = (DataClassRecord) dataClass;
 				Map<String, Object> map = (Map<String, Object>) data;
-				DataClassComponent[] fields = dataRecord.dataComponents();
+				DataClassField[] fields = dataRecord.dataComponents();
 				Object[] construct = new Object[fields.length];
 				for (fieldIndex = 0; fieldIndex < dataRecord.dataComponents().length; fieldIndex++) {
-					DataClassComponent field = fields[fieldIndex];
+					DataClassField field = fields[fieldIndex];
 
 					Object fv = map.get(field.name());
 

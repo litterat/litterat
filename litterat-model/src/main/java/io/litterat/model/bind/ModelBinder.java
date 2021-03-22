@@ -22,7 +22,7 @@ import java.util.List;
 
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.model.Array;
 import io.litterat.model.Definition;
@@ -53,8 +53,8 @@ public class ModelBinder {
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 				List<Field> fields = new ArrayList<>();
 
-				DataClassComponent[] components = dataClassRecord.dataComponents();
-				for (DataClassComponent component : components) {
+				DataClassField[] components = dataClassRecord.dataComponents();
+				for (DataClassField component : components) {
 					String name = component.name();
 
 					if (component.dataClass().isArray()) {
@@ -89,7 +89,7 @@ public class ModelBinder {
 
 	public static MethodHandle resolveFieldGetter(DataClassRecord dataClass, String field) throws DataBindException {
 
-		for (DataClassComponent component : dataClass.dataComponents()) {
+		for (DataClassField component : dataClass.dataComponents()) {
 			if (component.name().equalsIgnoreCase(field)) {
 
 				// Pass the accessor through the toData handle to get the correct data type.
@@ -107,7 +107,7 @@ public class ModelBinder {
 	}
 
 	public static MethodHandle resolveFieldSetter(DataClassRecord dataClass, String field) throws DataBindException {
-		for (DataClassComponent component : dataClass.dataComponents()) {
+		for (DataClassField component : dataClass.dataComponents()) {
 			if (component.name().equalsIgnoreCase(field)) {
 
 				MethodHandle setter = component.setter()
@@ -130,10 +130,10 @@ public class ModelBinder {
 
 		MethodHandle[] toObject = new MethodHandle[dataClass.dataComponents().length];
 
-		DataClassComponent[] components = dataClass.dataComponents();
+		DataClassField[] components = dataClass.dataComponents();
 
 		for (int x = 0; x < components.length; x++) {
-			DataClassComponent component = dataClass.dataComponents()[x];
+			DataClassField component = dataClass.dataComponents()[x];
 
 			toObject[x] = component.dataClass().toObject();
 		}

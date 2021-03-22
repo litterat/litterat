@@ -23,7 +23,7 @@ import java.util.Optional;
  * This is analogous to the Java reflection RecordComponent class but for Data classes.
  *
  */
-public class DataClassComponent {
+public class DataClassField {
 
 	// constructor index.
 	private final int index;
@@ -42,7 +42,7 @@ public class DataClassComponent {
 	// setter write handle. signature object.setT( type t);
 	private final Optional<MethodHandle> setter;
 
-	public DataClassComponent(int index, String name, Class<?> type, DataClass dataClass, MethodHandle readHandle,
+	public DataClassField(int index, String name, Class<?> type, DataClass dataClass, MethodHandle readHandle,
 			MethodHandle setter) {
 		this.index = index;
 		this.name = name;

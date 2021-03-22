@@ -32,7 +32,7 @@ import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.json.parser.JsonReader;
 import io.litterat.json.parser.JsonToken;
@@ -83,10 +83,10 @@ public class JsonMapper {
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 				writer.beginObject();
 
-				DataClassComponent[] fields = dataClassRecord.dataComponents();
+				DataClassField[] fields = dataClassRecord.dataComponents();
 
 				for (fieldIndex = 0; fieldIndex < dataClassRecord.dataComponents().length; fieldIndex++) {
-					DataClassComponent field = fields[fieldIndex];
+					DataClassField field = fields[fieldIndex];
 
 					Object v = field.accessor().invoke(data);
 
@@ -155,12 +155,12 @@ public class JsonMapper {
 		return (T) fromJson(dataClass, new JsonReader(reader));
 	}
 
-	private Map<DataClassRecord, Map<String, DataClassComponent>> fieldMaps = new HashMap<>();
+	private Map<DataClassRecord, Map<String, DataClassField>> fieldMaps = new HashMap<>();
 
-	private Map<String, DataClassComponent> componentMap(DataClassRecord dataClass) {
+	private Map<String, DataClassField> componentMap(DataClassRecord dataClass) {
 		return fieldMaps.computeIfAbsent(dataClass, (clss) -> {
 			return Arrays.asList(clss.dataComponents()).stream()
-					.collect(Collectors.toMap(DataClassComponent::name, item -> item));
+					.collect(Collectors.toMap(DataClassField::name, item -> item));
 		});
 
 	}
@@ -208,7 +208,7 @@ public class JsonMapper {
 
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
-				DataClassComponent[] fields = dataClassRecord.dataComponents();
+				DataClassField[] fields = dataClassRecord.dataComponents();
 				Object[] construct = new Object[fields.length];
 
 				while (reader.hasNext()) {
@@ -216,7 +216,7 @@ public class JsonMapper {
 					String name = reader.nextName();
 
 					// Find the name in the fields.
-					DataClassComponent field = componentMap(dataClassRecord).get(name);
+					DataClassField field = componentMap(dataClassRecord).get(name);
 					Objects.requireNonNull(field,
 							String.format("field %s not found in class", name, dataClass.dataClass()));
 

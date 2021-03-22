@@ -26,7 +26,7 @@ import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 
 /**
@@ -152,9 +152,9 @@ public class PepArrayMapper {
 
 			result = dataClassRecord.constructor();
 
-			DataClassComponent[] fields = dataClassRecord.dataComponents();
+			DataClassField[] fields = dataClassRecord.dataComponents();
 			for (int x = 0; x < dataClassRecord.dataComponents().length; x++) {
-				DataClassComponent field = fields[x];
+				DataClassField field = fields[x];
 
 				int inputIndex = x;
 
@@ -308,10 +308,10 @@ public class PepArrayMapper {
 		// (Object[], embedClass):object[] -> return object[];
 		MethodHandle result = MethodHandles.dropArguments(identity, 1, dataClass.dataClass());
 
-		DataClassComponent[] fields = dataClass.dataComponents();
+		DataClassField[] fields = dataClass.dataComponents();
 		for (int x = 0; x < fields.length; x++) {
 
-			DataClassComponent field = fields[x];
+			DataClassField field = fields[x];
 			int outputIndex = x;
 
 			// (value[],x, v) -> value[x] = v

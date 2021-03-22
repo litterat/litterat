@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
@@ -60,23 +60,23 @@ public class SimplePojoDataOrderTest {
 		Assertions.assertEquals(SimplePojoDataOrder.class, descriptor.typeClass());
 		Assertions.assertEquals(SimplePojoDataOrder.class, descriptor.dataClass());
 
-		DataClassComponent[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(4, fields.length);
 
-		DataClassComponent fieldX = fields[0];
+		DataClassField fieldX = fields[0];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
 
-		DataClassComponent fieldZ = fields[1];
+		DataClassField fieldZ = fields[1];
 		Assertions.assertEquals("z", fieldZ.name());
 		Assertions.assertEquals(int.class, fieldZ.type());
 
-		DataClassComponent fieldY = fields[2];
+		DataClassField fieldY = fields[2];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
 
-		DataClassComponent fieldA = fields[3];
+		DataClassField fieldA = fields[3];
 		Assertions.assertEquals("a", fieldA.name());
 		Assertions.assertEquals(int.class, fieldA.type());
 

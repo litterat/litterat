@@ -46,7 +46,7 @@ import io.litterat.bind.DataBridge;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClass.DataClassType;
 import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.DataOrder;
@@ -299,7 +299,7 @@ public class DefaultResolver implements DataBindContextResolver {
 				// primitives should already be registered, but just incase.
 				MethodHandle identity = MethodHandles.identity(targetClass);
 				descriptor = new DataClassRecord(targetClass, targetClass, identity, identity, identity,
-						new DataClassComponent[0]);
+						new DataClassField[0]);
 			}
 
 			// Check for annotation on constructor.
@@ -327,7 +327,7 @@ public class DefaultResolver implements DataBindContextResolver {
 					MethodHandle toData = MethodHandles.lookup().unreflect(toDataMethod);
 
 					descriptor = new DataClassRecord(targetClass, dataClass, identity, toData, toObject,
-							new DataClassComponent[0]);
+							new DataClassField[0]);
 					break;
 				}
 			}
@@ -462,7 +462,7 @@ public class DefaultResolver implements DataBindContextResolver {
 				}
 
 				// Prepare the field descriptors.
-				DataClassComponent[] dataComponents = new DataClassComponent[components.size()];
+				DataClassField[] dataComponents = new DataClassField[components.size()];
 				for (int x = 0; x < components.size(); x++) {
 					ComponentInfo info = components.get(x);
 
@@ -473,7 +473,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						setter = info.getWriteMethod();
 					}
 
-					DataClassComponent component;
+					DataClassField component;
 
 					// Will probably need a more generic way of handling paramterized types.
 					Field fieldAnnotation = info.getField();
@@ -545,7 +545,7 @@ public class DefaultResolver implements DataBindContextResolver {
 									.asType(MethodType.methodType(info.getType(), bridgeDataClass));
 						}
 
-						component = new DataClassComponent(x, info.getName(), bridgeDataClass, tupleData, accessor,
+						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, accessor,
 								setter);
 					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
@@ -578,7 +578,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						}
 
 						// TODO the constructor parameter will need to pass through the bridge.
-						component = new DataClassComponent(x, info.getName(), optionalType, dataClass, optionalObject,
+						component = new DataClassField(x, info.getName(), optionalType, dataClass, optionalObject,
 								setter);
 
 					} else {
@@ -586,7 +586,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						DataClass dataClass = context.getDescriptor(info.getType(),
 								(info.getParamType() != null ? info.getParamType() : info.getType()));
 
-						component = new DataClassComponent(x, info.getName(), info.getType(), dataClass, accessor,
+						component = new DataClassField(x, info.getName(), info.getType(), dataClass, accessor,
 								setter);
 					}
 					dataComponents[x] = component;

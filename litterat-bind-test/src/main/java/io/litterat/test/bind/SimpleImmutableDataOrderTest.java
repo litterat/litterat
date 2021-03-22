@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
@@ -52,15 +52,15 @@ public class SimpleImmutableDataOrderTest {
 		Assertions.assertEquals(SimpleImmutableDataOrder.class, descriptor.typeClass());
 		Assertions.assertEquals(SimpleImmutableDataOrder.class, descriptor.dataClass());
 
-		DataClassComponent[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(2, fields.length);
 
-		DataClassComponent fieldY = fields[0];
+		DataClassField fieldY = fields[0];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
 
-		DataClassComponent fieldX = fields[1];
+		DataClassField fieldX = fields[1];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
 

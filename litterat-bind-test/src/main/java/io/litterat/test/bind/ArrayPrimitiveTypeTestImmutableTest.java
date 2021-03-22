@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassComponent;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.PepArrayMapper;
 import io.litterat.bind.mapper.PepMapMapper;
@@ -69,75 +69,75 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		Assertions.assertEquals(ArrayPrimitiveTypeTestImmutable.class, descriptor.typeClass());
 		Assertions.assertEquals(ArrayPrimitiveTypeTestImmutable.class, descriptor.dataClass());
 
-		DataClassComponent[] fields = descriptor.dataComponents();
+		DataClassField[] fields = descriptor.dataComponents();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(17, fields.length);
 
-		DataClassComponent fieldPBoolean = fields[0];
+		DataClassField fieldPBoolean = fields[0];
 		Assertions.assertEquals("pBoolean", fieldPBoolean.name());
 		Assertions.assertEquals(boolean[].class, fieldPBoolean.type());
 
-		DataClassComponent fieldOBoolean = fields[1];
+		DataClassField fieldOBoolean = fields[1];
 		Assertions.assertEquals("oBoolean", fieldOBoolean.name());
 		Assertions.assertEquals(Boolean[].class, fieldOBoolean.type());
 
-		DataClassComponent fieldPByte = fields[2];
+		DataClassField fieldPByte = fields[2];
 		Assertions.assertEquals("pByte", fieldPByte.name());
 		Assertions.assertEquals(byte[].class, fieldPByte.type());
 
-		DataClassComponent fieldOByte = fields[3];
+		DataClassField fieldOByte = fields[3];
 		Assertions.assertEquals("oByte", fieldOByte.name());
 		Assertions.assertEquals(Byte[].class, fieldOByte.type());
 
-		DataClassComponent fieldPChar = fields[4];
+		DataClassField fieldPChar = fields[4];
 		Assertions.assertEquals("pChar", fieldPChar.name());
 		Assertions.assertEquals(char[].class, fieldPChar.type());
 
-		DataClassComponent fieldOChar = fields[5];
+		DataClassField fieldOChar = fields[5];
 		Assertions.assertEquals("oChar", fieldOChar.name());
 		Assertions.assertEquals(Character[].class, fieldOChar.type());
 
-		DataClassComponent fieldPShort = fields[6];
+		DataClassField fieldPShort = fields[6];
 		Assertions.assertEquals("pShort", fieldPShort.name());
 		Assertions.assertEquals(short[].class, fieldPShort.type());
 
-		DataClassComponent fieldOShort = fields[7];
+		DataClassField fieldOShort = fields[7];
 		Assertions.assertEquals("oShort", fieldOShort.name());
 		Assertions.assertEquals(Short[].class, fieldOShort.type());
 
-		DataClassComponent fieldPInteger = fields[8];
+		DataClassField fieldPInteger = fields[8];
 		Assertions.assertEquals("pInteger", fieldPInteger.name());
 		Assertions.assertEquals(int[].class, fieldPInteger.type());
 
-		DataClassComponent fieldOInteger = fields[9];
+		DataClassField fieldOInteger = fields[9];
 		Assertions.assertEquals("oInteger", fieldOInteger.name());
 		Assertions.assertEquals(Integer[].class, fieldOInteger.type());
 
-		DataClassComponent fieldPLong = fields[10];
+		DataClassField fieldPLong = fields[10];
 		Assertions.assertEquals("pLong", fieldPLong.name());
 		Assertions.assertEquals(long[].class, fieldPLong.type());
 
-		DataClassComponent fieldOLong = fields[11];
+		DataClassField fieldOLong = fields[11];
 		Assertions.assertEquals("oLong", fieldOLong.name());
 		Assertions.assertEquals(Long[].class, fieldOLong.type());
 
-		DataClassComponent fieldPFloat = fields[12];
+		DataClassField fieldPFloat = fields[12];
 		Assertions.assertEquals("pFloat", fieldPFloat.name());
 		Assertions.assertEquals(float[].class, fieldPFloat.type());
 
-		DataClassComponent fieldOFloat = fields[13];
+		DataClassField fieldOFloat = fields[13];
 		Assertions.assertEquals("oFloat", fieldOFloat.name());
 		Assertions.assertEquals(Float[].class, fieldOFloat.type());
 
-		DataClassComponent fieldPDouble = fields[14];
+		DataClassField fieldPDouble = fields[14];
 		Assertions.assertEquals("pDouble", fieldPDouble.name());
 		Assertions.assertEquals(double[].class, fieldPDouble.type());
 
-		DataClassComponent fieldODouble = fields[15];
+		DataClassField fieldODouble = fields[15];
 		Assertions.assertEquals("oDouble", fieldODouble.name());
 		Assertions.assertEquals(Double[].class, fieldODouble.type());
 
-		DataClassComponent fieldString = fields[16];
+		DataClassField fieldString = fields[16];
 		Assertions.assertEquals("string", fieldString.name());
 		Assertions.assertEquals(String[].class, fieldString.type());
 
