@@ -25,6 +25,10 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
+## Day 40 - March 22 - Refactoring bind classes
+
+Refactored DataClassComponent to be DataClassField and added a DataClassAtom class. The classes are now aligning better with the theoretical model. There's more follow on changes that will be required as the union type is better integrated. More work is required on the difference between the Java type class and the data class, as it is not always clear which is which. The naming and which one fields reference needs to be clearer.
+
 ## Day 39 - March 21 - Clarity on union problem
 
 Finally coming to a landing on how to treat the mismatch between Java parent classes mapping to Records and Unions. Given the example of a Vehicle which has two subclasses Car and Truck, then if there's a List<Vehicle> then serialization should ignore Car and Truck object types and just serialize Vehicle as a record. This is most likely not what the programmer will want, but it won't take long to realise that Vehicle should be an interface rather than a base class. The concrete example is:
