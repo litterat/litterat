@@ -381,7 +381,7 @@ public class PepArrayMapper {
 				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
-					outputArray[x] = dataToObject.invoke(iterator, arrayData);
+					outputArray[x] = dataToObject.invoke(arrayData, iterator);
 				}
 
 				return outputArray;
@@ -424,7 +424,7 @@ public class PepArrayMapper {
 
 					Object v = arrayToObject.invoke(inputArray[x]);
 
-					arrayClass.put().invoke(iterator, arrayData, v);
+					arrayClass.put().invoke(arrayData, iterator, v);
 					// arrayToObject.invoke(iterator, arrayData, inputArray[x]);
 
 				}

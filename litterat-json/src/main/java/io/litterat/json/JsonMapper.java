@@ -119,7 +119,7 @@ public class JsonMapper {
 				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
-					Object av = arrayClass.get().invoke(iterator, arrayData);
+					Object av = arrayClass.get().invoke(arrayData, iterator);
 					toJson(av, arrayDataClass, writer);
 				}
 
@@ -262,7 +262,7 @@ public class JsonMapper {
 				Object iterator = arrayDataClass.iterator().invoke(arrayData);
 
 				for (int x = 0; x < length; x++) {
-					arrayDataClass.put().invoke(iterator, arrayData, list.get(x));
+					arrayDataClass.put().invoke(arrayData, iterator, list.get(x));
 				}
 
 				return arrayData;

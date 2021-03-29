@@ -52,8 +52,6 @@ import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.DataOrder;
 import io.litterat.bind.Field;
 import io.litterat.bind.ToData;
-import io.litterat.bind.array.CollectionArrayBridge;
-import io.litterat.bind.array.PrimitiveBridges;
 
 public class DefaultResolver implements DataBindContextResolver {
 
@@ -223,23 +221,23 @@ public class DefaultResolver implements DataBindContextResolver {
 		DataClassArray descriptor = null;
 
 		try {
+
+			DataClass arrayDataClass;
+
+			// Find the type of the Array collection.
 			if (targetClass.isArray()) {
 
-				MethodHandle constructor = MethodHandles.arrayConstructor(targetClass);
-				MethodHandle identity = MethodHandles.identity(targetClass);
-
-				DataClass arrayDataClass = context.getDescriptor(targetClass.getComponentType());
-
-				descriptor = new DataClassArray(targetClass, targetClass, constructor, identity, identity,
-						arrayDataClass, PrimitiveBridges.getPrimitiveArrayBridge(targetClass.getComponentType()));
+				// Java arrays type is easily available via reflection.
+				arrayDataClass = context.getDescriptor(targetClass.getComponentType());
 
 			} else if (Collection.class.isAssignableFrom(targetClass)) {
 
+				// We need the parameterizedType as type erasure means we can only get Collection type
+				// from certain places.
 				if (!(parameterizedType instanceof ParameterizedType)) {
 					throw new DataBindException("Collection must provide parameterized type information");
 				}
 
-				DataClass arrayDataClass;
 				Type paramType = ((ParameterizedType) parameterizedType).getActualTypeArguments()[0];
 				if (paramType instanceof Class) {
 					arrayDataClass = context.getDescriptor((Class<?>) paramType);
@@ -250,29 +248,17 @@ public class DefaultResolver implements DataBindContextResolver {
 					throw new DataBindException("Unrecognized parameterized type");
 				}
 
-				// TODO Some Collections will not have a size constructor. Fallback and drop the
-				// argument.
-				MethodHandle constructor = null;
-
-				// TODO this is a hack and needs to be extended.
-				if (targetClass == List.class) {
-					constructor = MethodHandles.lookup()
-							.unreflectConstructor(ArrayList.class.getConstructor(int.class));
-				} else {
-					constructor = MethodHandles.lookup().unreflectConstructor(targetClass.getConstructor(int.class));
-				}
-
-				MethodHandle toObject = MethodHandles.identity(targetClass);
-				MethodHandle toData = MethodHandles.identity(targetClass);
-
-				descriptor = new DataClassArray(targetClass, Object[].class, constructor, toData, toObject,
-						arrayDataClass, new CollectionArrayBridge());
-
 			} else {
 				throw new DataBindException("Not recognised array class");
 			}
 
-		} catch (IllegalAccessException | NoSuchMethodException | SecurityException e) {
+			ArrayAccessBridge arrayBridge = new ArrayAccessBridge(targetClass, arrayDataClass);
+
+			descriptor = new DataClassArray(targetClass, arrayDataClass, arrayBridge.constructor(),
+					arrayBridge.getSizeMethodHandle(), arrayBridge.getIteratorMethodHandle(),
+					arrayBridge.getIteratorGetMethodHandle(), arrayBridge.getIteratorPutMethodHandle());
+
+		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
 			throw new DataBindException("Failed to get array descriptor", e);
 		}
 

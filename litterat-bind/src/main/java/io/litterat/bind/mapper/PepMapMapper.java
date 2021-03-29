@@ -100,7 +100,7 @@ public class PepMapMapper {
 				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
-					Object av = arrayClass.get().invoke(iterator, arrayData);
+					Object av = arrayClass.get().invoke(arrayData, iterator);
 					outputArray[x] = toMap(arrayDataClass, av);
 				}
 
@@ -167,7 +167,7 @@ public class PepMapMapper {
 				DataClass arrayDataClass = arrayClass.arrayDataClass();
 
 				for (int x = 0; x < length; x++) {
-					arrayClass.put().invoke(iterator, arrayData, toObject(arrayDataClass, inputArray[x]));
+					arrayClass.put().invoke(arrayData, iterator, toObject(arrayDataClass, inputArray[x]));
 				}
 
 				v = arrayData;

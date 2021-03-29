@@ -1,9 +1,21 @@
+/*
+ * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.litterat.bind;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.util.Collection;
 
 /**
  * 
@@ -62,58 +74,32 @@ public class DataClassArray extends DataClass {
 	// data class.
 	private final DataClass arrayDataClass;
 
-	// <Array> constructor( int size );
+	// <array> constructor( int size );
 	private final MethodHandle constructor;
 
-	// int size( <Array> );
+	// int size( <array> );
 	private final MethodHandle size;
 
-	// <Iterator> iterator( <Array> );
+	// <iter> iterator( <array> );
 	private final MethodHandle iterator;
 
-	// void put( <Iterator>, <Array>, <Value> );
+	// void put( <array>, <iter>, <value> );
 	private final MethodHandle put;
 
-	// <data> get( <Iterator> iterator, <Array> );
+	// <value> get( <array>, <iter> );
 	private final MethodHandle get;
 
-	public DataClassArray(Class<?> targetType, Class<?> serialType, MethodHandle constructor, MethodHandle toData,
-			MethodHandle toObject, DataClass arrayDataClass, Object bridge)
+	public DataClassArray(Class<?> targetType, DataClass arrayDataClass, MethodHandle constructor, MethodHandle size,
+			MethodHandle iterator, MethodHandle get, MethodHandle put)
 			throws NoSuchMethodException, IllegalAccessException {
 		super(targetType, DataClassType.ARRAY);
 
-		Class<?> iteratorClass;
-		Class<?> arrayClass = targetType;
 		this.arrayDataClass = arrayDataClass;
 		this.constructor = constructor;
-
-		Class<?> bridgeDataClass = arrayDataClass.typeClass();
-		if (Collection.class.isAssignableFrom(targetType)) {
-			arrayClass = Collection.class;
-			bridgeDataClass = Object.class;
-			iteratorClass = bridge.getClass().getMethod("iterator", Collection.class).getReturnType();
-		} else {
-			if (bridgeDataClass.isPrimitive()) {
-				iteratorClass = bridge.getClass().getMethod("iterator", targetType).getReturnType();
-			} else {
-				arrayClass = Object[].class;
-				bridgeDataClass = Object.class;
-				iteratorClass = bridge.getClass().getMethod("iterator", arrayClass).getReturnType();
-			}
-		}
-
-		size = MethodHandles.lookup()
-				.findVirtual(bridge.getClass(), "size", MethodType.methodType(int.class, arrayClass)).bindTo(bridge);
-
-		iterator = MethodHandles.lookup()
-				.findVirtual(bridge.getClass(), "iterator", MethodType.methodType(iteratorClass, arrayClass))
-				.bindTo(bridge);
-
-		put = MethodHandles.lookup().findVirtual(bridge.getClass(), "put",
-				MethodType.methodType(void.class, iteratorClass, arrayClass, bridgeDataClass)).bindTo(bridge);
-
-		get = MethodHandles.lookup().findVirtual(bridge.getClass(), "get",
-				MethodType.methodType(bridgeDataClass, iteratorClass, arrayClass)).bindTo(bridge);
+		this.iterator = iterator;
+		this.size = size;
+		this.get = get;
+		this.put = put;
 	}
 
 	/**
@@ -123,22 +109,39 @@ public class DataClassArray extends DataClass {
 		return constructor;
 	}
 
+	/**
+	 * @return The DataClass type for the array.
+	 */
 	public DataClass arrayDataClass() {
 		return arrayDataClass;
 	}
 
+	/**
+	 * 
+	 * @return a MethodHandle that returns the size of the array. size( array ):int;
+	 */
 	public MethodHandle size() {
 		return this.size;
 	}
 
+	/**
+	 * @return a MethodHandle that returns an iterator to be used with put/get MethodHandles. iterator(
+	 *         array ):iter;
+	 */
 	public MethodHandle iterator() {
 		return this.iterator;
 	}
 
+	/**
+	 * @return a MethodHandle for adding values to the array. put( array, iter, value ):void;
+	 */
 	public MethodHandle put() {
 		return this.put;
 	}
 
+	/**
+	 * @return a MethodHandle for getting values from the array. get( array, iter ):value;
+	 */
 	public MethodHandle get() {
 		return this.get;
 	}

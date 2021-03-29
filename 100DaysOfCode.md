@@ -6,8 +6,6 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 Next steps list. A general list of things that could be done next in no particular order.
 
  litterat-bind
- - Deeper looker at defaults for Lists, Sets and other collections.
- - Investigate removing the primitive array bridge classes and replace with generated MethodHandles.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
@@ -24,6 +22,15 @@ Next steps list. A general list of things that could be done next in no particul
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
+
+## Day 42 - March 29 - Complete array refactor
+
+Completed the array interface refactoring. This removes the need for individual bridge classes
+in favour of using constructed MethodHandles. It's still not a perfect solution, but puts all the generation code in one place; of which is more complex.
+
+## Day 41 - March 28 - Refactoring array MethodHandles
+
+Removing the various ArrayBridge classes by using MethodHandles to generator the access patterns. Made a reasonable amount of progress. Able to generate MethodHandles for constructor, size, iterator and get. Still have put to do and update testing.
 
 ## Day 40 - March 22 - Refactoring bind classes
 
