@@ -26,6 +26,7 @@ import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 
 /**
  *
@@ -54,10 +55,10 @@ public class PepMapMapper {
 
 		try {
 			Object v = null;
-			if (dataClass.isAtom()) {
+			if (dataClass instanceof DataClassAtom) {
 				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
 				v = dataClassAtom.toData().invoke(object);
-			} else if (dataClass.isRecord()) {
+			} else if (dataClass instanceof DataClassRecord) {
 				DataClassRecord dataRecord = (DataClassRecord) dataClass;
 				Object data = dataRecord.toData().invoke(object);
 
@@ -80,16 +81,7 @@ public class PepMapMapper {
 
 				v = map;
 
-			} else if (dataClass.isUnion()) {
-				// An interface needs to know the type being written so it can be picked up by
-				// the reader later.
-				v = toMap(object);
-				if (v instanceof Map) {
-					@SuppressWarnings("rawtypes")
-					Map baseMap = (Map) v;
-					baseMap.put("type", object.getClass().getName());
-				}
-			} else if (dataClass.isArray()) {
+			} else if (dataClass instanceof DataClassArray) {
 				DataClassArray arrayClass = (DataClassArray) dataClass;
 
 				Object arrayData = object;
@@ -105,6 +97,15 @@ public class PepMapMapper {
 				}
 
 				v = outputArray;
+			} else if (dataClass instanceof DataClassUnion) {
+				// A union needs to know the type being written so it can be picked up by
+				// the reader later.
+				v = toMap(object);
+				if (v instanceof Map) {
+					@SuppressWarnings("rawtypes")
+					Map baseMap = (Map) v;
+					baseMap.put("type", object.getClass().getName());
+				}
 			} else {
 				throw new IllegalArgumentException("Unknown data class");
 			}
@@ -129,10 +130,10 @@ public class PepMapMapper {
 
 		try {
 			Object v = null;
-			if (dataClass.isAtom()) {
+			if (dataClass instanceof DataClassAtom) {
 				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
 				v = dataClassAtom.toObject().invoke(data);
-			} else if (dataClass.isRecord()) {
+			} else if (dataClass instanceof DataClassRecord) {
 				DataClassRecord dataRecord = (DataClassRecord) dataClass;
 				Map<String, Object> map = (Map<String, Object>) data;
 				DataClassField[] fields = dataRecord.fields();
@@ -155,7 +156,7 @@ public class PepMapMapper {
 				v = dataRecord.constructor().invoke(construct);
 
 				v = dataRecord.toObject().invoke(v);
-			} else if (dataClass.isArray()) {
+			} else if (dataClass instanceof DataClassArray) {
 				DataClassArray arrayClass = (DataClassArray) dataClass;
 
 				Object[] inputArray = (Object[]) data;
@@ -171,6 +172,8 @@ public class PepMapMapper {
 				}
 
 				v = arrayData;
+			} else if (dataClass instanceof DataClassUnion) {
+				throw new IllegalArgumentException("not implemented");
 			} else {
 				throw new IllegalArgumentException("unrecognised type");
 			}

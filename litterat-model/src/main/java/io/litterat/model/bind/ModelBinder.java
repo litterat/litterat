@@ -22,6 +22,7 @@ import java.util.List;
 
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
@@ -44,6 +45,10 @@ import io.litterat.model.TypeName;
 
 public class ModelBinder {
 
+	/*
+	 *
+	 * TODO this needs to be rewritten.
+	 */
 	public Definition createDefinition(TypeLibrary library, Class<?> clss) throws TypeException {
 
 		try {
@@ -51,7 +56,7 @@ public class ModelBinder {
 			// This might throw an exception.
 			DataClass dataClass = library.pepContext().getDescriptor(clss);
 
-			if (dataClass.isRecord()) {
+			if (dataClass instanceof DataClassRecord) {
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 				List<Field> fields = new ArrayList<>();
 
@@ -60,14 +65,14 @@ public class ModelBinder {
 					String name = dataClassField.name();
 
 					DataClass fieldDataClass = dataClassField.dataClass();
-					if (fieldDataClass.isArray()) {
+					if (fieldDataClass instanceof DataClassArray) {
 
 						TypeName typeName = library
 								.getTypeName(dataClassField.dataClass().typeClass().getComponentType());
 
 						fields.add(new Field(name, new Array(typeName)));
 
-					} else if (fieldDataClass.isAtom() || fieldDataClass.isRecord()) {
+					} else if (fieldDataClass instanceof DataClassAtom) {
 						DataClassAtom fieldDataClassAtom = (DataClassAtom) fieldDataClass;
 
 						TypeName typeName = library.getTypeName(fieldDataClassAtom.dataClass());
@@ -75,8 +80,15 @@ public class ModelBinder {
 						// TODO - What about optional?
 
 						fields.add(new Field(name, new Reference(typeName), false));
+					} else if (fieldDataClass instanceof DataClassRecord) {
+						DataClassRecord fieldDataClassRecord = (DataClassRecord) fieldDataClass;
 
-					} else if (fieldDataClass.isUnion()) {
+						TypeName typeName = library.getTypeName(fieldDataClassRecord.dataClass());
+
+						// TODO - What about optional?
+
+						fields.add(new Field(name, new Reference(typeName), false));
+					} else if (fieldDataClass instanceof DataClassUnion) {
 						DataClassUnion fieldDataClassUnion = (DataClassUnion) fieldDataClass;
 
 						TypeName typeName = library.getTypeName(fieldDataClassUnion.typeClass());
@@ -89,7 +101,14 @@ public class ModelBinder {
 
 				Field[] finalFields = new Field[fields.size()];
 				return new Record(fields.toArray(finalFields));
-			} else if (dataClass.isAtom()) {
+			} else if (dataClass instanceof DataClassAtom) {
+				// TODO rewrite this
+				throw new TypeException("Could not generate descriptor for " + clss.getName());
+			} else if (dataClass instanceof DataClassArray) {
+				// TODO implement this.
+				throw new TypeException("Could not generate descriptor for " + clss.getName());
+			} else if (dataClass instanceof DataClassUnion) {
+				// TODO implement this.
 				throw new TypeException("Could not generate descriptor for " + clss.getName());
 			} else {
 				throw new TypeException("Could not generate descriptor for " + clss.getName());
@@ -108,8 +127,12 @@ public class ModelBinder {
 				// Pass the accessor through the toData handle to get the correct data type.
 				// toData will be identity function if no change required.
 				DataClass componentClass = component.dataClass();
-				if (componentClass instanceof DataClassAtom || componentClass instanceof DataClassRecord) {
+				if (componentClass instanceof DataClassAtom) {
 					MethodHandle toData = ((DataClassAtom) componentClass).toData();
+
+					return MethodHandles.filterArguments(toData, 0, component.accessor());
+				} else if (componentClass instanceof DataClassRecord) {
+					MethodHandle toData = ((DataClassRecord) componentClass).toData();
 
 					return MethodHandles.filterArguments(toData, 0, component.accessor());
 				} else {
@@ -132,8 +155,12 @@ public class ModelBinder {
 				// Pass the object through the toObject method handle to get the correct type
 				// for the setter. toObject will be identity function if no change required.
 				DataClass componentClass = component.dataClass();
-				if (componentClass instanceof DataClassAtom || componentClass instanceof DataClassRecord) {
+				if (componentClass instanceof DataClassAtom) {
 					MethodHandle toObject = ((DataClassAtom) componentClass).toObject();
+
+					return MethodHandles.filterArguments(setter, 0, toObject);
+				} else if (componentClass instanceof DataClassRecord) {
+					MethodHandle toObject = ((DataClassRecord) componentClass).toObject();
 
 					return MethodHandles.filterArguments(setter, 0, toObject);
 				} else {
@@ -155,9 +182,12 @@ public class ModelBinder {
 			DataClassField field = dataClass.fields()[x];
 			DataClass fieldDataClass = field.dataClass();
 
-			if (fieldDataClass.isAtom() || fieldDataClass.isRecord()) {
+			if (fieldDataClass instanceof DataClassAtom) {
 				DataClassAtom fieldAtom = (DataClassAtom) fieldDataClass;
 				toObject[x] = fieldAtom.toObject();
+			} else if (fieldDataClass instanceof DataClassRecord) {
+				DataClassRecord fieldRecord = (DataClassRecord) fieldDataClass;
+				toObject[x] = fieldRecord.toObject();
 			} else {
 				toObject[x] = MethodHandles.identity(field.dataClass().typeClass());
 			}

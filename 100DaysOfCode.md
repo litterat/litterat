@@ -6,6 +6,10 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 Next steps list. A general list of things that could be done next in no particular order.
 
  litterat-bind
+ - Decide on implementation for embedded union (e.g. int | string ).
+ - Develop testcase for interface and abstract class unions.
+ - Define method to use unions in PepArrayMapper.
+ - Define way of using unions in PepMapMapper.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
@@ -22,6 +26,11 @@ Next steps list. A general list of things that could be done next in no particul
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
+
+
+## Day 43 - March 30 - Sort out github access
+
+Finally got around to sorting out github access after turning on 2fa. Next up is to review tasks. 
 
 ## Day 42 - March 29 - Complete array refactor
 

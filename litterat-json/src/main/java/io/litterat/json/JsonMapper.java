@@ -35,6 +35,7 @@ import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 import io.litterat.json.parser.JsonReader;
 import io.litterat.json.parser.JsonToken;
 import io.litterat.json.parser.JsonWriter;
@@ -76,13 +77,13 @@ public class JsonMapper {
 
 		try {
 
-			if (dataClass.isAtom()) {
+			if (dataClass instanceof DataClassAtom) {
 				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
 
 				Object data = dataClassAtom.toData().invoke(object);
 
 				writeAtom(data, writer);
-			} else if (dataClass.isRecord()) {
+			} else if (dataClass instanceof DataClassRecord) {
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
 				Object data = dataClassRecord.toData().invoke(object);
@@ -108,10 +109,10 @@ public class JsonMapper {
 				}
 
 				writer.endObject();
-			} else {
-				writer.beginArray();
-
+			} else if (dataClass instanceof DataClassArray) {
 				DataClassArray arrayClass = (DataClassArray) dataClass;
+
+				writer.beginArray();
 
 				Object arrayData = object;
 				int length = (int) arrayClass.size().invoke(arrayData);
@@ -124,6 +125,10 @@ public class JsonMapper {
 				}
 
 				writer.endArray();
+			} else if (dataClass instanceof DataClassUnion) {
+				throw new DataBindException("union not implemented");
+			} else {
+				throw new DataBindException("unexpected data class type");
 			}
 
 		} catch (Throwable t) {
@@ -204,11 +209,24 @@ public class JsonMapper {
 
 			case BEGIN_OBJECT:
 
-				if (!dataClass.isRecord()) {
+				if (!(dataClass instanceof DataClassRecord || dataClass instanceof DataClassUnion)) {
 					throw new IllegalStateException();
 				}
 
 				reader.beginObject();
+
+				// For a union, we need to know which type has been embedded.
+				// For JSON, this is the only time additional information needs to be added to the format
+				// to support the data model.
+				if (dataClass instanceof DataClassUnion) {
+					String name = reader.nextName();
+					if (!name.equalsIgnoreCase("type")) {
+						// The other option here is to try and pattern match the field names against the record models.
+						// That doesn't work great for a stream/token based reader like this.
+						// Check https://serde.rs/enum-representations.html for future implementation options.
+						throw new DataBindException("union expected a type");
+					}
+				}
 
 				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
@@ -236,7 +254,9 @@ public class JsonMapper {
 
 			case BEGIN_ARRAY:
 
-				if (!dataClass.isArray()) {
+				// JSON schema allows embedding a record inside an array. This type of record flattenning is not
+				// supported.
+				if (!(dataClass instanceof DataClassArray)) {
 					throw new IllegalStateException();
 				}
 

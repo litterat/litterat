@@ -18,6 +18,10 @@ import java.lang.reflect.ParameterizedType;
 
 import io.litterat.bind.Field;
 
+/**
+ * Placeholder to collect information about field details. Used as a temporary hold during the
+ * resolving process.
+ */
 public class ComponentInfo {
 
 	private String name;

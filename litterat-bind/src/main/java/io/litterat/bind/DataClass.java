@@ -51,20 +51,4 @@ public abstract class DataClass {
 		return dataClassType;
 	}
 
-	public boolean isRecord() {
-		return DataClassType.RECORD == dataClassType;
-	}
-
-	public boolean isAtom() {
-		return DataClassType.ATOM == dataClassType;
-	}
-
-	public boolean isArray() {
-		return DataClassType.ARRAY == dataClassType;
-	}
-
-	public boolean isUnion() {
-		return DataClassType.UNION == dataClassType;
-	}
-
 }

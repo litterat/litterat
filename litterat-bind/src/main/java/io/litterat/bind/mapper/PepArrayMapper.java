@@ -29,6 +29,7 @@ import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 
 /**
  * Sample showing how to use the Pep library to convert an Object to/from Object[]
@@ -36,10 +37,14 @@ import io.litterat.bind.DataClassRecord;
  * This is intentionally using MethodHandles throughout to demonstrate pre-building method handles
  * for each type. This is the method likely to be used by serialization libraries to improve
  * performance.
+ * 
+ * <ul>
+ * <li>TODO add try/catch/throw around conversions
+ * <li>TODO deal with union
+ * <li>TODO deal with null values correctly
+ * </ul>
  *
- * TODO add try/catch/throw around conversions TODO deal with arrays TODO deal with null values
- * correctly
- *
+ * 
  */
 public class PepArrayMapper {
 
@@ -142,14 +147,14 @@ public class PepArrayMapper {
 		// return MethodHandles.collectArguments(dataClass.toObject(), 0, create);
 
 		MethodHandle result = null;
-		if (dataClass.isAtom()) {
+		if (dataClass instanceof DataClassAtom) {
 			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
 			// Use identity here because calling function wraps the toObject method.
 			// identity( dataObject ):dataObject
 			result = dataClassAtom.toObject()
 					.asType(dataClassAtom.toObject().type().changeParameterType(0, Object.class));
 
-		} else if (dataClass.isRecord()) {
+		} else if (dataClass instanceof DataClassRecord) {
 			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
 			result = dataClassRecord.constructor();
@@ -203,11 +208,11 @@ public class PepArrayMapper {
 
 			result = result.asType(result.type().changeReturnType(dataClass.typeClass()));
 
-		} else if (dataClass.isArray()) {
+		} else if (dataClass instanceof DataClassArray) {
+			DataClassArray dataArrayClass = (DataClassArray) dataClass;
 
 			// toObject( Object[] ):<array>
 			try {
-				DataClassArray dataArrayClass = (DataClassArray) dataClass;
 
 				MethodHandle valueToData = createToObjectFunction(dataArrayClass.arrayDataClass());
 
@@ -221,8 +226,10 @@ public class PepArrayMapper {
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				throw new DataBindException("failed to build bridge for array", e);
 			}
-		} else if (dataClass.isUnion()) {
-			throw new DataBindException("not implemented");
+		} else if (dataClass instanceof DataClassUnion) {
+			throw new DataBindException("union not implemented");
+		} else {
+			throw new DataBindException("unexpected data class type");
 		}
 
 		return result;
@@ -247,11 +254,11 @@ public class PepArrayMapper {
 
 		MethodHandle returnArray = null;
 
-		if (dataClass.isAtom()) {
+		if (dataClass instanceof DataClassAtom) {
 			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
 
 			returnArray = dataClassAtom.toData();
-		} else if (dataClass.isRecord()) {
+		} else if (dataClass instanceof DataClassRecord) {
 
 			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
 
@@ -272,7 +279,7 @@ public class PepArrayMapper {
 
 			// ():Object[] -> return new Object[fields.length];
 			returnArray = MethodHandles.collectArguments(projectGetters, 0, arrayCreate);
-		} else if (dataClass.isArray()) {
+		} else if (dataClass instanceof DataClassArray) {
 
 			try {
 
@@ -290,8 +297,10 @@ public class PepArrayMapper {
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				throw new DataBindException("failed to build array bridge", e);
 			}
+		} else if (dataClass instanceof DataClassUnion) {
+			throw new DataBindException("union not implemented");
 		} else {
-			throw new DataBindException("not implemented");
+			throw new DataBindException("unexpected data class type");
 		}
 
 		return returnArray;
@@ -425,7 +434,6 @@ public class PepArrayMapper {
 					Object v = arrayToObject.invoke(inputArray[x]);
 
 					arrayClass.put().invoke(arrayData, iterator, v);
-					// arrayToObject.invoke(iterator, arrayData, inputArray[x]);
 
 				}
 
