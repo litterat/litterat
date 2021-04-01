@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -227,7 +227,21 @@ public class PepArrayMapper {
 				throw new DataBindException("failed to build bridge for array", e);
 			}
 		} else if (dataClass instanceof DataClassUnion) {
-			throw new DataBindException("union not implemented");
+			DataClassUnion dataUnionClass = (DataClassUnion) dataClass;
+
+			// toObject( Object[] ):<array>
+			try {
+
+				UnionToObjectBridge bridge = new UnionToObjectBridge(dataUnionClass);
+
+				result = MethodHandles.lookup().findVirtual(UnionToObjectBridge.class, "toObject",
+						MethodType.methodType(Object.class, Object[].class)).bindTo(bridge);
+
+				result = result.asType(MethodType.methodType(dataUnionClass.typeClass(), Object.class));
+
+			} catch (NoSuchMethodException | IllegalAccessException e) {
+				throw new DataBindException("failed to build bridge for array", e);
+			}
 		} else {
 			throw new DataBindException("unexpected data class type");
 		}
@@ -252,12 +266,12 @@ public class PepArrayMapper {
 	 */
 	private MethodHandle createToDataFunction(DataClass dataClass) throws DataBindException {
 
-		MethodHandle returnArray = null;
+		MethodHandle toDataMethod = null;
 
 		if (dataClass instanceof DataClassAtom) {
 			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
 
-			returnArray = dataClassAtom.toData();
+			toDataMethod = dataClassAtom.toData();
 		} else if (dataClass instanceof DataClassRecord) {
 
 			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
@@ -278,7 +292,7 @@ public class PepArrayMapper {
 			MethodHandle projectGetters = MethodHandles.collectArguments(getters, 1, dataClassRecord.toData());
 
 			// ():Object[] -> return new Object[fields.length];
-			returnArray = MethodHandles.collectArguments(projectGetters, 0, arrayCreate);
+			toDataMethod = MethodHandles.collectArguments(projectGetters, 0, arrayCreate);
 		} else if (dataClass instanceof DataClassArray) {
 
 			try {
@@ -292,18 +306,31 @@ public class PepArrayMapper {
 				MethodHandle bridgeToData = MethodHandles.lookup().findVirtual(ObjectToArrayBridge.class, "toData",
 						MethodType.methodType(Object[].class, Object.class)).bindTo(bridge);
 
-				returnArray = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
+				toDataMethod = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
 				// fieldBox = MethodHandles.collectArguments(bridgeToData, 0, fieldBox);
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				throw new DataBindException("failed to build array bridge", e);
 			}
 		} else if (dataClass instanceof DataClassUnion) {
-			throw new DataBindException("union not implemented");
+			try {
+
+				DataClassUnion unionClass = (DataClassUnion) dataClass;
+
+				ObjectToUnionBridge bridge = new ObjectToUnionBridge(unionClass);
+
+				MethodHandle bridgeToData = MethodHandles.lookup().findVirtual(ObjectToUnionBridge.class, "toData",
+						MethodType.methodType(Object[].class, Object.class)).bindTo(bridge);
+
+				toDataMethod = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
+
+			} catch (NoSuchMethodException | IllegalAccessException e) {
+				throw new DataBindException("failed to build array bridge", e);
+			}
 		} else {
 			throw new DataBindException("unexpected data class type");
 		}
 
-		return returnArray;
+		return toDataMethod;
 	}
 
 	/**
@@ -396,10 +423,57 @@ public class PepArrayMapper {
 				return outputArray;
 
 			} catch (Throwable e) {
-				throw new DataBindException("Failed to convert arra", e);
+				throw new DataBindException("Failed to convert array", e);
 			}
 		}
 
+	}
+
+	private class ObjectToUnionBridge {
+
+		private final DataClassUnion unionClass;
+		private final Map<Class<?>, ArrayFunctions> typeMap;
+
+		public ObjectToUnionBridge(DataClassUnion unionClass) {
+			this.unionClass = unionClass;
+			this.typeMap = new HashMap<>();
+		}
+
+		@SuppressWarnings("unused")
+		public Object[] toData(Object v) throws DataBindException {
+
+			Object[] unionPair = new Object[2];
+			if (v != null) {
+				unionPair[0] = v.getClass().getName();
+
+				ArrayFunctions function = typeMap.get(v.getClass());
+				if (function == null) {
+
+					DataClass dataClass = context.getDescriptor(v.getClass());
+
+					if (!unionClass.isMemberType(dataClass)) {
+						throw new DataBindException("Class not of union type");
+					}
+
+					function = getFunctions(dataClass);
+					if (function != null) {
+						typeMap.put(v.getClass(), function);
+					} else {
+						throw new DataBindException("no descriptor for class");
+					}
+				}
+
+				try {
+					unionPair[1] = function.toArray.invoke(v);
+				} catch (Throwable e) {
+					throw new DataBindException("Failed to convert class");
+				}
+			} else {
+				unionPair[0] = "null";
+				unionPair[1] = null;
+			}
+			return unionPair;
+		}
 	}
 
 	private class ArrayToObjectBridge {
@@ -439,8 +513,54 @@ public class PepArrayMapper {
 
 				return arrayData;
 			} catch (Throwable e) {
-				throw new DataBindException("Failed to convert arra", e);
+				throw new DataBindException("Failed to convert array", e);
 			}
+		}
+	}
+
+	private class UnionToObjectBridge {
+		private final DataClassUnion unionClass;
+		private final Map<String, ArrayFunctions> typeMap;
+
+		public UnionToObjectBridge(DataClassUnion unionClass) {
+			this.unionClass = unionClass;
+			this.typeMap = new HashMap<>();
+		}
+
+		@SuppressWarnings("unused")
+		public Object toObject(Object[] s) throws DataBindException {
+			Object[] unionPair = s;
+
+			String unionType = (String) unionPair[0];
+			Object unionValue = unionPair[1];
+			Object value = null;
+
+			if (!unionType.equals("null")) {
+
+				try {
+					ArrayFunctions function = typeMap.get(unionType);
+					if (function == null) {
+
+						DataClass dataClass = context.getDescriptor(Class.forName(unionType));
+						if (!unionClass.isMemberType(dataClass)) {
+							throw new DataBindException("Class not of union type");
+						}
+
+						function = getFunctions(dataClass);
+						if (function != null) {
+							typeMap.put(unionType, function);
+						} else {
+							throw new DataBindException("no descriptor for class");
+						}
+					}
+
+					value = function.toObject.invoke(unionValue);
+				} catch (Throwable e) {
+					throw new DataBindException("Failed to convert class");
+				}
+			}
+
+			return value;
 		}
 
 	}

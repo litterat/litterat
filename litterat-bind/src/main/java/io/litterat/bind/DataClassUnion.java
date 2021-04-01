@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package io.litterat.bind;
 
+import java.util.Arrays;
+
 /**
  * 
  * A Union data class is tagged union type. It can be represented in a number of ways in Java:
@@ -29,16 +31,32 @@ package io.litterat.bind;
  */
 public class DataClassUnion extends DataClass {
 
-	private DataClass[] componentTypes;
+	private DataClass[] memberTypes;
 
 	public DataClassUnion(Class<?> targetType) {
 		super(targetType, DataClassType.UNION);
 
-		componentTypes = null;
+		memberTypes = new DataClass[0];
 	}
 
-	public DataClass[] components() {
-		return componentTypes;
+	public DataClass[] memberTypes() {
+		return memberTypes;
+	}
+
+	public boolean isMemberType(DataClass dataClass) {
+		boolean found = false;
+
+		// Get a reference to latest version as this method isn't synchronized.
+		// Probably a better way to do this.
+		DataClass[] types = this.memberTypes;
+		for (DataClass dClass : types) {
+			if (dClass.equals(dataClass)) {
+				found = true;
+				break;
+			}
+		}
+
+		return found;
 	}
 
 	/**
@@ -47,8 +65,11 @@ public class DataClassUnion extends DataClass {
 	 * add additional implementations to the list. One of the reasons why sealed classes are a better
 	 * choice.
 	 */
-	public synchronized void addDataClass(DataClass unionClass) {
+	public synchronized void addMemberType(DataClass newType) {
+		DataClass[] newMemberTypes = Arrays.copyOf(memberTypes, memberTypes.length + 1);
+		newMemberTypes[newMemberTypes.length - 1] = newType;
 
+		this.memberTypes = newMemberTypes;
 	}
 
 }

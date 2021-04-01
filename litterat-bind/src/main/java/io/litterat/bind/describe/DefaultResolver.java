@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,19 @@ public class DefaultResolver implements DataBindContextResolver {
 			}
 
 			return true;
+		} else if (targetClass.isInterface()) {
+
+			// Interface needs to be marked with @Data or Serializable.
+			Data pepData = targetClass.getAnnotation(Data.class);
+			if (pepData != null) {
+				return true;
+			}
+
+			if (allowSerializable) {
+				if (Serializable.class.isAssignableFrom(targetClass)) {
+					return true;
+				}
+			}
 		}
 
 		return false;
@@ -595,6 +608,20 @@ public class DefaultResolver implements DataBindContextResolver {
 				descriptor = new DataClassRecord(targetClass, targetClass, creator, constructor, toData, toObject,
 						dataComponents);
 			}
+
+			// At this point descriptor is not null but hasn't been added to context.
+			// Loop through know interfaces and if we find a union type add this descriptor to it.
+			Class<?>[] interfaces = targetClass.getInterfaces();
+			for (Class<?> targetInterface : interfaces) {
+				try {
+					DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(targetInterface);
+
+					targetUnion.addMemberType(descriptor);
+				} catch (Throwable t) {
+					// ignore.
+				}
+			}
+
 		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | DataBindException e) {
 			throw new DataBindException("Failed to get data descriptor", e);
 		}

@@ -6,10 +6,9 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 Next steps list. A general list of things that could be done next in no particular order.
 
  litterat-bind
- - Decide on implementation for embedded union (e.g. int | string ).
- - Develop testcase for interface and abstract class unions.
- - Define method to use unions in PepArrayMapper.
- - Define way of using unions in PepMapMapper.
+ - Decide on implementation for embedded atom union (e.g. int | string ).
+ - Implement test case for abstract union type.
+ - Match constructor parameters to super class parameters.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
@@ -27,10 +26,17 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
+## Day 45 - April 1 - Implement InterfaceUnion test case
+
+Implemented the interface union test case and implementation for PepArrayMapper and PepMapMapper.
+
+## Day 44 - March 31 - Test cases for abstract and interface unions
+
+Implementation of examples and test cases for abstract and interface based unions. The embedded union continues to sit in the too hard basket.
 
 ## Day 43 - March 30 - Sort out github access
 
-Finally got around to sorting out github access after turning on 2fa. Next up is to review tasks. 
+Finally got around to sorting out github access after turning on 2fa. Next up is to review tasks. Refactored the DataClass to remove isAtom type methods in favour of using instanceof. Stopped DataClassRecord from extending DataClassAtom.
 
 ## Day 42 - March 29 - Complete array refactor
 

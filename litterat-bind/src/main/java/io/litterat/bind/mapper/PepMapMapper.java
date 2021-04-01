@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,13 +98,26 @@ public class PepMapMapper {
 
 				v = outputArray;
 			} else if (dataClass instanceof DataClassUnion) {
+				DataClassUnion unionClass = (DataClassUnion) dataClass;
+
+				// Make sure this class is a member of the union before writing it.
+				DataClass unionInstanceClass = context.getDescriptor(object.getClass());
+				if (!unionClass.isMemberType(unionInstanceClass)) {
+					throw new IllegalArgumentException("Class not a member of union type");
+				}
+
 				// A union needs to know the type being written so it can be picked up by
 				// the reader later.
 				v = toMap(object);
 				if (v instanceof Map) {
 					@SuppressWarnings("rawtypes")
 					Map baseMap = (Map) v;
+
+					// Using the full class name here as an example. A better/more complete implementation
+					// would use a schema based name.
 					baseMap.put("type", object.getClass().getName());
+				} else {
+					throw new IllegalArgumentException("Unable to write non-record type union");
 				}
 			} else {
 				throw new IllegalArgumentException("Unknown data class");
@@ -173,7 +186,20 @@ public class PepMapMapper {
 
 				v = arrayData;
 			} else if (dataClass instanceof DataClassUnion) {
-				throw new IllegalArgumentException("not implemented");
+				DataClassUnion unionClass = (DataClassUnion) dataClass;
+
+				Map<String, Object> map = (Map<String, Object>) data;
+
+				// A tagged union uses "type" for the class name.
+				String type = (String) map.get("type");
+
+				DataClass instantType = context.getDescriptor(Class.forName(type));
+				if (!unionClass.isMemberType(instantType)) {
+					throw new DataBindException("instance not of expected union type");
+				}
+
+				v = toObject(instantType, data);
+
 			} else {
 				throw new IllegalArgumentException("unrecognised type");
 			}
