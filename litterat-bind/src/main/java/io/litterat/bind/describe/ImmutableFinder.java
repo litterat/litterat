@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,13 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import io.litterat.bind.Field;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.Field;
 
 public class ImmutableFinder implements ComponentFinder {
 
@@ -81,7 +82,6 @@ public class ImmutableFinder implements ComponentFinder {
 					identifyArguments(constructor, immutableFields, method, methodType);
 					break;
 				}
-
 			}
 
 			// if byte code analysis failed or if user supplies @Field annotations.
@@ -106,45 +106,18 @@ public class ImmutableFinder implements ComponentFinder {
 				}
 			}
 
-			// Perform node instruction inspection to match constructor arguments with
-			// accessors.
-			for (MethodNode methodNode : classNode.methods) {
+			// Find the matching accessor methods.
+			examineAccessorMethods(clss, immutableFields, classNode);
+			examineAccessorAnnotations(clss, immutableFields, lookup);
 
-				Type methodType = Type.getType(methodNode.desc);
+			Class<?> superClass = clss;
+			while ((superClass = superClass.getSuperclass()) != null) {
+				ClassReader superClassReader = new ClassReader(superClass.getName());
+				ClassNode superClassNode = new ClassNode();
+				superClassReader.accept(superClassNode, 0);
 
-				// Only interested in accessors.
-				if (methodType.getArgumentTypes().length != 0) {
-					continue;
-				}
-
-				// Returns the field name that this accessor is using if it is a simple accessor
-				// type.
-				examineAccessor(clss, immutableFields, methodNode);
-			}
-
-			// Possibly failed to find accessor through invariant byte code analysis.
-			// Fallback on @Field annotation or method name.
-			for (Method method : clss.getDeclaredMethods()) {
-				Field field = method.getAnnotation(Field.class);
-				if (field != null) {
-					// field has been annotated so check for matching field.
-					final String name = field.name();
-					ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
-							.orElse(null);
-					if (component != null && component.getReadMethod() == null) {
-						component.setReadMethod(lookup.unreflect(method));
-						component.setField(field);
-						continue;
-					}
-				}
-
-				String name = method.getName();
-				ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
-						.orElse(null);
-				if (component != null && component.getReadMethod() == null) {
-					component.setReadMethod(lookup.unreflect(method));
-					continue;
-				}
+				examineAccessorMethods(superClass, immutableFields, superClassNode);
+				examineAccessorAnnotations(superClass, immutableFields, lookup);
 			}
 
 			// Fail if we didn't find the right number of parameters.
@@ -179,6 +152,53 @@ public class ImmutableFinder implements ComponentFinder {
 		return argumentTypes;
 	}
 
+	private void examineAccessorMethods(Class<?> clss, List<ComponentInfo> immutableFields, ClassNode classNode)
+			throws NoSuchMethodException, IllegalAccessException, SecurityException {
+		// Perform node instruction inspection to match constructor arguments with
+		// accessors.
+		for (MethodNode methodNode : classNode.methods) {
+
+			Type methodType = Type.getType(methodNode.desc);
+
+			// Only interested in accessors.
+			if (methodType.getArgumentTypes().length != 0) {
+				continue;
+			}
+
+			// Returns the field name that this accessor is using if it is a simple accessor
+			// type.
+			examineAccessor(clss, immutableFields, methodNode);
+		}
+	}
+
+	private void examineAccessorAnnotations(Class<?> clss, List<ComponentInfo> immutableFields, Lookup lookup)
+			throws IllegalAccessException {
+		// Possibly failed to find accessor through invariant byte code analysis.
+		// Fallback on @Field annotation or method name.
+		for (Method method : clss.getDeclaredMethods()) {
+			Field field = method.getAnnotation(Field.class);
+			if (field != null) {
+				// field has been annotated so check for matching field.
+				final String name = field.name();
+				ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
+						.orElse(null);
+				if (component != null && component.getReadMethod() == null) {
+					component.setReadMethod(lookup.unreflect(method));
+					component.setField(field);
+					continue;
+				}
+			}
+
+			String name = method.getName();
+			ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
+					.orElse(null);
+			if (component != null && component.getReadMethod() == null) {
+				component.setReadMethod(lookup.unreflect(method));
+				continue;
+			}
+		}
+	}
+
 	private void checkFieldAnnotation(ComponentInfo info, Class<?> clss, String fieldName) {
 		// Capture field annotation from field if present.
 		try {
@@ -196,16 +216,32 @@ public class ImmutableFinder implements ComponentFinder {
 	}
 
 	/**
-	 * Find all the
+	 * This matches up a constructor arguments with the relevant fields for a class. It requires that
+	 * each argument is not mutated before being assigned to the field. It relies on the fact that the
+	 * instructions required to assign a value to a field uses the following operations:
+	 * 
+	 * <pre>
+	 * ALOAD 0 // Load this object reference. 
+	 * ILOAD x // Load the value for the parameter. 
+	 * PUTFIELD y // Assign the value x to the field y on this object.
+	 * </pre>
+	 * 
+	 * In the case of a class that extends another class it will call the super class. This is a little
+	 * more complex to work out. The constructor of the super class needs to be analysed and matched
+	 * with the parameters it is called with.
 	 *
 	 * @param fieldMap
 	 * @param method
+	 * @throws IOException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws DataBindException
 	 */
 	private int identifyArguments(Constructor<?> constructor, List<ComponentInfo> fields, MethodNode method,
-			Type methodType) {
+			Type methodType) throws IOException, NoSuchMethodException, SecurityException, DataBindException {
 		boolean foundLoadThis = false;
 		boolean foundLoadArg = false;
-		int arg = 0;
+
 		int argsFound = 0;
 
 		// Find param load instruction indexes.
@@ -226,6 +262,8 @@ public class ImmutableFinder implements ComponentFinder {
 		}
 
 		int maxVarLoadInsn = paramCounter;
+
+		List<Integer> args = new ArrayList<>();
 
 		ListIterator<AbstractInsnNode> it = method.instructions.iterator();
 		while (it.hasNext()) {
@@ -254,14 +292,15 @@ public class ImmutableFinder implements ComponentFinder {
 				if (foundLoadThis & varLoadInsn.var > 0 && varLoadInsn.var <= maxVarLoadInsn) {
 					foundLoadArg = true;
 					// map back to the correct argument index.
-					arg = loadIndexToParamMap.get(varLoadInsn.var);
+					args.add(loadIndexToParamMap.get(varLoadInsn.var));
 				}
 				break;
 			case Opcodes.PUTFIELD:
 				FieldInsnNode putFieldInsn = (FieldInsnNode) insn;
-				if (foundLoadThis && foundLoadArg) {
+				if (foundLoadThis && foundLoadArg && args.size() == 1) {
 
 					// Invariance identified, so capture the argument number.
+					int arg = args.get(0);
 					Parameter param = constructor.getParameters()[arg];
 					Class<?> fieldClass = param.getType();
 					ComponentInfo component = new ComponentInfo(putFieldInsn.name, fieldClass);
@@ -279,9 +318,62 @@ public class ImmutableFinder implements ComponentFinder {
 					argsFound++;
 
 				}
+				foundLoadThis = false;
+				foundLoadArg = false;
+				args.clear();
+				break;
+
+			case Opcodes.INVOKESPECIAL:
+				MethodInsnNode superInvoke = (MethodInsnNode) insn;
+				if (foundLoadThis && foundLoadArg && args.size() > 0 && superInvoke.name.equals("<init>")) {
+					List<ComponentInfo> superFields = new ArrayList<>();
+
+					// Get the super class and read the byte code.
+					Class<?> superClass = constructor.getDeclaringClass().getSuperclass();
+					ClassReader cr = new ClassReader(superClass.getName());
+					ClassNode classNode = new ClassNode();
+					cr.accept(classNode, 0);
+
+					// Find the right constructor that matches the calling parameters.
+					Class<?>[] superInitArgs = new Class<?>[args.size()];
+					for (int x = 0; x < args.size(); x++) {
+						int arg = args.get(x);
+						superInitArgs[x] = constructor.getParameters()[arg].getType();
+					}
+
+					Constructor<?> superConstructor = superClass.getConstructor(superInitArgs);
+
+					// Find the byte code for the corresponding initialiser method in the super class.
+					int superArgsFound = 0;
+					for (MethodNode superMethod : classNode.methods) {
+
+						Type superMethodType = Type.getType(superMethod.desc);
+						String constructorDescriptor = Type.getConstructorDescriptor(superConstructor);
+
+						// Find the MethodNode that matches the passed in constructor.
+						if (superMethod.name.equals("<init>") && superMethod.desc.equals(constructorDescriptor)) {
+							superArgsFound = identifyArguments(superConstructor, superFields, superMethod,
+									superMethodType);
+							break;
+
+						}
+					}
+
+					if (superArgsFound != args.size()) {
+						throw new DataBindException(String.format(
+								"Failed to match super fields for class: %s. Add @Field annotations to assist. %s",
+								superClass.getName()));
+					}
+
+					// add found fields to the list.
+					fields.addAll(superFields);
+
+				}
+				// fall through to reset.
 			default:
 				foundLoadThis = false;
 				foundLoadArg = false;
+				args.clear();
 			}
 
 		}

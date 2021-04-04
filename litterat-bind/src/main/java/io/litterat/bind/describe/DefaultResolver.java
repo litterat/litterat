@@ -429,7 +429,8 @@ public class DefaultResolver implements DataBindContextResolver {
 					}
 
 					// Should be unreachable code.
-					throw new DataBindException("Failed to get data descriptor. Failed to find constructor");
+					throw new DataBindException(String.format(
+							"Failed to get data descriptor. Failed to find constructor for %s", targetClass.getName()));
 				}
 
 			} else {
@@ -622,8 +623,25 @@ public class DefaultResolver implements DataBindContextResolver {
 				}
 			}
 
-		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | DataBindException e) {
-			throw new DataBindException("Failed to get data descriptor", e);
+			// Same applies to super classes that are abstract.
+			Class<?> superClass = targetClass;
+			while ((superClass = superClass.getSuperclass()) != null) {
+
+				// An abstract type is a union type.
+				if (Modifier.isAbstract(superClass.getModifiers())) {
+					try {
+						DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(superClass);
+
+						targetUnion.addMemberType(descriptor);
+					} catch (Throwable t) {
+						// ignore.
+					}
+				}
+			}
+
+		} catch (IllegalAccessException | NoSuchMethodException | SecurityException e) {
+			throw new DataBindException(String.format("Failed to get data descriptor for %s", targetClass.getName()),
+					e);
 		}
 
 		return descriptor;

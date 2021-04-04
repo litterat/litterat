@@ -7,8 +7,6 @@ Next steps list. A general list of things that could be done next in no particul
 
  litterat-bind
  - Decide on implementation for embedded atom union (e.g. int | string ).
- - Implement test case for abstract union type.
- - Match constructor parameters to super class parameters.
  - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
@@ -25,6 +23,13 @@ Next steps list. A general list of things that could be done next in no particul
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
+
+## Day 46 - April 4 - Implement AbstractUnion test case
+
+Implemented the abstract union test case. This required implementing the ability for ImmutableFinder to be able to find record parameters in super classes. ImmutableFinder and DefaultResolver are getting a bit unwieldy and could do with a rewrite at some point.
+
+The embedded union is probably the final item worth implementing. The likely implementation will be based on using Object as the Java type which maps to a DataClassUnion in the field. A MethodHandle which checks the type and sets the correct value will need to be generated. The accessor will need to take the first non-null value it finds in the union.
+
 
 ## Day 45 - April 1 - Implement InterfaceUnion test case
 

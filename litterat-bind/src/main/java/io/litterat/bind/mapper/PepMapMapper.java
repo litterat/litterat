@@ -103,7 +103,8 @@ public class PepMapMapper {
 				// Make sure this class is a member of the union before writing it.
 				DataClass unionInstanceClass = context.getDescriptor(object.getClass());
 				if (!unionClass.isMemberType(unionInstanceClass)) {
-					throw new IllegalArgumentException("Class not a member of union type");
+					throw new IllegalArgumentException(
+							String.format("Class '%s' not a member of union type.", object.getClass().getName()));
 				}
 
 				// A union needs to know the type being written so it can be picked up by
