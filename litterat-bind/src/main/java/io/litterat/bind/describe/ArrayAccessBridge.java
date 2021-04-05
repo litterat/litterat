@@ -59,6 +59,8 @@ public class ArrayAccessBridge {
 	}
 
 	private final Class<?> targetClass;
+
+	@SuppressWarnings("unused")
 	private final DataClass arrayDataClass;
 
 	public ArrayAccessBridge(Class<?> targetClass, DataClass arrayDataClass) {

@@ -40,13 +40,11 @@ import io.litterat.bind.DataClassUnion;
  * 
  * <ul>
  * <li>TODO add try/catch/throw around conversions
- * <li>TODO deal with union
- * <li>TODO deal with null values correctly
  * </ul>
  *
  * 
  */
-public class PepArrayMapper {
+public class ArrayMapper {
 
 	private final DataBindContext context;
 
@@ -68,7 +66,7 @@ public class PepArrayMapper {
 		}
 	}
 
-	public PepArrayMapper(DataBindContext context) {
+	public ArrayMapper(DataBindContext context) {
 		this.context = context;
 		this.functionCache = new HashMap<>();
 

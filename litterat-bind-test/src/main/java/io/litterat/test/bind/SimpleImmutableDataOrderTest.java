@@ -25,8 +25,8 @@ import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.mapper.PepArrayMapper;
-import io.litterat.bind.mapper.PepMapMapper;
+import io.litterat.bind.mapper.ArrayMapper;
+import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.bind.data.SimpleImmutableDataOrder;
 
 public class SimpleImmutableDataOrderTest {
@@ -70,7 +70,7 @@ public class SimpleImmutableDataOrderTest {
 	public void testToArray() throws Throwable {
 
 		// project to an array.
-		PepArrayMapper arrayMap = new PepArrayMapper(context);
+		ArrayMapper arrayMap = new ArrayMapper(context);
 
 		// write to array.
 		Object[] values = arrayMap.toArray(test);
@@ -88,7 +88,7 @@ public class SimpleImmutableDataOrderTest {
 
 	@Test
 	public void testToMap() throws Throwable {
-		PepMapMapper mapMapper = new PepMapMapper(context);
+		MapMapper mapMapper = new MapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
 		SimpleImmutableDataOrder object = (SimpleImmutableDataOrder) mapMapper.toObject(SimpleImmutableDataOrder.class,
@@ -104,7 +104,7 @@ public class SimpleImmutableDataOrderTest {
 
 	@Test
 	public void testMapToObjectException() throws Throwable {
-		PepMapMapper mapMapper = new PepMapMapper(context);
+		MapMapper mapMapper = new MapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
 		// corrupting the map by putting an invalid value for x.

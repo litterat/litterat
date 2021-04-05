@@ -23,8 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.mapper.PepArrayMapper;
-import io.litterat.bind.mapper.PepMapMapper;
+import io.litterat.bind.mapper.ArrayMapper;
+import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.bind.data.ImmutableAtom;
 import io.litterat.test.bind.data.SimpleEnum;
 import io.litterat.test.bind.data.UUIDBridge;
@@ -57,7 +57,7 @@ public class ImmutableAtomTest {
 		context.registerAtom(UUID.class, new UUIDBridge());
 
 		// project to an array.
-		PepArrayMapper arrayMap = new PepArrayMapper(context);
+		ArrayMapper arrayMap = new ArrayMapper(context);
 		Object[] values = arrayMap.toArray(test);
 		Assertions.assertNotNull(values);
 
@@ -80,7 +80,7 @@ public class ImmutableAtomTest {
 
 		context.registerAtom(UUID.class, new UUIDBridge());
 
-		PepMapMapper mapMapper = new PepMapMapper(context);
+		MapMapper mapMapper = new MapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
 
 		ImmutableAtom object = (ImmutableAtom) mapMapper.toObject(ImmutableAtom.class, map);

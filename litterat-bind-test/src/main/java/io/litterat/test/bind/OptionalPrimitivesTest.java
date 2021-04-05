@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.mapper.PepArrayMapper;
-import io.litterat.bind.mapper.PepMapMapper;
+import io.litterat.bind.mapper.ArrayMapper;
+import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.bind.data.OptionalPrimitives;
 
 public class OptionalPrimitivesTest {
@@ -74,7 +74,7 @@ public class OptionalPrimitivesTest {
 	public void test1ToArray() throws Throwable {
 
 		// project to an array.
-		PepArrayMapper arrayMap = new PepArrayMapper(context);
+		ArrayMapper arrayMap = new ArrayMapper(context);
 
 		// write to array.
 		Object[] values = arrayMap.toArray(test1);
@@ -93,7 +93,7 @@ public class OptionalPrimitivesTest {
 
 	@Test
 	public void test1ToMap() throws Throwable {
-		PepMapMapper mapMapper = new PepMapMapper(context);
+		MapMapper mapMapper = new MapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test1);
 
 		OptionalPrimitives object = (OptionalPrimitives) mapMapper.toObject(OptionalPrimitives.class, map);
@@ -111,7 +111,7 @@ public class OptionalPrimitivesTest {
 	public void test2ToArray() throws Throwable {
 
 		// project to an array.
-		PepArrayMapper arrayMap = new PepArrayMapper(context);
+		ArrayMapper arrayMap = new ArrayMapper(context);
 
 		// write to array.
 		Object[] values = arrayMap.toArray(test2);
@@ -130,7 +130,7 @@ public class OptionalPrimitivesTest {
 
 	@Test
 	public void test2ToMap() throws Throwable {
-		PepMapMapper mapMapper = new PepMapMapper(context);
+		MapMapper mapMapper = new MapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test2);
 
 		OptionalPrimitives object = (OptionalPrimitives) mapMapper.toObject(OptionalPrimitives.class, map);

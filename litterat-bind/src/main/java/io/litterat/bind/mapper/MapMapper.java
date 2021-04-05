@@ -30,14 +30,15 @@ import io.litterat.bind.DataClassUnion;
 
 /**
  *
- * Sample showing how to use the Pep library to convert an Object to/from Map<String,Object>
- *
+ * Sample showing how to use the library to convert an Object to/from Map<String,Object> Each key in
+ * the returned map has the name of the field. Union types have an extra field called "type" which
+ * provides the class name of the type of value recorded.
  */
-public class PepMapMapper {
+public class MapMapper {
 
 	private final DataBindContext context;
 
-	public PepMapMapper(DataBindContext context) {
+	public MapMapper(DataBindContext context) {
 		this.context = context;
 	}
 
