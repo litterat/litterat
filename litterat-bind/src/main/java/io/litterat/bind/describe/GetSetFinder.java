@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 import io.litterat.bind.Field;
 
@@ -124,6 +125,24 @@ public class GetSetFinder implements ComponentFinder {
 			}
 		});
 
+		// merge any fields already found previously
+		ListIterator<ComponentInfo> iter = getSetList.listIterator();
+		while (iter.hasNext()) {
+			ComponentInfo field = iter.next();
+
+			for (ComponentInfo existingField : fields) {
+				if (field.getName().equalsIgnoreCase(existingField.getName())) {
+
+					// remove from list to add.
+					iter.remove();
+
+					existingField.setWriteMethod(field.getWriteMethod());
+				}
+			}
+
+		}
+
+		// Add any remaining.
 		fields.addAll(getSetList);
 	}
 

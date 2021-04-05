@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -41,6 +41,7 @@ public class ComponentInfo {
 	public ComponentInfo(String name, Class<?> type) {
 		this.name = name;
 		this.type = type;
+		this.constructorArgument = -1;
 	}
 
 	public void setName(String name) {

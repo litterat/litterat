@@ -24,9 +24,14 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
-## Day 47 - April 5 - Complete implementation of isPresent for fields
+## Day 47 - April 5 - Complete implementation of isPresent for fields and primitive optional classes
 
 Completed changing the interaction with fields using isPresent MethodHandle. Found that the XPL code is too reliant on null values and this will require a bigger refactor later. Focus now is to continue to get the bind library correct. 
+
+After adding isPresent, I expected adding support for OptionalInt, OptionalLong and OptionalDouble wouldn't be too difficult. This worked without much trouble for accessing values. The isPresent proxied to the optional value and the accessor proxied correctly to the get method. The problem is on the other side, setting values and constructors. Optional are by design final and can not be mutated, so to some degree having a setter makes little sense and could potentially not be included. However, the constructor relies on a method handle with a parameter for each field. There's no such thing as not setting a primitive value as a parameter in a constructor, so options are either expose these Optional values or use nullable classes such as Integer and convert it to a OptionalInt. This poses a problem that the constructor would use Integer and the accessor would use int. Not a great solution. Unfortunately promoting the values to boxed versions is the best way forward for both accessor and constructor; OptionalInt <-> Integer, etc. This required some detailed MethodHandle work, and is working correctly. Given that these types are not likely to be used that often this seems like a good compromise.
+
+Discovered some issues with mixing getters/setters with immutable constructors where fields are found twice.
+Added additional test cases for OptionalPrimitives to test immutable, pojo and mixed fields.
 
 ## Day 46 - April 4 - Implement AbstractUnion test case
 

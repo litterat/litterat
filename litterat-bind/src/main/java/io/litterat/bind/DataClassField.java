@@ -20,8 +20,28 @@ import java.util.Optional;
 
 /**
  * 
- * This is analogous to the Java reflection RecordComponent class but for Data classes.
- *
+ * This is analogous to the Java reflection RecordComponent of a Record class but for Data classes.
+ * It provides an isPresent method handle, to check if a value is present/non-null. If a value is
+ * present the accessor MethodHandle can be called to return the value. The accessor returns the
+ * value as primitive or class object. If a method to set the value is present a MethodHandle for
+ * setter is available.
+ * 
+ * The field wraps Optional, OptionalInt, OptionalLong, and OptionalDouble so that isPresent will
+ * proxy the call through to the Optional object. Calling the accessor will proxy the call to the
+ * Optional.get call.
+ * 
+ * If the dataClass type is a Record or Atom then toData and toObject methodhandles should be
+ * called. Here's an example from the MapMapper.
+ * 
+ * <pre>
+ * DataClassField field = fields[fieldIndex];
+ * 
+ * if (field.isPresent(data)) {
+ * 	DataClass fieldDataClass = field.dataClass();
+ * 	Object fv = toMap(fieldDataClass, field.get(data));
+ * 	map.put(field.name(), fv);
+ * }
+ * </pre>
  */
 public class DataClassField {
 
