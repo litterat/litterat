@@ -68,15 +68,11 @@ public class PepMapMapper {
 				for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
 					DataClassField field = fields[fieldIndex];
 
-					Object fv = field.accessor().invoke(data);
-
-					// Recursively convert object to map.
-					if (fv != null) {
+					if (field.isPresent(data)) {
 						DataClass fieldDataClass = field.dataClass();
-						fv = toMap(fieldDataClass, fv);
+						Object fv = toMap(fieldDataClass, field.get(data));
+						map.put(field.name(), fv);
 					}
-
-					map.put(field.name(), fv);
 				}
 
 				v = map;

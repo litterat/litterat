@@ -119,30 +119,63 @@ public class ModelBinder {
 
 	}
 
-	public static MethodHandle resolveFieldGetter(DataClassRecord dataClass, String field) throws DataBindException {
+	public static MethodHandle resolveFieldGetter(DataClassRecord dataClass, String fieldName)
+			throws DataBindException {
 
-		for (DataClassField component : dataClass.fields()) {
-			if (component.name().equalsIgnoreCase(field)) {
+		for (DataClassField dataField : dataClass.fields()) {
+			if (dataField.name().equalsIgnoreCase(fieldName)) {
 
+				MethodHandle toData = null;
 				// Pass the accessor through the toData handle to get the correct data type.
 				// toData will be identity function if no change required.
-				DataClass componentClass = component.dataClass();
+				DataClass componentClass = dataField.dataClass();
 				if (componentClass instanceof DataClassAtom) {
-					MethodHandle toData = ((DataClassAtom) componentClass).toData();
+					DataClassAtom dataClassAtom = (DataClassAtom) componentClass;
 
-					return MethodHandles.filterArguments(toData, 0, component.accessor());
+					toData = MethodHandles.filterArguments(dataClassAtom.toData(), 0, dataField.accessor());
+
+					if (!dataClassAtom.dataClass().isPrimitive()) {
+						toData = checkIsPresent(dataClass, dataField, toData, dataClassAtom.dataClass());
+					}
+
 				} else if (componentClass instanceof DataClassRecord) {
-					MethodHandle toData = ((DataClassRecord) componentClass).toData();
 
-					return MethodHandles.filterArguments(toData, 0, component.accessor());
+					DataClassRecord dataClassRecord = (DataClassRecord) componentClass;
+
+					MethodHandle fieldToData = dataClassRecord.toData();
+
+					toData = MethodHandles.filterArguments(fieldToData, 0, dataField.accessor());
+
+					if (!dataClassRecord.dataClass().isPrimitive()) {
+						toData = checkIsPresent(dataClass, dataField, toData, dataClassRecord.dataClass());
+					}
+
 				} else {
-					return component.accessor();
+					toData = dataField.accessor();
 				}
+
+				return toData;
+
 			}
 		}
 
 		throw new DataBindException(
-				String.format("Field '%s' not found in dataClass '%s'", field, dataClass.dataClass().getName()));
+				String.format("Field '%s' not found in dataClass '%s'", fieldName, dataClass.dataClass().getName()));
+	}
+
+	// If the value is primitive don't wrap it in guard with test. This is mainly because
+	// MethodHandles.constant will throw a NPE for primitives. Also relates to a bigger issue
+	// of design of XPL passing nulls around which will need to be refactored to remove.
+	// TODO refactor so that design of interpreter doesn't need to pass around nulls.
+	private static MethodHandle checkIsPresent(DataClassRecord dataClass, DataClassField dataField, MethodHandle toData,
+			Class<?> fieldDataClass) {
+		// Check for is a value is present prior to reading.
+		MethodHandle isPresent = dataField.isPresent();
+
+		MethodHandle returnNull = MethodHandles.constant(fieldDataClass, null);
+		returnNull = MethodHandles.dropArguments(returnNull, 0, dataClass.typeClass());
+
+		return MethodHandles.guardWithTest(isPresent, toData, returnNull);
 	}
 
 	public static MethodHandle resolveFieldSetter(DataClassRecord dataClass, String field) throws DataBindException {

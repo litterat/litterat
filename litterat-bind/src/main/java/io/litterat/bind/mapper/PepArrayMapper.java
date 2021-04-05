@@ -334,7 +334,9 @@ public class PepArrayMapper {
 	}
 
 	/**
-	 * Create the getters
+	 * Creates a MethodHandle which converts a Record value into an Object[]. It accepts an empty
+	 * object[] and the record object, and for each field check if a value is present and if available,
+	 * calls the accessor and sets the field.
 	 *
 	 * @param fields
 	 * @return
@@ -365,23 +367,37 @@ public class PepArrayMapper {
 
 			DataClass fieldDataClass = field.dataClass();
 
-			// (object) -> (Object) object.getter()
+			// (<targettype>):<fieldtype> -> (Object) object.getter()
 			MethodHandle fieldBox = field.accessor();
-
-			// TODO needs to deal with null here.
 
 			if (field.dataClass().typeClass() == dataClass.typeClass()) {
 				throw new IllegalArgumentException("Recursive structures not yet supported for array mapper");
 			}
 
+			// (<targettype>):<fieldtype> -> toData( object.getter() );
 			fieldBox = MethodHandles.collectArguments(createToDataFunction(fieldDataClass), 0, fieldBox)
 					.asType(MethodType.methodType(Object.class, dataClass.dataClass()));
 
-			// (value[],object) -> value[inputIndex] = object.getter()
+			// (value[],object):void -> value[inputIndex] = toData( object.getter() )
 			MethodHandle arrayValueSetter = MethodHandles.collectArguments(arrayIndexSetter, 1, fieldBox);
 
+			// (object):boolean -> object.isPresent(object);
+			MethodHandle isPresent = field.isPresent();
+
+			// (value[],object):boolean -> object.isPresent(object);
+			MethodHandle isPresentTest = MethodHandles.dropArguments(isPresent, 0, Object[].class);
+
+			// ():void -> void;
+			MethodHandle noop = MethodHandles.constant(Void.class, null).asType(MethodType.methodType(void.class));
+
+			// (value[],object):void -> void;
+			MethodHandle noopElse = MethodHandles.dropArguments(noop, 0, Object[].class, dataClass.dataClass());
+
+			// (value[],object):void -> if(isPresent(object)) { value[inputIndex] = toData( object.getter() ) }
+			MethodHandle checkAndSet = MethodHandles.guardWithTest(isPresentTest, arrayValueSetter, noopElse);
+
 			// add to list of getters.
-			result = MethodHandles.foldArguments(result, arrayValueSetter);
+			result = MethodHandles.foldArguments(result, checkAndSet);
 
 		}
 

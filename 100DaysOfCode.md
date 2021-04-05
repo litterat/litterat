@@ -24,12 +24,52 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
+## Day 47 - April 5 - Complete implementation of isPresent for fields
+
+Completed changing the interaction with fields using isPresent MethodHandle. Found that the XPL code is too reliant on null values and this will require a bigger refactor later. Focus now is to continue to get the bind library correct. 
+
 ## Day 46 - April 4 - Implement AbstractUnion test case
 
 Implemented the abstract union test case. This required implementing the ability for ImmutableFinder to be able to find record parameters in super classes. ImmutableFinder and DefaultResolver are getting a bit unwieldy and could do with a rewrite at some point.
 
 The embedded union is probably the final item worth implementing. The likely implementation will be based on using Object as the Java type which maps to a DataClassUnion in the field. A MethodHandle which checks the type and sets the correct value will need to be generated. The accessor will need to take the first non-null value it finds in the union.
 
+Found another interesting edge case with the behaviour of OptionalInt, OptionalLong and OptionalDouble. These correctly avoid autoboxing and don't support orElse(null) or ofNullable(Integer). Optional is currently being treated as a nullable field while accessing/setting the value and MethodHandles are used to wrap/unwrap the value. However, this doesn't work with OptionalInt etc as boxing values to Integer would be required. One possiblity is to provide an isPresent or required/optional on every record field. This would change the way serialization needs to interact with all fields. The existing Mapper looks as follows:
+
+```java
+DataClassField[] fields = dataRecord.fields();
+for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+	DataClassField field = fields[fieldIndex];
+
+	Object fv = field.accessor().invoke(data);
+
+	// Recursively convert object to map.
+	if (fv != null) {
+		DataClass fieldDataClass = field.dataClass();
+		fv = toMap(fieldDataClass, fv);
+		map.put(field.name(), fv);
+	}
+
+	
+}
+```
+
+This could be potentially changed to:
+
+```java
+DataClassField[] fields = dataRecord.fields();
+for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+	DataClassField field = fields[fieldIndex];
+
+    if (field.isPresent(data)) {
+		DataClass fieldDataClass = field.dataClass();
+		Object fv = toMap(fieldDataClass, field.get(data));
+		map.put(field.name(), fv);
+    }
+}
+```
+
+By removing the null check it means that the field is likely accessed twice for null fields. In the above case the boxing to Integer would still occur, but only in the client library. The isPresent could also be optimised to return true for primitive types.
 
 ## Day 45 - April 1 - Implement InterfaceUnion test case
 

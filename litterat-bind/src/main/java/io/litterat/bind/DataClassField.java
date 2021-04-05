@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,18 +36,21 @@ public class DataClassField {
 
 	private final DataClass dataClass;
 
+	private final MethodHandle isPresent;
+
 	// accessor read handle. signature: type t = object.getT();
 	private final MethodHandle accessor;
 
 	// setter write handle. signature object.setT( type t);
 	private final Optional<MethodHandle> setter;
 
-	public DataClassField(int index, String name, Class<?> type, DataClass dataClass, MethodHandle readHandle,
-			MethodHandle setter) {
+	public DataClassField(int index, String name, Class<?> type, DataClass dataClass, MethodHandle isPresent,
+			MethodHandle readHandle, MethodHandle setter) {
 		this.index = index;
 		this.name = name;
 		this.type = type;
 		this.dataClass = dataClass;
+		this.isPresent = isPresent;
 		this.accessor = readHandle;
 		this.setter = Optional.ofNullable(setter);
 	}
@@ -68,11 +71,39 @@ public class DataClassField {
 		return dataClass;
 	}
 
+	public MethodHandle isPresent() {
+		return isPresent;
+	}
+
+	public boolean isPresent(Object record) {
+		try {
+			return (boolean) isPresent.invoke(record);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public MethodHandle accessor() {
 		return accessor;
 	}
 
+	public Object get(Object record) {
+		try {
+			return accessor.invoke(record);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public Optional<MethodHandle> setter() {
 		return setter;
+	}
+
+	public void set(Object record, Object value) {
+		try {
+			setter.get().invoke(record, value);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

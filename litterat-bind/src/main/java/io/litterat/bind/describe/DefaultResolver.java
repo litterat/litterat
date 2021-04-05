@@ -18,6 +18,7 @@ package io.litterat.bind.describe;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -33,6 +34,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -544,27 +546,30 @@ public class DefaultResolver implements DataBindContextResolver {
 									.asType(MethodType.methodType(info.getType(), bridgeDataClass));
 						}
 
-						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, accessor, setter);
+						MethodHandle isPresent = MethodHandles.publicLookup()
+								.findStatic(Objects.class, "nonNull",
+										MethodType.methodType(boolean.class, Object.class))
+								.asType(MethodType.methodType(boolean.class, bridgeDataClass));
+
+						isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
+
+						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, isPresent,
+								accessor, setter);
 					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
 						Class<?> optionalType = (Class<?>) info.getParamType().getActualTypeArguments()[0];
 
 						DataClass dataClass = context.getDescriptor(optionalType);
 
-						@SuppressWarnings("rawtypes")
-						OptionalBridge bridge = new OptionalBridge();
+						Lookup lookup = MethodHandles.publicLookup();
 
-						// bridge.toObject(optionalType):Optional
-						MethodHandle optionalToObject = MethodHandles.lookup()
-								.findVirtual(OptionalBridge.class, TOOBJECT_METHOD,
-										MethodType.methodType(Optional.class, Object.class))
-								.bindTo(bridge).asType(MethodType.methodType(Optional.class, optionalType));
+						// Optional.ofNullable(value);
+						MethodHandle optionalToObject = lookup.findStatic(Optional.class, "ofNullable",
+								MethodType.methodType(Optional.class, Object.class));
 
-						// bridge.toData(Optional):optionalType
-						MethodHandle optionalToData = MethodHandles.lookup()
-								.findVirtual(OptionalBridge.class, TODATA_METHOD,
-										MethodType.methodType(Object.class, Optional.class))
-								.bindTo(bridge).asType(MethodType.methodType(optionalType, Optional.class));
+						// (value, elseValue ) -> value.orElse(elseValue);
+						MethodHandle optionalToData = lookup.findVirtual(Optional.class, "get",
+								MethodType.methodType(Object.class));
 
 						// bridge.toData( targetClass.getOptional() ): optionalType
 						MethodHandle optionalObject = MethodHandles.collectArguments(optionalToData, 0, accessor)
@@ -575,16 +580,38 @@ public class DefaultResolver implements DataBindContextResolver {
 									.asType(MethodType.methodType(optionalType, Optional.class));
 						}
 
+						// (optional) -> optional.isPresent();
+						MethodHandle isPresent = lookup.findVirtual(Optional.class, "isPresent",
+								MethodType.methodType(boolean.class));
+
+						isPresent = MethodHandles.collectArguments(isPresent, 0, accessor)
+								.asType(MethodType.methodType(boolean.class, targetClass));
+
 						// TODO the constructor parameter will need to pass through the bridge.
-						component = new DataClassField(x, info.getName(), optionalType, dataClass, optionalObject,
-								setter);
+						component = new DataClassField(x, info.getName(), optionalType, dataClass, isPresent,
+								optionalObject, setter);
 
 					} else {
 
 						DataClass dataClass = context.getDescriptor(info.getType(),
 								(info.getParamType() != null ? info.getParamType() : info.getType()));
 
-						component = new DataClassField(x, info.getName(), info.getType(), dataClass, accessor, setter);
+						MethodHandle isPresent = null;
+						if (info.getType().isPrimitive()) {
+							isPresent = MethodHandles.constant(boolean.class, true);
+
+							isPresent = MethodHandles.dropArguments(isPresent, 0, targetClass);
+						} else {
+							isPresent = MethodHandles.publicLookup()
+									.findStatic(Objects.class, "nonNull",
+											MethodType.methodType(boolean.class, Object.class))
+									.asType(MethodType.methodType(boolean.class, info.getType()));
+
+							isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
+						}
+
+						component = new DataClassField(x, info.getName(), info.getType(), dataClass, isPresent,
+								accessor, setter);
 					}
 					dataComponents[x] = component;
 				}
@@ -877,21 +904,18 @@ public class DefaultResolver implements DataBindContextResolver {
 					arrayIndexGetter = MethodHandles.collectArguments(bridgeToObject, 0, arrayIndexGetter);
 
 				} else if (field.getType() == Optional.class && field.getParamType() != null) {
-					// TODO this is a hack to get Optional to work. Needs more work.
-					Class<?> optionalType = (Class<?>) field.getParamType().getActualTypeArguments()[0];
 
-					@SuppressWarnings("rawtypes")
-					OptionalBridge bridge = new OptionalBridge();
+					Class<?> optionalType = (Class<?>) field.getParamType().getActualTypeArguments()[0];
 
 					// (values[]) -> values[inputIndex]:optionalType
 					arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index)
 							.asType(MethodType.methodType(optionalType, Object[].class));
 
-					// bridge.toObject(optionalType):Optional
-					MethodHandle optionalToObject = MethodHandles.lookup()
-							.findVirtual(OptionalBridge.class, TOOBJECT_METHOD,
+					// (value) -> Optional.ofNullable(value);
+					MethodHandle optionalToObject = MethodHandles.publicLookup()
+							.findStatic(Optional.class, "ofNullable",
 									MethodType.methodType(Optional.class, Object.class))
-							.bindTo(bridge).asType(MethodType.methodType(Optional.class, optionalType));
+							.asType(MethodType.methodType(Optional.class, optionalType));
 
 					// (values[]) -> bridge.toObject( values[inputIndex] ):Optional
 					arrayIndexGetter = MethodHandles.collectArguments(optionalToObject, 0, arrayIndexGetter);
