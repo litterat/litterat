@@ -57,6 +57,7 @@ public class OptionalImmutableTest {
 		DataClassField field = fields[0];
 		Assertions.assertEquals("optionalString", field.name());
 		Assertions.assertEquals(String.class, field.type());
+		Assertions.assertEquals(false, field.isRequired());
 
 	}
 

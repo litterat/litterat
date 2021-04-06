@@ -56,6 +56,9 @@ public class DataClassField {
 
 	private final DataClass dataClass;
 
+	// Is the field required to be set.
+	private final boolean isRequired;
+
 	private final MethodHandle isPresent;
 
 	// accessor read handle. signature: type t = object.getT();
@@ -64,12 +67,13 @@ public class DataClassField {
 	// setter write handle. signature object.setT( type t);
 	private final Optional<MethodHandle> setter;
 
-	public DataClassField(int index, String name, Class<?> type, DataClass dataClass, MethodHandle isPresent,
-			MethodHandle readHandle, MethodHandle setter) {
+	public DataClassField(int index, String name, Class<?> type, DataClass dataClass, boolean isRequired,
+			MethodHandle isPresent, MethodHandle readHandle, MethodHandle setter) {
 		this.index = index;
 		this.name = name;
 		this.type = type;
 		this.dataClass = dataClass;
+		this.isRequired = isRequired;
 		this.isPresent = isPresent;
 		this.accessor = readHandle;
 		this.setter = Optional.ofNullable(setter);
@@ -89,6 +93,17 @@ public class DataClassField {
 
 	public DataClass dataClass() {
 		return dataClass;
+	}
+
+	/**
+	 * A field is required automatically for primitive classes. For Nullable classes the Field
+	 * annotation can be used to set the field to be required. Optional fields are by definition
+	 * optional.
+	 * 
+	 * @return true if field is required to be set with a value.
+	 */
+	public boolean isRequired() {
+		return isRequired;
 	}
 
 	public MethodHandle isPresent() {

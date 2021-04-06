@@ -60,14 +60,17 @@ public class OptionalPrimitivesTest {
 		DataClassField intField = fields[0];
 		Assertions.assertEquals("optionalInt", intField.name());
 		Assertions.assertEquals(Integer.class, intField.type());
+		Assertions.assertEquals(false, intField.isRequired());
 
 		DataClassField longField = fields[1];
 		Assertions.assertEquals("optionalLong", longField.name());
 		Assertions.assertEquals(Long.class, longField.type());
+		Assertions.assertEquals(false, longField.isRequired());
 
 		DataClassField doubleField = fields[2];
 		Assertions.assertEquals("optionalDouble", doubleField.name());
 		Assertions.assertEquals(Double.class, doubleField.type());
+		Assertions.assertEquals(false, doubleField.isRequired());
 	}
 
 	@Test

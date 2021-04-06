@@ -49,6 +49,7 @@ public class UnmodifiableLinkedListTest {
 		DataClassField fieldList = fields[0];
 		Assertions.assertEquals("list", fieldList.name());
 		Assertions.assertEquals(String[].class, fieldList.type());
+		Assertions.assertEquals(false, fieldList.isRequired());
 
 	}
 

@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.bind.data.IntAtom;
@@ -36,6 +38,19 @@ public class IntAtomTest {
 	@BeforeEach
 	public void setup() {
 		context = DataBindContext.builder().build();
+	}
+
+	@Test
+	public void testDescriptor() throws Throwable {
+		DataClass descriptor = context.getDescriptor(IntAtom.class);
+
+		Assertions.assertNotNull(descriptor);
+		Assertions.assertTrue(descriptor instanceof DataClassAtom);
+
+		DataClassAtom descriptorAtom = (DataClassAtom) descriptor;
+
+		Assertions.assertEquals(IntAtom.class, descriptorAtom.typeClass());
+		Assertions.assertEquals(int.class, descriptorAtom.dataClass());
 	}
 
 	@Test

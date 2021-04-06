@@ -64,14 +64,17 @@ public class MixedImmutableTest {
 		DataClassField fieldX = fields[0];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
+		Assertions.assertEquals(true, fieldX.isRequired());
 
 		DataClassField fieldY = fields[1];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
+		Assertions.assertEquals(true, fieldY.isRequired());
 
 		DataClassField fieldLoc = fields[2];
 		Assertions.assertEquals("location", fieldLoc.name());
 		Assertions.assertEquals(String.class, fieldLoc.type());
+		Assertions.assertEquals(false, fieldLoc.isRequired());
 	}
 
 	@Test

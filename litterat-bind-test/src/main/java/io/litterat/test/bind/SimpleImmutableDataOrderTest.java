@@ -59,10 +59,12 @@ public class SimpleImmutableDataOrderTest {
 		DataClassField fieldY = fields[0];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
+		Assertions.assertEquals(true, fieldY.isRequired());
 
 		DataClassField fieldX = fields[1];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
+		Assertions.assertEquals(true, fieldX.isRequired());
 
 	}
 

@@ -59,7 +59,7 @@ public class PrimitiveArrayTest {
 		DataClassField field = fields[0];
 		Assertions.assertEquals("intArray", field.name());
 		Assertions.assertEquals(int[].class, field.type());
-
+		Assertions.assertEquals(false, field.isRequired());
 	}
 
 	@Test

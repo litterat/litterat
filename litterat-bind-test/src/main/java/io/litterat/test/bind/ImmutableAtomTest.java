@@ -23,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.bind.data.ImmutableAtom;
@@ -49,6 +51,15 @@ public class ImmutableAtomTest {
 	public void checkDescriptor() throws Throwable {
 		context.registerAtom(UUID.class, new UUIDBridge());
 
+		DataClass descriptor = context.getDescriptor(UUID.class);
+
+		Assertions.assertNotNull(descriptor);
+		Assertions.assertTrue(descriptor instanceof DataClassAtom);
+
+		DataClassAtom descriptorAtom = (DataClassAtom) descriptor;
+
+		Assertions.assertEquals(UUID.class, descriptorAtom.typeClass());
+		Assertions.assertEquals(String.class, descriptorAtom.dataClass());
 	}
 
 	@Test

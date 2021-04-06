@@ -60,10 +60,13 @@ public class ProjectImmutableTest {
 		DataClassField fieldX = fields[0];
 		Assertions.assertEquals("a", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
+		Assertions.assertEquals(true, fieldX.isRequired());
 
 		DataClassField fieldY = fields[1];
 		Assertions.assertEquals("b", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
+		Assertions.assertEquals(true, fieldY.isRequired());
+
 	}
 
 	@Test

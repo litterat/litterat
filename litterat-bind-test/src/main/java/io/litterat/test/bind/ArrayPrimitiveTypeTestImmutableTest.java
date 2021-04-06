@@ -76,70 +76,87 @@ public class ArrayPrimitiveTypeTestImmutableTest {
 		DataClassField fieldPBoolean = fields[0];
 		Assertions.assertEquals("pBoolean", fieldPBoolean.name());
 		Assertions.assertEquals(boolean[].class, fieldPBoolean.type());
+		Assertions.assertEquals(false, fieldPBoolean.isRequired());
 
 		DataClassField fieldOBoolean = fields[1];
 		Assertions.assertEquals("oBoolean", fieldOBoolean.name());
 		Assertions.assertEquals(Boolean[].class, fieldOBoolean.type());
+		Assertions.assertEquals(false, fieldOBoolean.isRequired());
 
 		DataClassField fieldPByte = fields[2];
 		Assertions.assertEquals("pByte", fieldPByte.name());
 		Assertions.assertEquals(byte[].class, fieldPByte.type());
+		Assertions.assertEquals(false, fieldPByte.isRequired());
 
 		DataClassField fieldOByte = fields[3];
 		Assertions.assertEquals("oByte", fieldOByte.name());
 		Assertions.assertEquals(Byte[].class, fieldOByte.type());
+		Assertions.assertEquals(false, fieldOByte.isRequired());
 
 		DataClassField fieldPChar = fields[4];
 		Assertions.assertEquals("pChar", fieldPChar.name());
 		Assertions.assertEquals(char[].class, fieldPChar.type());
+		Assertions.assertEquals(false, fieldPChar.isRequired());
 
 		DataClassField fieldOChar = fields[5];
 		Assertions.assertEquals("oChar", fieldOChar.name());
 		Assertions.assertEquals(Character[].class, fieldOChar.type());
+		Assertions.assertEquals(false, fieldOChar.isRequired());
 
 		DataClassField fieldPShort = fields[6];
 		Assertions.assertEquals("pShort", fieldPShort.name());
 		Assertions.assertEquals(short[].class, fieldPShort.type());
+		Assertions.assertEquals(false, fieldPShort.isRequired());
 
 		DataClassField fieldOShort = fields[7];
 		Assertions.assertEquals("oShort", fieldOShort.name());
 		Assertions.assertEquals(Short[].class, fieldOShort.type());
+		Assertions.assertEquals(false, fieldOShort.isRequired());
 
 		DataClassField fieldPInteger = fields[8];
 		Assertions.assertEquals("pInteger", fieldPInteger.name());
 		Assertions.assertEquals(int[].class, fieldPInteger.type());
+		Assertions.assertEquals(false, fieldPInteger.isRequired());
 
 		DataClassField fieldOInteger = fields[9];
 		Assertions.assertEquals("oInteger", fieldOInteger.name());
 		Assertions.assertEquals(Integer[].class, fieldOInteger.type());
+		Assertions.assertEquals(false, fieldOInteger.isRequired());
 
 		DataClassField fieldPLong = fields[10];
 		Assertions.assertEquals("pLong", fieldPLong.name());
 		Assertions.assertEquals(long[].class, fieldPLong.type());
+		Assertions.assertEquals(false, fieldPLong.isRequired());
 
 		DataClassField fieldOLong = fields[11];
 		Assertions.assertEquals("oLong", fieldOLong.name());
 		Assertions.assertEquals(Long[].class, fieldOLong.type());
+		Assertions.assertEquals(false, fieldOLong.isRequired());
 
 		DataClassField fieldPFloat = fields[12];
 		Assertions.assertEquals("pFloat", fieldPFloat.name());
 		Assertions.assertEquals(float[].class, fieldPFloat.type());
+		Assertions.assertEquals(false, fieldPFloat.isRequired());
 
 		DataClassField fieldOFloat = fields[13];
 		Assertions.assertEquals("oFloat", fieldOFloat.name());
 		Assertions.assertEquals(Float[].class, fieldOFloat.type());
+		Assertions.assertEquals(false, fieldOFloat.isRequired());
 
 		DataClassField fieldPDouble = fields[14];
 		Assertions.assertEquals("pDouble", fieldPDouble.name());
 		Assertions.assertEquals(double[].class, fieldPDouble.type());
+		Assertions.assertEquals(false, fieldPDouble.isRequired());
 
 		DataClassField fieldODouble = fields[15];
 		Assertions.assertEquals("oDouble", fieldODouble.name());
 		Assertions.assertEquals(Double[].class, fieldODouble.type());
+		Assertions.assertEquals(false, fieldODouble.isRequired());
 
 		DataClassField fieldString = fields[16];
 		Assertions.assertEquals("string", fieldString.name());
 		Assertions.assertEquals(String[].class, fieldString.type());
+		Assertions.assertEquals(false, fieldString.isRequired());
 
 	}
 

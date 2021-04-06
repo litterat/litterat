@@ -59,6 +59,7 @@ public class AtomicDateImmutableTest {
 		DataClassField fieldDate = fields[0];
 		Assertions.assertEquals("date", fieldDate.name());
 		Assertions.assertEquals(Date.class, fieldDate.type());
+		Assertions.assertEquals(false, fieldDate.isRequired());
 
 	}
 

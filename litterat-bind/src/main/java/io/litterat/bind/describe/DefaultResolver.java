@@ -481,6 +481,12 @@ public class DefaultResolver implements DataBindContextResolver {
 
 					// Will probably need a more generic way of handling paramterized types.
 					Field fieldAnnotation = info.getField();
+
+					boolean isRequired = false;
+					if (fieldAnnotation != null) {
+						isRequired = fieldAnnotation.required();
+					}
+
 					if (fieldAnnotation != null && fieldAnnotation.bridge() != null
 							&& fieldAnnotation.bridge() != IdentityBridge.class) {
 
@@ -549,6 +555,8 @@ public class DefaultResolver implements DataBindContextResolver {
 									.asType(MethodType.methodType(info.getType(), bridgeDataClass));
 						}
 
+						// Use Objects.nonNull(accessor()) to check if value is present.
+						// Probably not hugely efficient.
 						MethodHandle isPresent = MethodHandles.publicLookup()
 								.findStatic(Objects.class, "nonNull",
 										MethodType.methodType(boolean.class, Object.class))
@@ -556,8 +564,8 @@ public class DefaultResolver implements DataBindContextResolver {
 
 						isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
 
-						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, isPresent,
-								accessor, setter);
+						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, isRequired,
+								isPresent, accessor, setter);
 					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
 						Class<?> optionalType = (Class<?>) info.getParamType().getActualTypeArguments()[0];
@@ -590,9 +598,12 @@ public class DefaultResolver implements DataBindContextResolver {
 						isPresent = MethodHandles.collectArguments(isPresent, 0, accessor)
 								.asType(MethodType.methodType(boolean.class, targetClass));
 
+						// By definition optional is not required.
+						isRequired = false;
+
 						// TODO the constructor parameter will need to pass through the bridge.
-						component = new DataClassField(x, info.getName(), optionalType, dataClass, isPresent,
-								optionalObject, setter);
+						component = new DataClassField(x, info.getName(), optionalType, dataClass, isRequired,
+								isPresent, optionalObject, setter);
 
 					} else if (info.getType() == OptionalInt.class
 							|| info.getType() == OptionalLong.class | info.getType() == OptionalDouble.class) {
@@ -667,6 +678,9 @@ public class DefaultResolver implements DataBindContextResolver {
 
 						}
 
+						// Optional values by definition are not required.
+						isRequired = false;
+
 						// (optional) -> optional.isPresent();
 						MethodHandle isPresent = lookup.findVirtual(optionalClass, "isPresent",
 								MethodType.methodType(boolean.class));
@@ -674,14 +688,19 @@ public class DefaultResolver implements DataBindContextResolver {
 						isPresent = MethodHandles.collectArguments(isPresent, 0, accessor)
 								.asType(MethodType.methodType(boolean.class, targetClass));
 
-						component = new DataClassField(x, info.getName(), optionalNullableType, dataClass, isPresent,
-								fieldAccessor, setter);
+						component = new DataClassField(x, info.getName(), optionalNullableType, dataClass, isRequired,
+								isPresent, fieldAccessor, setter);
 
 					} else {
 
 						DataClass dataClass = context.getDescriptor(info.getType(),
 								(info.getParamType() != null ? info.getParamType() : info.getType()));
 
+						if (dataClass.typeClass().isPrimitive()) {
+							isRequired = true;
+						}
+
+						// Make isPresent return true for primitives/isRequired or call Objects.nonNull(value)
 						MethodHandle isPresent = null;
 						if (info.getType().isPrimitive()) {
 							isPresent = MethodHandles.constant(boolean.class, true);
@@ -696,8 +715,8 @@ public class DefaultResolver implements DataBindContextResolver {
 							isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
 						}
 
-						component = new DataClassField(x, info.getName(), info.getType(), dataClass, isPresent,
-								accessor, setter);
+						component = new DataClassField(x, info.getName(), info.getType(), dataClass, isRequired,
+								isPresent, accessor, setter);
 					}
 					dataComponents[x] = component;
 				}
@@ -1063,7 +1082,7 @@ public class DefaultResolver implements DataBindContextResolver {
 
 			bridgeToObject = bridgeToObject.asType(bridgeToObject.type().changeReturnType(field.getType()));
 
-			// (values[]) -> bridge.toObject( (bridgeData) values[inputIndex] ):bridgeObject
+			// (values[]):bridgeType -> bridge.toObject( (bridgeData) values[inputIndex] ):bridgeObject
 			arrayIndexGetter = MethodHandles.collectArguments(bridgeToObject, 0, arrayIndexGetter);
 
 		} else if (field.getType() == Optional.class && field.getParamType() != null) {
@@ -1079,7 +1098,7 @@ public class DefaultResolver implements DataBindContextResolver {
 					.findStatic(Optional.class, "ofNullable", MethodType.methodType(Optional.class, Object.class))
 					.asType(MethodType.methodType(Optional.class, optionalType));
 
-			// (values[]) -> bridge.toObject( values[inputIndex] ):Optional
+			// (values[]):Optional<fieldType> -> bridge.toObject( values[inputIndex] ):Optional
 			arrayIndexGetter = MethodHandles.collectArguments(optionalToObject, 0, arrayIndexGetter);
 			// .asType(MethodType.methodType(field.getType(), Object[].class));
 		} else if (field.getType() == OptionalInt.class
@@ -1147,7 +1166,7 @@ public class DefaultResolver implements DataBindContextResolver {
 			arrayIndexGetter = MethodHandles.guardWithTest(checkNonNull, optionalIntOf, optionalIntEmpty);
 
 		} else {
-			// (values[]) -> values[inputIndex]
+			// (values[]):fieldType -> values[inputIndex]
 			arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index)
 					.asType(MethodType.methodType(field.getType(), Object[].class));
 		}

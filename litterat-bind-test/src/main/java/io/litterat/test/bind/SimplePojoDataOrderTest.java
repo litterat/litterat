@@ -67,18 +67,22 @@ public class SimplePojoDataOrderTest {
 		DataClassField fieldX = fields[0];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
+		Assertions.assertEquals(true, fieldX.isRequired());
 
 		DataClassField fieldZ = fields[1];
 		Assertions.assertEquals("z", fieldZ.name());
 		Assertions.assertEquals(int.class, fieldZ.type());
+		Assertions.assertEquals(true, fieldZ.isRequired());
 
 		DataClassField fieldY = fields[2];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
+		Assertions.assertEquals(true, fieldY.isRequired());
 
 		DataClassField fieldA = fields[3];
 		Assertions.assertEquals("a", fieldA.name());
 		Assertions.assertEquals(int.class, fieldA.type());
+		Assertions.assertEquals(true, fieldA.isRequired());
 
 	}
 

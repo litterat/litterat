@@ -49,7 +49,7 @@ public class ListOfStringTest {
 		DataClassField fieldList = fields[0];
 		Assertions.assertEquals("list", fieldList.name());
 		Assertions.assertEquals(List.class, fieldList.type());
-
+		Assertions.assertEquals(false, fieldList.isRequired());
 	}
 
 	@Test

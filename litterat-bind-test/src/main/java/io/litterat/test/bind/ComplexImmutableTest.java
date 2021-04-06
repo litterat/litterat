@@ -59,10 +59,13 @@ public class ComplexImmutableTest {
 		DataClassField fieldX = fields[0];
 		Assertions.assertEquals("x", fieldX.name());
 		Assertions.assertEquals(int.class, fieldX.type());
+		Assertions.assertEquals(true, fieldX.isRequired());
 
 		DataClassField fieldY = fields[1];
 		Assertions.assertEquals("y", fieldY.name());
 		Assertions.assertEquals(int.class, fieldY.type());
+		Assertions.assertEquals(true, fieldY.isRequired());
+
 	}
 
 	@Test
