@@ -16,6 +16,7 @@ package io.litterat.bind.describe;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.ParameterizedType;
 
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.Field;
 
 /**
@@ -52,7 +53,9 @@ public class ComponentInfo {
 		return name;
 	}
 
-	public void setField(Field field) {
+	public void setField(Field field) throws DataBindException {
+		if (this.field != null && this.field != field)
+			throw new DataBindException(String.format("Field '%s' already has Field annotation", this.name));
 		this.field = field;
 	}
 

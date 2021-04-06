@@ -28,13 +28,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.Field;
 
 public class GetSetFinder implements ComponentFinder {
 
 	@Override
 	public void findComponents(Class<?> clss, Constructor<?> constructor, List<ComponentInfo> fields)
-			throws SecurityException {
+			throws SecurityException, DataBindException {
 
 		List<ComponentInfo> getSetList = new ArrayList<>();
 
@@ -46,14 +47,13 @@ public class GetSetFinder implements ComponentFinder {
 			int modifiers = classField.getModifiers();
 			if (Modifier.isPublic(modifiers) && !Modifier.isTransient(modifiers) && !Modifier.isStatic(modifiers)) {
 
-				String name = classField.getName();
+				ComponentInfo info = new ComponentInfo(classField.getName(), classField.getType());
+
 				Field pepField = classField.getAnnotation(Field.class);
 				if (pepField != null) {
 					// Found a matching setter/getter pair, so add to fields.
-					name = pepField.name();
+					info.setField(pepField);
 				}
-
-				ComponentInfo info = new ComponentInfo(name, classField.getType());
 
 				try {
 					info.setReadMethod(lookup.unreflectGetter(classField));
@@ -93,6 +93,18 @@ public class GetSetFinder implements ComponentFinder {
 					// Found a matching setter/getter pair, so add to fields.
 					ComponentInfo info = new ComponentInfo(fieldName, getter.getReturnType());
 
+					Field getterField = getter.getAnnotation(Field.class);
+					if (getterField != null) {
+						// Found a matching setter/getter pair, so add to fields.
+						info.setField(getterField);
+					}
+
+					Field setterField = method.getAnnotation(Field.class);
+					if (setterField != null) {
+						// Found a matching setter/getter pair, so add to fields.
+						info.setField(setterField);
+					}
+
 					try {
 						info.setReadMethod(lookup.unreflect(getter));
 						info.setWriteMethod(lookup.unreflect(method));
@@ -121,7 +133,18 @@ public class GetSetFinder implements ComponentFinder {
 
 			@Override
 			public int compare(ComponentInfo o1, ComponentInfo o2) {
-				return o1.getName().compareTo(o2.getName());
+
+				String o1Name = o1.getName();
+				if (o1.getField() != null && !o1.getField().name().strip().equals("")) {
+					o1Name = o1.getField().name();
+				}
+
+				String o2Name = o2.getName();
+				if (o2.getField() != null && !o2.getField().name().strip().equals("")) {
+					o2Name = o2.getField().name();
+				}
+
+				return o1Name.compareTo(o2Name);
 			}
 		});
 
@@ -144,6 +167,31 @@ public class GetSetFinder implements ComponentFinder {
 
 		// Add any remaining.
 		fields.addAll(getSetList);
+
+		// Check any private fields to see if we need to capture Field annotations.
+		// After adding getters/setters because we might pick up fields that are found using immutable
+		// finder.
+		java.lang.reflect.Field[] privateFields = clss.getDeclaredFields();
+		for (java.lang.reflect.Field classField : privateFields) {
+			int modifiers = classField.getModifiers();
+			if (Modifier.isPrivate(modifiers) && !Modifier.isTransient(modifiers) && !Modifier.isStatic(modifiers)) {
+
+				Field pepField = classField.getAnnotation(Field.class);
+				if (pepField != null) {
+
+					ComponentInfo info = fields.stream().filter(e -> e.getName().equals(classField.getName()))
+							.findFirst().orElse(null);
+					if (info == null) {
+						throw new DataBindException(String
+								.format("Could not find matching getter/setter for field '%s'", classField.getName()));
+					}
+
+					// Found a matching setter/getter pair, so add to fields.
+					info.setField(pepField);
+				}
+			}
+		}
+
 	}
 
 }

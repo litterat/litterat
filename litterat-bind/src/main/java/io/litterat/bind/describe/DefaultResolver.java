@@ -483,8 +483,12 @@ public class DefaultResolver implements DataBindContextResolver {
 					Field fieldAnnotation = info.getField();
 
 					boolean isRequired = false;
+					String fieldName = info.getName();
 					if (fieldAnnotation != null) {
 						isRequired = fieldAnnotation.required();
+						if (fieldAnnotation.name() != null && !fieldAnnotation.name().strip().equals("")) {
+							fieldName = fieldAnnotation.name();
+						}
 					}
 
 					if (fieldAnnotation != null && fieldAnnotation.bridge() != null
@@ -564,8 +568,8 @@ public class DefaultResolver implements DataBindContextResolver {
 
 						isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
 
-						component = new DataClassField(x, info.getName(), bridgeDataClass, tupleData, isRequired,
-								isPresent, accessor, setter);
+						component = new DataClassField(x, fieldName, bridgeDataClass, tupleData, isRequired, isPresent,
+								accessor, setter);
 					} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
 						Class<?> optionalType = (Class<?>) info.getParamType().getActualTypeArguments()[0];
@@ -602,8 +606,8 @@ public class DefaultResolver implements DataBindContextResolver {
 						isRequired = false;
 
 						// TODO the constructor parameter will need to pass through the bridge.
-						component = new DataClassField(x, info.getName(), optionalType, dataClass, isRequired,
-								isPresent, optionalObject, setter);
+						component = new DataClassField(x, fieldName, optionalType, dataClass, isRequired, isPresent,
+								optionalObject, setter);
 
 					} else if (info.getType() == OptionalInt.class
 							|| info.getType() == OptionalLong.class | info.getType() == OptionalDouble.class) {
@@ -688,7 +692,7 @@ public class DefaultResolver implements DataBindContextResolver {
 						isPresent = MethodHandles.collectArguments(isPresent, 0, accessor)
 								.asType(MethodType.methodType(boolean.class, targetClass));
 
-						component = new DataClassField(x, info.getName(), optionalNullableType, dataClass, isRequired,
+						component = new DataClassField(x, fieldName, optionalNullableType, dataClass, isRequired,
 								isPresent, fieldAccessor, setter);
 
 					} else {
@@ -715,8 +719,8 @@ public class DefaultResolver implements DataBindContextResolver {
 							isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
 						}
 
-						component = new DataClassField(x, info.getName(), info.getType(), dataClass, isRequired,
-								isPresent, accessor, setter);
+						component = new DataClassField(x, fieldName, info.getType(), dataClass, isRequired, isPresent,
+								accessor, setter);
 					}
 					dataComponents[x] = component;
 				}

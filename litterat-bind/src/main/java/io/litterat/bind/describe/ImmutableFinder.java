@@ -112,6 +112,9 @@ public class ImmutableFinder implements ComponentFinder {
 
 			Class<?> superClass = clss;
 			while ((superClass = superClass.getSuperclass()) != null) {
+				if (superClass == Object.class) {
+					continue;
+				}
 				ClassReader superClassReader = new ClassReader(superClass.getName());
 				ClassNode superClassNode = new ClassNode();
 				superClassReader.accept(superClassNode, 0);
@@ -153,7 +156,7 @@ public class ImmutableFinder implements ComponentFinder {
 	}
 
 	private void examineAccessorMethods(Class<?> clss, List<ComponentInfo> immutableFields, ClassNode classNode)
-			throws NoSuchMethodException, IllegalAccessException, SecurityException {
+			throws NoSuchMethodException, IllegalAccessException, SecurityException, DataBindException {
 		// Perform node instruction inspection to match constructor arguments with
 		// accessors.
 		for (MethodNode methodNode : classNode.methods) {
@@ -172,7 +175,7 @@ public class ImmutableFinder implements ComponentFinder {
 	}
 
 	private void examineAccessorAnnotations(Class<?> clss, List<ComponentInfo> immutableFields, Lookup lookup)
-			throws IllegalAccessException {
+			throws IllegalAccessException, DataBindException {
 		// Possibly failed to find accessor through invariant byte code analysis.
 		// Fallback on @Field annotation or method name.
 		for (Method method : clss.getDeclaredMethods()) {
@@ -199,7 +202,7 @@ public class ImmutableFinder implements ComponentFinder {
 		}
 	}
 
-	private void checkFieldAnnotation(ComponentInfo info, Class<?> clss, String fieldName) {
+	private void checkFieldAnnotation(ComponentInfo info, Class<?> clss, String fieldName) throws DataBindException {
 		// Capture field annotation from field if present.
 		try {
 			java.lang.reflect.Field clssField = clss.getDeclaredField(fieldName);
@@ -392,9 +395,10 @@ public class ImmutableFinder implements ComponentFinder {
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 * @throws IllegalAccessException
+	 * @throws DataBindException
 	 */
 	private String examineAccessor(Class<?> clss, List<ComponentInfo> fields, MethodNode method)
-			throws NoSuchMethodException, IllegalAccessException, SecurityException {
+			throws NoSuchMethodException, IllegalAccessException, SecurityException, DataBindException {
 		boolean foundLoadThis = false;
 		String lastField = null;
 
@@ -428,7 +432,14 @@ public class ImmutableFinder implements ComponentFinder {
 					ComponentInfo info = fields.stream().filter(e -> e.getName().equals(fieldName)).findFirst()
 							.orElse(null);
 					if (info != null) {
-						info.setReadMethod(MethodHandles.publicLookup().unreflect(clss.getDeclaredMethod(method.name)));
+						Method accessorMethod = clss.getDeclaredMethod(method.name);
+
+						Field field = accessorMethod.getAnnotation(Field.class);
+						if (field != null) {
+							info.setField(field);
+						}
+
+						info.setReadMethod(MethodHandles.publicLookup().unreflect(accessorMethod));
 						checkFieldAnnotation(info, clss, fieldName);
 					}
 

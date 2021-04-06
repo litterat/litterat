@@ -7,7 +7,6 @@ Next steps list. A general list of things that could be done next in no particul
 
  litterat-bind
  - Decide on implementation for embedded atom union (e.g. int | string ).
- - Look at @Field name overrides and develop some rules/errors to ensure no name conflicts.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
  - Implement Annotation interface
@@ -29,6 +28,8 @@ Next steps list. A general list of things that could be done next in no particul
 Another common issue with fields is the question of if they are required or not. By definition primitives are required and cannot be null, however, all classes derived from Object can be null. In the past there has been a non standard @NotNull annotation. There's debate on if the fact a field is required or not should be specified in the data specification, but for a Class implementation a field is either required or not. Java provides Objects.requireNonNull as a way to enforce non null values, but this isn't easily found using reflection. Adding 'isRequired' to the field annotation seems like the most straight forward solution. By default a field isRequired if it is a primitive and not required for Optional or Object based classes. 
 
 One option is to enforce required fields by calling Objects.requireNonNull on each value before calling the constructor. This has the nice property that it will enforce data to align with what is specified. The problem is that this does not enforce the developer to play by the same rules. If the developer calls Objects.requireNonNull in the constructor then the call would be made twice. Unfortunately, without rewriting the bytecode of the constructor(s), this means that isRequired would only be a hint rather than an enforcement. The 'isRequired' does end up being a feature of many schemas so as a code first schema solution the hint is worth keeping. A possible solution for the future is to add an option to generate Objects.requireNonNull if an attribute (e.g. message) is set in the field. However, this doesn't quite feel right. It is more likely that if generating Java template code from a schema that the Objects.requireNonNull would end up being generated.
+
+Setup some test cases to investigate the use of @Field annotations for both changing the name of a field and setting the isRequired flag. Its possible to set the @Field annotation on one of public/private fields, getter/setter or constructor parameter. It will require some more negative test cases in the future.
 
 ## Day 47 - April 5 - Complete implementation of isPresent for fields and primitive optional classes
 
