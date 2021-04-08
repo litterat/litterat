@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * parameters where the name cannot be detected.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
 public @interface Union {
 
 	public Class<?>[] value() default {};

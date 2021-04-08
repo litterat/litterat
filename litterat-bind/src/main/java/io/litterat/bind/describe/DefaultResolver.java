@@ -94,26 +94,14 @@ public class DefaultResolver implements DataBindContextResolver {
 	}
 
 	private boolean isUnion(Class<?> targetClass) {
-		if (targetClass.isInterface() && !Collection.class.isAssignableFrom(targetClass)) {
-			return true;
+		if (Collection.class.isAssignableFrom(targetClass)) {
+			return false;
 		}
 
-		// Array classes are abstract and we don't want them.
-		if (Modifier.isAbstract(targetClass.getModifiers())) {
-
-			if (targetClass.isArray()) {
-				// this is classed as an array, not a union.
-				return false;
-			} else if (Collection.class.isAssignableFrom(targetClass)) {
-				// this is classed as an array, not an interface.
-				return false;
-			}
-
-			return true;
-		} else if (targetClass.isInterface()) {
+		if (targetClass.isInterface()) {
 
 			// Interface needs to be marked with @Data or Serializable.
-			Data pepData = targetClass.getAnnotation(Data.class);
+			Union pepData = targetClass.getAnnotation(Union.class);
 			if (pepData != null) {
 				return true;
 			}
@@ -123,6 +111,22 @@ public class DefaultResolver implements DataBindContextResolver {
 					return true;
 				}
 			}
+		} else
+
+		if (Modifier.isAbstract(targetClass.getModifiers())) {
+			// Array classes are abstract and we don't want them.
+			if (targetClass.isArray()) {
+				// this is classed as an array, not a union.
+				return false;
+			}
+
+			// Interface needs to be marked with @Data or Serializable.
+			Union pepData = targetClass.getAnnotation(Union.class);
+			if (pepData != null) {
+				return true;
+			}
+
+			return false;
 		}
 
 		return false;

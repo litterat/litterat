@@ -29,6 +29,8 @@ For embedded unions, the initial implementation will be with Object as that alig
 
 Created the Union annotation and implemented the resolver to pick it up. Did a few checks to ensure any member types are assignable to the class type used (e.g. Object). It is possible this mechanism could be abused. Will need to work that out in the future.
 
+Also switched to using Union annotation on interfaces and abstract class test cases. Also thinking about renaming @Data annotation to @Record annotation. That would align better with Java 16+ record types. 
+
 ## Day 49 - April 7 - Anther look at embedded unions
 
 Taking another look at a design for embedded unions. Ideally, Java would provide a union

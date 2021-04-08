@@ -15,9 +15,9 @@
  */
 package io.litterat.test.bind.union;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Union;
 
-@Data
+@Union
 public abstract class AbstractUnion {
 
 	private final int x;
