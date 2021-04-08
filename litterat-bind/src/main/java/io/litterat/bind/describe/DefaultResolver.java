@@ -57,6 +57,7 @@ import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.DataOrder;
 import io.litterat.bind.Field;
 import io.litterat.bind.ToData;
+import io.litterat.bind.Union;
 
 public class DefaultResolver implements DataBindContextResolver {
 
@@ -697,30 +698,72 @@ public class DefaultResolver implements DataBindContextResolver {
 
 					} else {
 
-						DataClass dataClass = context.getDescriptor(info.getType(),
-								(info.getParamType() != null ? info.getParamType() : info.getType()));
+						Union union = info.getUnion();
+						if (union != null) {
 
-						if (dataClass.typeClass().isPrimitive()) {
-							isRequired = true;
-						}
+							Class<?> unionClass = info.getType();
 
-						// Make isPresent return true for primitives/isRequired or call Objects.nonNull(value)
-						MethodHandle isPresent = null;
-						if (info.getType().isPrimitive()) {
-							isPresent = MethodHandles.constant(boolean.class, true);
+							if (union.value() == null || union.value().length == 0) {
+								throw new DataBindException("Union annotation must have one or more classes");
+							}
 
-							isPresent = MethodHandles.dropArguments(isPresent, 0, targetClass);
-						} else {
-							isPresent = MethodHandles.publicLookup()
+							DataClass[] unionTypes = new DataClass[union.value().length];
+							for (int z = 0; z < union.value().length; z++) {
+								Class<?> clss = union.value()[z];
+								if (!unionClass.isAssignableFrom(clss)) {
+									throw new DataBindException("Union types not assignable from class type");
+								}
+
+								unionTypes[z] = context.getDescriptor(clss);
+								if (unionTypes[z] instanceof DataClassUnion
+										|| unionTypes[z] instanceof DataClassArray) {
+									// Embedded unions will require more work to decide on how valid other unions or
+									// arrays would be. Unions with unknown type sets is problematic. If another union
+									// member set is known it might be ok to add all children to the parent. Something
+									// for future.
+									throw new DataBindException(
+											"Embedded union types can not include other unions or arrays");
+								}
+							}
+
+							DataClassUnion dataUnion = new DataClassUnion(unionClass, unionTypes);
+
+							MethodHandle isPresent = MethodHandles.publicLookup()
 									.findStatic(Objects.class, "nonNull",
 											MethodType.methodType(boolean.class, Object.class))
 									.asType(MethodType.methodType(boolean.class, info.getType()));
 
 							isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
-						}
 
-						component = new DataClassField(x, fieldName, info.getType(), dataClass, isRequired, isPresent,
-								accessor, setter);
+							component = new DataClassField(x, fieldName, unionClass, dataUnion, isRequired, isPresent,
+									accessor, setter);
+						} else {
+
+							DataClass dataClass = context.getDescriptor(info.getType(),
+									(info.getParamType() != null ? info.getParamType() : info.getType()));
+
+							if (dataClass.typeClass().isPrimitive()) {
+								isRequired = true;
+							}
+
+							// Make isPresent return true for primitives/isRequired or call Objects.nonNull(value)
+							MethodHandle isPresent = null;
+							if (info.getType().isPrimitive()) {
+								isPresent = MethodHandles.constant(boolean.class, true);
+
+								isPresent = MethodHandles.dropArguments(isPresent, 0, targetClass);
+							} else {
+								isPresent = MethodHandles.publicLookup()
+										.findStatic(Objects.class, "nonNull",
+												MethodType.methodType(boolean.class, Object.class))
+										.asType(MethodType.methodType(boolean.class, info.getType()));
+
+								isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
+							}
+
+							component = new DataClassField(x, fieldName, info.getType(), dataClass, isRequired,
+									isPresent, accessor, setter);
+						}
 					}
 					dataComponents[x] = component;
 				}

@@ -18,6 +18,7 @@ import java.lang.reflect.ParameterizedType;
 
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.Field;
+import io.litterat.bind.Union;
 
 /**
  * Placeholder to collect information about field details. Used as a temporary hold during the
@@ -39,6 +40,8 @@ public class ComponentInfo {
 
 	private Field field;
 
+	private Union union;
+
 	public ComponentInfo(String name, Class<?> type) {
 		this.name = name;
 		this.type = type;
@@ -54,13 +57,23 @@ public class ComponentInfo {
 	}
 
 	public void setField(Field field) throws DataBindException {
-		if (this.field != null && this.field != field)
+		if (this.field != null && !this.field.equals(field))
 			throw new DataBindException(String.format("Field '%s' already has Field annotation", this.name));
 		this.field = field;
 	}
 
 	public Field getField() {
 		return this.field;
+	}
+
+	public void setUnion(Union union) throws DataBindException {
+		if (this.union != null && this.union.equals(union))
+			throw new DataBindException(String.format("Field '%s' already has Field annotation", this.name));
+		this.union = union;
+	}
+
+	public Union getUnion() {
+		return this.union;
 	}
 
 	public Class<?> getType() {

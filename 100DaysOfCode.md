@@ -23,6 +23,36 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
+## Day 50 - April 8 - Decision time on embedded unions
+
+For embedded unions, the initial implementation will be with Object as that aligns closest to current design. The other options can be added potentially later.
+
+Created the Union annotation and implemented the resolver to pick it up. Did a few checks to ensure any member types are assignable to the class type used (e.g. Object). It is possible this mechanism could be abused. Will need to work that out in the future.
+
+## Day 49 - April 7 - Anther look at embedded unions
+
+Taking another look at a design for embedded unions. Ideally, Java would provide a union
+type allowing a constructor to look like:
+
+    MyClass( int | String identifier, int someValue );
+    
+This would enforce that an identifer can be an int or String type, but nothing else. Unfortunately, without that option there's a few paths worth exploring. The first is to use Object and add a Union annotation. Something like:
+ 
+    MyClass( @Union( [ Integer.class | String.class ] ) Object identifier, int someValue );
+     
+Using an Object would require that int.class be promoted to Integer.class to be compatible with Object. Similar to "Field.required", it is now difficult to enforce that identifier will only be one of these class types. The developer is free to set identifier to any class and we're reliant on the developer doing the right thing. Writing can be checked prior to constructor and reading could also be checked. The other option is to split this into two fields:
+
+    MyClass( @Field( name="identifier") Integer intIdent, @Field( name="identifier") String strIdent, int someValue );
+    
+This improves type safety and enforces that only the required types can be used. From a DataClassField this would still be represented as a single Object type. It requires some work to choose the correct constructor and accessor. For instance the accessor would need to be built up with MethodHandles to mimic:
+
+    if (Objects.nonNull(o.intIdent()) 
+       return o.intIdent();
+    else
+       return o.strIdent();
+
+Another option is for the developer to provide a class which provides stronger type safety for a union type. There's various implementations of this covered on Stackoverflow, however (this one)[https://stackoverflow.com/questions/48143268/java-tagged-union-sum-types/48143514#48143514] is quite good. This would need further exploration on how to specify and annotate in a generic enough way to allow for different implementations.
+
 ## Day 48 - April 6 - Add support for isRequired to Field annotation and DataClassField
 
 Another common issue with fields is the question of if they are required or not. By definition primitives are required and cannot be null, however, all classes derived from Object can be null. In the past there has been a non standard @NotNull annotation. There's debate on if the fact a field is required or not should be specified in the data specification, but for a Class implementation a field is either required or not. Java provides Objects.requireNonNull as a way to enforce non null values, but this isn't easily found using reflection. Adding 'isRequired' to the field annotation seems like the most straight forward solution. By default a field isRequired if it is a primitive and not required for Optional or Object based classes. 

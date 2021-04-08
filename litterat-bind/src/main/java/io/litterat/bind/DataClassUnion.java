@@ -33,10 +33,14 @@ public class DataClassUnion extends DataClass {
 
 	private DataClass[] memberTypes;
 
-	public DataClassUnion(Class<?> targetType) {
+	public DataClassUnion(Class<?> targetType, DataClass[] members) {
 		super(targetType, DataClassType.UNION);
 
-		memberTypes = new DataClass[0];
+		memberTypes = members;
+	}
+
+	public DataClassUnion(Class<?> targetType) {
+		this(targetType, new DataClass[0]);
 	}
 
 	public DataClass[] memberTypes() {

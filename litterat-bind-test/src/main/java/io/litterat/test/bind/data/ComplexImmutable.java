@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,10 @@ public class ComplexImmutable {
 		this.y = test / multiplier;
 	}
 
+	// Event though method name "x" matches the field, it doesn't return the value from field x that
+	// was found in the constructor. Even though we use the method name to find the already found
+	// field "x", the annotation is here to confirm we're looking in the right place.
+	@Field(name = "x")
 	public int x() {
 		int test = x * multiplier;
 		return test / multiplier;

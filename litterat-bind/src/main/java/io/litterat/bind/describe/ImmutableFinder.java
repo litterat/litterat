@@ -41,6 +41,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.Field;
+import io.litterat.bind.Union;
 
 public class ImmutableFinder implements ComponentFinder {
 
@@ -104,9 +105,28 @@ public class ImmutableFinder implements ComponentFinder {
 						immutableFields.add(component);
 					}
 				}
+
+				// Look to see if this is a union field.
+				Union union = params[x].getAnnotation(Union.class);
+				if (union != null) {
+					// union has been annotated so check for matching field.
+					final int paramIndex = x;
+					ComponentInfo component = immutableFields.stream()
+							.filter(e -> e.getConstructorArgument() == paramIndex).findFirst().orElse(null);
+					if (component != null) {
+						component.setUnion(union);
+					} else {
+						// Add the parameter.
+						component = new ComponentInfo(field.name(), params[x].getType());
+						component.setConstructorArgument(x);
+						component.setUnion(union);
+
+						immutableFields.add(component);
+					}
+				}
 			}
 
-			// Find the matching accessor methods.
+			// Find the matching accessor methods. Must have already found fields in constructor.
 			examineAccessorMethods(clss, immutableFields, classNode);
 			examineAccessorAnnotations(clss, immutableFields, lookup);
 
@@ -133,7 +153,7 @@ public class ImmutableFinder implements ComponentFinder {
 			for (ComponentInfo component : immutableFields) {
 				if (component.getReadMethod() == null) {
 					throw new DataBindException(String.format(
-							"Failed to match immutable field accessor for class: %s. Add @Field annotations to assist. %s",
+							"Failed to match immutable field accessor for class: %s. Add @Field annotations to assist field '%s'",
 							clss, component.getName()));
 				}
 			}
@@ -179,26 +199,31 @@ public class ImmutableFinder implements ComponentFinder {
 		// Possibly failed to find accessor through invariant byte code analysis.
 		// Fallback on @Field annotation or method name.
 		for (Method method : clss.getDeclaredMethods()) {
-			Field field = method.getAnnotation(Field.class);
-			if (field != null) {
-				// field has been annotated so check for matching field.
-				final String name = field.name();
-				ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
-						.orElse(null);
-				if (component != null && component.getReadMethod() == null) {
-					component.setReadMethod(lookup.unreflect(method));
-					component.setField(field);
-					continue;
-				}
+
+			// Only interested in accessors.
+			if (method.getParameterCount() > 0) {
+				continue;
 			}
 
-			String name = method.getName();
+			// field has been annotated so check for matching field.
+			final String name = method.getName();
 			ComponentInfo component = immutableFields.stream().filter(e -> e.getName().equals(name)).findFirst()
 					.orElse(null);
 			if (component != null && component.getReadMethod() == null) {
-				component.setReadMethod(lookup.unreflect(method));
-				continue;
+				Field field = method.getAnnotation(Field.class);
+				if (field != null) {
+					component.setReadMethod(lookup.unreflect(method));
+					component.setField(field);
+				}
+
+				Union union = method.getAnnotation(Union.class);
+				if (union != null) {
+					component.setReadMethod(lookup.unreflect(method));
+					component.setField(field);
+				}
+
 			}
+
 		}
 	}
 
@@ -209,6 +234,11 @@ public class ImmutableFinder implements ComponentFinder {
 			Field field = clssField.getAnnotation(Field.class);
 			if (field != null) {
 				info.setField(field);
+			}
+
+			Union union = clssField.getAnnotation(Union.class);
+			if (union != null) {
+				info.setUnion(union);
 			}
 
 		} catch (NoSuchFieldException | SecurityException e1) {
@@ -386,7 +416,8 @@ public class ImmutableFinder implements ComponentFinder {
 	}
 
 	/**
-	 * Look through the instructions looking for ALOAD, GETFIELD, RETURN combination.
+	 * Look through the instructions looking for ALOAD, GETFIELD, RETURN combination. The fieldName used
+	 * in the GETFIELD instruction must have previously been used and found in the constructor.
 	 *
 	 * @param clss
 	 * @param fieldMap
@@ -439,8 +470,12 @@ public class ImmutableFinder implements ComponentFinder {
 							info.setField(field);
 						}
 
+						Union union = accessorMethod.getAnnotation(Union.class);
+						if (union != null) {
+							info.setUnion(union);
+						}
+
 						info.setReadMethod(MethodHandles.publicLookup().unreflect(accessorMethod));
-						checkFieldAnnotation(info, clss, fieldName);
 					}
 
 					// accessor matches, break;
