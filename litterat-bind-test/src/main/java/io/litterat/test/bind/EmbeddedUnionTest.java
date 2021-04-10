@@ -15,16 +15,22 @@
  */
 package io.litterat.test.bind;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
+import io.litterat.bind.mapper.ArrayMapper;
+import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.bind.union.EmbeddedUnion;
 
 public class EmbeddedUnionTest {
@@ -65,9 +71,68 @@ public class EmbeddedUnionTest {
 		DataClassUnion union = (DataClassUnion) fieldIdentifier.dataClass();
 		Assertions.assertNotNull(union);
 		Assertions.assertEquals(2, union.memberTypes().length);
+		Assertions.assertTrue(union.isSealed());
 
 		Assertions.assertTrue(union.memberTypes()[0] instanceof DataClassAtom);
 		Assertions.assertTrue(union.memberTypes()[1] instanceof DataClassAtom);
+	}
+
+	@Test
+	public void testToArray() throws Throwable {
+
+		// project to an array.
+		ArrayMapper arrayMap = new ArrayMapper(context);
+
+		// write to array.
+		Object[] valuesString = arrayMap.toArray(testString);
+		Object[] valuesInteger = arrayMap.toArray(testInteger);
+
+		// convert to object.
+		EmbeddedUnion objectString = arrayMap.toObject(EmbeddedUnion.class, valuesString);
+		EmbeddedUnion objectInteger = arrayMap.toObject(EmbeddedUnion.class, valuesInteger);
+
+		// validate result.
+		Assertions.assertNotNull(objectString);
+		Assertions.assertNotNull(objectInteger);
+
+		Assertions.assertEquals(testString.identifier(), objectString.identifier());
+		Assertions.assertEquals(testInteger.identifier(), objectInteger.identifier());
+	}
+
+	@Test
+	public void testToMap() throws Throwable {
+		MapMapper mapMapper = new MapMapper(context);
+		Map<String, Object> mapString = mapMapper.toMap(testString);
+		Map<String, Object> mapInteger = mapMapper.toMap(testInteger);
+
+		EmbeddedUnion objectString = (EmbeddedUnion) mapMapper.toObject(EmbeddedUnion.class, mapString);
+		EmbeddedUnion objectInteger = (EmbeddedUnion) mapMapper.toObject(EmbeddedUnion.class, mapInteger);
+
+		// validate result.
+		Assertions.assertNotNull(objectString);
+		Assertions.assertNotNull(objectInteger);
+
+		Assertions.assertEquals(testString.identifier(), objectString.identifier());
+		Assertions.assertEquals(testInteger.identifier(), objectInteger.identifier());
+	}
+
+	@Test
+	public void testMapToObjectException() throws Throwable {
+		MapMapper mapMapper = new MapMapper(context);
+
+		Map<String, Object> map;
+		Assertions.assertThrows(DataBindException.class, () -> {
+			mapMapper.toMap(testError);
+		});
+
+		// corrupting the map by putting an invalid value for x.
+		map = new HashMap<>();
+		map.put("identifier", Long.valueOf(1l));
+
+		Assertions.assertThrows(DataBindException.class, () -> {
+			mapMapper.toObject(EmbeddedUnion.class, map);
+		});
+
 	}
 
 }

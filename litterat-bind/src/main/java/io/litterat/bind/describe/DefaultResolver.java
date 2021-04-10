@@ -730,17 +730,23 @@ public class DefaultResolver implements DataBindContextResolver {
 								}
 							}
 
-							DataClassUnion dataUnion = new DataClassUnion(unionClass, unionTypes);
+							DataClassUnion dataUnion = new DataClassUnion(unionClass, unionTypes, union.sealed());
 
 							MethodHandle isPresent = MethodHandles.publicLookup()
 									.findStatic(Objects.class, "nonNull",
 											MethodType.methodType(boolean.class, Object.class))
 									.asType(MethodType.methodType(boolean.class, info.getType()));
 
+							MethodHandle unionCheck = MethodHandles.publicLookup().findVirtual(dataUnion.getClass(),
+									"checkIsMember", MethodType.methodType(Object.class, Object.class))
+									.bindTo(dataUnion);
+
+							MethodHandle accessorFilter = MethodHandles.filterReturnValue(accessor, unionCheck);
+
 							isPresent = MethodHandles.filterArguments(isPresent, 0, accessor);
 
 							component = new DataClassField(x, fieldName, unionClass, dataUnion, isRequired, isPresent,
-									accessor, setter);
+									accessorFilter, setter);
 						} else {
 
 							DataClass dataClass = context.getDescriptor(info.getType(),
@@ -778,7 +784,8 @@ public class DefaultResolver implements DataBindContextResolver {
 
 				// Build a MethodHandle that creates object and also calls setters with order of
 				// fields as defined in components.
-				MethodHandle constructor = createTupleConstructor(targetClass, components, dataConstructor);
+				MethodHandle constructor = createTupleConstructor(targetClass, components, dataComponents,
+						dataConstructor);
 
 				// See if there's an empty constructor available.
 				MethodHandle creator = null;
@@ -948,7 +955,8 @@ public class DefaultResolver implements DataBindContextResolver {
 	 * @throws DataBindException
 	 */
 	private MethodHandle createTupleConstructor(Class<?> dataClass, List<ComponentInfo> fields,
-			MethodHandle dataConstructor) throws IllegalAccessException, NoSuchMethodException, DataBindException {
+			DataClassField[] dataFields, MethodHandle dataConstructor)
+			throws IllegalAccessException, NoSuchMethodException, DataBindException {
 
 		// Class<?>[] params = new Class[fields.size()];
 		// for (int x = 0; x < fields.size(); x++) {
@@ -959,10 +967,10 @@ public class DefaultResolver implements DataBindContextResolver {
 		// params));
 
 		// (Object[]):serialClass -> ctor(Object[])
-		MethodHandle create = createEmbedConstructor(dataClass, dataConstructor, fields);
+		MethodHandle create = createEmbedConstructor(dataClass, dataConstructor, fields, dataFields);
 
 		// (serialClass, Object[]) -> serialClass.setValues(Object[x]);
-		MethodHandle setters = createEmbedSetters(create, dataClass, fields);
+		MethodHandle setters = createEmbedSetters(create, dataClass, fields, dataFields);
 
 		// (Object[], Object[]) -> ctor(Object[]).setvalues(Object[])
 		MethodHandle createAndSet = MethodHandles.collectArguments(setters, 0, create);
@@ -987,7 +995,8 @@ public class DefaultResolver implements DataBindContextResolver {
 	 * @throws DataBindException
 	 */
 	private MethodHandle createEmbedConstructor(Class<?> dataClass, MethodHandle dataConstructor,
-			List<ComponentInfo> fields) throws NoSuchMethodException, IllegalAccessException, DataBindException {
+			List<ComponentInfo> fields, DataClassField[] dataFields)
+			throws NoSuchMethodException, IllegalAccessException, DataBindException {
 		MethodHandle result = dataConstructor;
 
 		for (int x = 0; x < fields.size(); x++) {
@@ -1005,7 +1014,7 @@ public class DefaultResolver implements DataBindContextResolver {
 				MethodHandle index = MethodHandles.constant(int.class, inputIndex);
 
 				// (values[]) -> values[inputIndex] and maybe additional modifications to the value.
-				MethodHandle arrayIndexGetter = dataArrayToObject(field, arrayGetter, index);
+				MethodHandle arrayIndexGetter = dataArrayToObject(field, dataFields[x], arrayGetter, index);
 
 				// ()-> constructor( ..., values[inputIndex] , ... )
 				result = MethodHandles.collectArguments(result, arg, arrayIndexGetter);
@@ -1035,7 +1044,8 @@ public class DefaultResolver implements DataBindContextResolver {
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 */
-	private MethodHandle createEmbedSetters(MethodHandle ctorSignature, Class<?> dataClass, List<ComponentInfo> fields)
+	private MethodHandle createEmbedSetters(MethodHandle ctorSignature, Class<?> dataClass, List<ComponentInfo> fields,
+			DataClassField[] dataFields)
 			throws IllegalAccessException, NoSuchMethodException, SecurityException, DataBindException {
 
 		// (dataClass,Object[]):dataClass -> return object;
@@ -1061,7 +1071,7 @@ public class DefaultResolver implements DataBindContextResolver {
 				MethodHandle index = MethodHandles.constant(int.class, inputIndex);
 
 				// (values[]) -> values[inputIndex] and maybe additional modifications to the value.
-				MethodHandle arrayIndexGetter = dataArrayToObject(field, arrayGetter, index);
+				MethodHandle arrayIndexGetter = dataArrayToObject(field, dataFields[x], arrayGetter, index);
 
 				// (obj, value[]):void -> obj.setField( value[inputIndex] );
 				MethodHandle arrayFieldSetter = MethodHandles.collectArguments(fieldSetter, 1, arrayIndexGetter);
@@ -1078,7 +1088,8 @@ public class DefaultResolver implements DataBindContextResolver {
 	// required setters of an object. Some field types such as bridges, Optional, OptionalInt requires
 	// special handling to prepare the value prior to calling the constructor or setter. This makes the
 	// required adaptations.
-	private MethodHandle dataArrayToObject(ComponentInfo field, MethodHandle arrayGetter, MethodHandle index)
+	private MethodHandle dataArrayToObject(ComponentInfo field, DataClassField dataField, MethodHandle arrayGetter,
+			MethodHandle index)
 			throws DataBindException, IllegalAccessException, NoSuchMethodException, SecurityException {
 
 		MethodHandle arrayIndexGetter;
@@ -1220,6 +1231,17 @@ public class DefaultResolver implements DataBindContextResolver {
 			// (values[]):fieldType -> values[inputIndex]
 			arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index)
 					.asType(MethodType.methodType(field.getType(), Object[].class));
+
+			Union union = field.getUnion();
+			if (union != null) {
+
+				DataClassUnion dataUnion = (DataClassUnion) dataField.dataClass();
+
+				MethodHandle unionCheck = MethodHandles.publicLookup().findVirtual(dataUnion.getClass(),
+						"checkIsMember", MethodType.methodType(Object.class, Object.class)).bindTo(dataUnion);
+
+				arrayIndexGetter = MethodHandles.filterReturnValue(arrayIndexGetter, unionCheck);
+			}
 		}
 
 		return arrayIndexGetter;

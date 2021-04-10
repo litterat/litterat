@@ -6,7 +6,6 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 Next steps list. A general list of things that could be done next in no particular order.
 
  litterat-bind
- - Decide on implementation for embedded atom union (e.g. int | string ).
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
  - Implement Annotation interface
@@ -22,6 +21,15 @@ Next steps list. A general list of things that could be done next in no particul
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
+
+## Day 52 - April 10 - Embedded union filtering
+
+Implemented the embedded union constructor and accessor filtering. This checks values against the expected data types allowed in a union. Also added the concept of sealed unions. This mimics the concept of sealed interfaces.
+If a Union annotation is provided with a list of expected types then default behaviour is that no addition types can be added.
+
+## Day 51 - April 9 - Implementing embedded union
+
+Continued writing test case and implementation for embedded union. Currently reads/writes but performs no validation on reading or writing in the constructor or accessor method handles.
 
 ## Day 50 - April 8 - Decision time on embedded unions
 

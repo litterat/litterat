@@ -29,4 +29,6 @@ import java.lang.annotation.Target;
 public @interface Union {
 
 	public Class<?>[] value() default {};
+
+	public boolean sealed() default true;
 }

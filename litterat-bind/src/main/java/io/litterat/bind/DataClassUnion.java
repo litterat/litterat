@@ -33,18 +33,26 @@ public class DataClassUnion extends DataClass {
 
 	private DataClass[] memberTypes;
 
-	public DataClassUnion(Class<?> targetType, DataClass[] members) {
+	private boolean isSealed;
+
+	public DataClassUnion(Class<?> targetType, DataClass[] members, boolean isSealed) {
 		super(targetType, DataClassType.UNION);
 
-		memberTypes = members;
+		this.memberTypes = members;
+		this.isSealed = isSealed;
+
 	}
 
 	public DataClassUnion(Class<?> targetType) {
-		this(targetType, new DataClass[0]);
+		this(targetType, new DataClass[0], false);
 	}
 
 	public DataClass[] memberTypes() {
 		return memberTypes;
+	}
+
+	public boolean isSealed() {
+		return isSealed;
 	}
 
 	public boolean isMemberType(DataClass dataClass) {
@@ -68,12 +76,35 @@ public class DataClassUnion extends DataClass {
 	 * the list of union types will not all be known at startup. Therefore it needs to be possible to
 	 * add additional implementations to the list. One of the reasons why sealed classes are a better
 	 * choice.
+	 * 
+	 * @throws DataBindException
 	 */
-	public synchronized void addMemberType(DataClass newType) {
+	public synchronized void addMemberType(DataClass newType) throws DataBindException {
+
+		if (isSealed) {
+			throw new DataBindException("Union type is sealed. No addition member types can be added.");
+		}
+
 		DataClass[] newMemberTypes = Arrays.copyOf(memberTypes, memberTypes.length + 1);
 		newMemberTypes[newMemberTypes.length - 1] = newType;
 
 		this.memberTypes = newMemberTypes;
+	}
+
+	public Object checkIsMember(Object value) throws DataBindException {
+
+		if (value == null) {
+			return value;
+		}
+
+		DataClass[] values = this.memberTypes;
+		for (DataClass dataClass : values) {
+			if (dataClass.typeClass() == value.getClass()) {
+				return value;
+			}
+		}
+
+		throw new DataBindException("Union value not valid for type");
 	}
 
 }

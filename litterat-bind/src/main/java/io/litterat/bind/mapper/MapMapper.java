@@ -106,7 +106,7 @@ public class MapMapper {
 
 				// A union needs to know the type being written so it can be picked up by
 				// the reader later.
-				v = toMap(object);
+				v = toMap(unionInstanceClass, object);
 				if (v instanceof Map) {
 					@SuppressWarnings("rawtypes")
 					Map baseMap = (Map) v;
@@ -114,8 +114,6 @@ public class MapMapper {
 					// Using the full class name here as an example. A better/more complete implementation
 					// would use a schema based name.
 					baseMap.put("type", object.getClass().getName());
-				} else {
-					throw new IllegalArgumentException("Unable to write non-record type union");
 				}
 			} else {
 				throw new IllegalArgumentException("Unknown data class");
@@ -186,17 +184,24 @@ public class MapMapper {
 			} else if (dataClass instanceof DataClassUnion) {
 				DataClassUnion unionClass = (DataClassUnion) dataClass;
 
-				Map<String, Object> map = (Map<String, Object>) data;
+				if (data instanceof Map) {
 
-				// A tagged union uses "type" for the class name.
-				String type = (String) map.get("type");
+					Map<String, Object> map = (Map<String, Object>) data;
 
-				DataClass instantType = context.getDescriptor(Class.forName(type));
-				if (!unionClass.isMemberType(instantType)) {
-					throw new DataBindException("instance not of expected union type");
+					// A tagged union uses "type" for the class name.
+					String type = (String) map.get("type");
+
+					DataClass instantType = context.getDescriptor(Class.forName(type));
+					if (!unionClass.isMemberType(instantType)) {
+						throw new DataBindException("instance not of expected union type");
+					}
+
+					v = toObject(instantType, data);
+				} else {
+					DataClass unionType = context.getDescriptor(data.getClass());
+
+					v = toObject(unionType, data);
 				}
-
-				v = toObject(instantType, data);
 
 			} else {
 				throw new IllegalArgumentException("unrecognised type");
