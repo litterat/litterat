@@ -54,7 +54,7 @@ import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
-import io.litterat.bind.DataOrder;
+import io.litterat.bind.FieldOrder;
 import io.litterat.bind.Field;
 import io.litterat.bind.ToData;
 import io.litterat.bind.Union;
@@ -465,7 +465,7 @@ public class DefaultResolver implements DataBindContextResolver {
 				MethodHandle toData = MethodHandles.identity(targetClass);
 
 				// Modify the order of fields if order annotation supplied.
-				DataOrder dataOrder = targetClass.getAnnotation(DataOrder.class);
+				FieldOrder dataOrder = targetClass.getAnnotation(FieldOrder.class);
 				if (dataOrder != null) {
 					reorderFields(dataOrder, components);
 				}
@@ -837,7 +837,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		return descriptor;
 	}
 
-	private void reorderFields(DataOrder dataOrder, List<ComponentInfo> components) throws DataBindException {
+	private void reorderFields(FieldOrder dataOrder, List<ComponentInfo> components) throws DataBindException {
 
 		// Check lengths are ok.
 		String[] fieldOrder = dataOrder.value();

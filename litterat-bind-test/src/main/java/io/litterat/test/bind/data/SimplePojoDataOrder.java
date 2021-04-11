@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.DataOrder;
+import io.litterat.bind.FieldOrder;
 import io.litterat.bind.Record;
 
 /**
@@ -25,7 +25,7 @@ import io.litterat.bind.Record;
  */
 
 @Record
-@DataOrder({ "x", "z", "y", "a" })
+@FieldOrder({ "x", "z", "y", "a" })
 public class SimplePojoDataOrder {
 
 	private int x;

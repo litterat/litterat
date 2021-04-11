@@ -15,10 +15,10 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.DataOrder;
+import io.litterat.bind.FieldOrder;
 import io.litterat.bind.Record;
 
-@DataOrder({ "location", "x", "y" })
+@FieldOrder({ "location", "x", "y" })
 public class MixedImmutableDataOrder {
 
 	private final int x;

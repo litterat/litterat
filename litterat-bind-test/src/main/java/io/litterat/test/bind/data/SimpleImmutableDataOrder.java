@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.DataOrder;
+import io.litterat.bind.FieldOrder;
 import io.litterat.bind.Record;
 
 /**
@@ -23,7 +23,7 @@ import io.litterat.bind.Record;
  * An example of a simple immutable tuple.
  *
  */
-@DataOrder({ "y", "x" })
+@FieldOrder({ "y", "x" })
 public class SimpleImmutableDataOrder {
 
 	private final int x;
