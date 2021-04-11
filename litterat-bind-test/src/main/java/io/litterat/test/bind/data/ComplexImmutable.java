@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.bind.Field;
 
 /**
@@ -33,7 +33,7 @@ public class ComplexImmutable {
 	private final int x;
 	private final int y;
 
-	@Data
+	@Record
 	public ComplexImmutable(int x, @Field(name = "y") int y) {
 		this.x = x;
 

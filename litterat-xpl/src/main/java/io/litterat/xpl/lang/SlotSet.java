@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
-@Data
+@Record
 @SchemaType(namespace = "xpl.lang", name = "slot_set")
 public class SlotSet extends Statement {
 

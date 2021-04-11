@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.bind.ToData;
 import io.litterat.test.bind.data.ProjectImmutable.ProjectImmutableData;
 
@@ -35,7 +35,7 @@ public class ProjectImmutable implements ToData<ProjectImmutableData> {
 		private final int a;
 		private final int b;
 
-		@Data
+		@Record
 		public ProjectImmutableData(int a, int b) {
 			this.a = a;
 			this.b = b;
@@ -56,7 +56,7 @@ public class ProjectImmutable implements ToData<ProjectImmutableData> {
 		this.y = y;
 	}
 
-	@Data
+	@Record
 	public ProjectImmutable(ProjectImmutableData data) {
 		this.x = data.a;
 		this.y = data.b;

@@ -15,13 +15,13 @@
  */
 package io.litterat.test.bind.union;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 
 /**
  * This could extend InterfaceUnionPoint, however, that represents another more complex use case.
  * Duplicating x,y to isolate this interface based union test case.
  */
-@Data
+@Record
 public class InterfaceUnionRectangle implements InterfaceUnion {
 
 	private final int x;

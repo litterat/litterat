@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package io.litterat.test.bind.data;
 
 import java.util.Optional;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 
 /**
  *
@@ -34,7 +34,7 @@ public class ImmutableAtom {
 
 	private final Optional<String> optional;
 
-	@Data
+	@Record
 	public ImmutableAtom(SimpleEnum enumCount, String str, boolean bool, Optional<String> optional) {
 		this.enumCount = enumCount;
 		this.str = str;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@ package io.litterat.xpl;
 
 import java.util.Objects;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 
 public class Point {
 	private final float latitude;
 	private final float longitude;
 
-	@Data
+	@Record
 	public Point(float latitude, float longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;

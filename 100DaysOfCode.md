@@ -10,9 +10,9 @@ Next steps list. A general list of things that could be done next in no particul
  - Create bind error examples and test edge cases.
  - Implement Annotation interface
  
- litterat-schema
- - Review the schema language and look at schema annotations. 
- - Review schema arrays and look at multi-dimensional arrays as part of schema design.
+ litterat-model
+ - Review the data model language and look at data model annotations. 
+ - Review model arrays and look at multi-dimensional arrays as part of schema design.
  
  Other
  - Implement the jvm-serializers performance test.
@@ -21,6 +21,12 @@ Next steps list. A general list of things that could be done next in no particul
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
+
+## Day 53 - April 11 - Renamed @Data to @Record
+
+Took the step to rename @Data annotation to @Record. This is feeling like the right decision as it aligns with the Java 16+ record type. It is clear to me now how Union maps directly to sealed interfaces and forcing the use of @Union instead of reusing @Data for both makes it clearer. @Data was too ambiguous. Using @Record is clear and is really about making older classes behave the same way as a Java 16+ record class. By aligning and homogenising the old and new ways of defining data it creates a simple interface to interact with both.
+
+The bind library is effectively feature complete. While the data annotation concept is still on the feature list, it isn't completely clear if that should be in this library or not. It might be better to attempt to implement this as part of the litterat-model library first and then see if it will fit back into the bind library later.
 
 ## Day 52 - April 10 - Embedded union filtering
 

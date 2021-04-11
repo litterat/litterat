@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
 //@formatter:off
@@ -59,7 +59,7 @@ public class TypeName {
 	private final Optional<String> attribute;
 	private final int version;
 
-	@Data
+	@Record
 	public TypeName(String namespace, String name, Optional<String> attribute, int version) {
 		Objects.requireNonNull(namespace, "Namespace can not be null");
 		Objects.requireNonNull(name, "Name can not be null");

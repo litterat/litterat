@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@ package io.litterat.test.bind.data;
 
 import java.util.Date;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 
 public class AtomicDateImmutable {
 
 	private final Date date;
 
-	@Data
+	@Record
 	public AtomicDateImmutable(Date date) {
 		this.date = date;
 	}

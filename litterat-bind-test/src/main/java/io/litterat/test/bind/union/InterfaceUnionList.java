@@ -17,9 +17,9 @@ package io.litterat.test.bind.union;
 
 import java.util.List;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 
-@Data
+@Record
 public class InterfaceUnionList {
 	private final List<InterfaceUnion> list;
 

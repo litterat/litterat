@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package io.litterat.model;
 
 import java.util.Objects;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
 @SchemaType(namespace = "schema", name = "reference")
@@ -25,7 +25,7 @@ public class Reference implements Element, Definition {
 
 	private final TypeName type;
 
-	@Data
+	@Record
 	public Reference(TypeName type) {
 		Objects.requireNonNull(type, "typeName can not be null");
 		this.type = type;

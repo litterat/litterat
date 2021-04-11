@@ -15,10 +15,10 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.bind.Field;
 
-@Data
+@Record
 public class FieldAnnotationPojo {
 
 	// Change name and required.

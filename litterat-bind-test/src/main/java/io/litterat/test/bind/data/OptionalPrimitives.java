@@ -17,7 +17,7 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 
 public class OptionalPrimitives {
 
@@ -25,7 +25,7 @@ public class OptionalPrimitives {
 	private final OptionalLong optionalLong;
 	private final OptionalDouble optionalDouble;
 
-	@Data
+	@Record
 	public OptionalPrimitives(OptionalInt optionalInt, OptionalLong optionalLong, OptionalDouble optionalDouble) {
 		this.optionalInt = optionalInt;
 		this.optionalLong = optionalLong;

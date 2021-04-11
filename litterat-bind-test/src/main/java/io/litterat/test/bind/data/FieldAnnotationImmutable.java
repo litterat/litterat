@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.bind.Field;
 
 public class FieldAnnotationImmutable {
@@ -41,7 +41,7 @@ public class FieldAnnotationImmutable {
 	private final String hx;
 	private final String i;
 
-	@Data
+	@Record
 	public FieldAnnotationImmutable(String ax, String b, String c, @Field(name = "d", required = true) String dx,
 			@Field(name = "e") String ex, @Field(required = true) String f, String gx, String hx, String i) {
 		this.ax = ax;

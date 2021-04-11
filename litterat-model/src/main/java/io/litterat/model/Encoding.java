@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package io.litterat.model;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
 @SchemaType(namespace = "schema", name = "encoding")
@@ -23,7 +23,7 @@ public class Encoding implements Definition {
 
 	private final String encoding;
 
-	@Data
+	@Record
 	public Encoding(String encoding) {
 		this.encoding = encoding;
 	}

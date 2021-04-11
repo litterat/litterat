@@ -15,9 +15,9 @@
  */
 package io.litterat.test.bind.union;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 
-@Data
+@Record
 public class AbstractUnionRectangle extends AbstractUnion {
 
 	private final int width;

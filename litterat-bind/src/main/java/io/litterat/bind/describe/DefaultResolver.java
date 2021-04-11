@@ -43,7 +43,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.litterat.bind.Atom;
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindContextResolver;
 import io.litterat.bind.DataBindException;
@@ -135,7 +135,7 @@ public class DefaultResolver implements DataBindContextResolver {
 	private boolean isRecord(Class<?> targetClass) {
 
 		// if class has annotation this is a tuple.
-		Data pepData = targetClass.getAnnotation(Data.class);
+		Record pepData = targetClass.getAnnotation(Record.class);
 		if (pepData != null) {
 			return true;
 		}
@@ -143,7 +143,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		// Check for annotation on constructor.
 		Constructor<?>[] constructors = targetClass.getConstructors();
 		for (Constructor<?> constructor : constructors) {
-			pepData = constructor.getAnnotation(Data.class);
+			pepData = constructor.getAnnotation(Record.class);
 			if (pepData != null) {
 				return true;
 			}
@@ -153,7 +153,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		Method[] methods = targetClass.getDeclaredMethods();
 		for (Method method : methods) {
 
-			pepData = method.getAnnotation(Data.class);
+			pepData = method.getAnnotation(Record.class);
 			if (Modifier.isStatic(method.getModifiers()) && pepData != null) {
 				return true;
 			}
@@ -887,7 +887,7 @@ public class DefaultResolver implements DataBindContextResolver {
 
 		// Does it have an annotation?
 		for (Constructor<?> constructor : constructors) {
-			Data dataAnnotation = constructor.getAnnotation(Data.class);
+			Record dataAnnotation = constructor.getAnnotation(Record.class);
 			if (dataAnnotation != null) {
 				return constructor;
 			}
@@ -897,7 +897,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		Method[] methods = dataClass.getMethods();
 		for (Method method : methods) {
 			if (Modifier.isStatic(method.getModifiers())) {
-				Data dataAnnotation = method.getAnnotation(Data.class);
+				Record dataAnnotation = method.getAnnotation(Record.class);
 				if (dataAnnotation != null) {
 					// There must be a matching constructor that matches the parameters of the
 					// static constructor.
@@ -921,7 +921,7 @@ public class DefaultResolver implements DataBindContextResolver {
 
 		// Does it have an annotation?
 		for (Constructor<?> constructor : constructors) {
-			Data dataAnnotation = constructor.getAnnotation(Data.class);
+			Record dataAnnotation = constructor.getAnnotation(Record.class);
 			if (dataAnnotation != null) {
 				return MethodHandles.publicLookup().unreflectConstructor(constructor);
 			}
@@ -931,7 +931,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		Method[] methods = dataClass.getMethods();
 		for (Method method : methods) {
 			if (Modifier.isStatic(method.getModifiers())) {
-				Data dataAnnotation = method.getAnnotation(Data.class);
+				Record dataAnnotation = method.getAnnotation(Record.class);
 				if (dataAnnotation != null) {
 					return MethodHandles.publicLookup().unreflect(method);
 				}

@@ -15,7 +15,7 @@
  */
 package io.litterat.model;
 
-import io.litterat.bind.Data;
+import io.litterat.bind.Record;
 import io.litterat.bind.Union;
 import io.litterat.model.annotation.SchemaType;
 
@@ -23,37 +23,37 @@ import io.litterat.model.annotation.SchemaType;
 @SchemaType(namespace = "schema", name = "atom_attribute")
 public abstract class AtomAttribute {
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_big_endian")
 	public static class AtomBigEndian extends AtomAttribute {
 	}
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_little_endian")
 	public static class AtomLittleEndian extends AtomAttribute {
 	}
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_integer")
 	public static class AtomInteger extends AtomAttribute {
 	}
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_unsigned")
 	public static class AtomUnsigned extends AtomAttribute {
 	}
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_signed")
 	public static class AtomSigned extends AtomAttribute {
 	}
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_ieee756")
 	public static class AtomIEEE756 extends AtomAttribute {
 	}
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_fixed_length")
 	public static class AtomFixedLength extends AtomAttribute {
 
@@ -69,7 +69,7 @@ public abstract class AtomAttribute {
 		}
 	}
 
-	@Data
+	@Record
 	@SchemaType(namespace = "schema", name = "atom_variable_length")
 	public static class AtomVariableLength extends AtomAttribute {
 
