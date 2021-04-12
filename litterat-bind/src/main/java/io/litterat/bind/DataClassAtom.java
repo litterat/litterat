@@ -74,4 +74,9 @@ public class DataClassAtom extends DataClass {
 	public MethodHandle toData() {
 		return toData;
 	}
+
+	@Override
+	public String toString() {
+		return "DataClassAtom [ typeClass=" + typeClass().getName() + ", dataClass=" + dataClass.getName() + "]";
+	}
 }

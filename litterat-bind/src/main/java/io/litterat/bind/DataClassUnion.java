@@ -107,4 +107,29 @@ public class DataClassUnion extends DataClass {
 		throw new DataBindException("Union value not valid for type");
 	}
 
+	@Override
+	public String toString() {
+		return "DataClassUnion [typeClass=" + typeClass().getName() + ", memberTypes=" + membersToString(memberTypes)
+				+ ", isSealed=" + isSealed + "]";
+	}
+
+	private String membersToString(DataClass[] dataClass) {
+
+		if (dataClass == null || dataClass.length == 0) {
+			return "[]";
+		}
+
+		StringBuilder b = new StringBuilder();
+		b.append('[');
+		for (int x = 0; x < dataClass.length; x++) {
+			b.append(String.valueOf(dataClass[x].typeClass().getName()));
+			if (x == dataClass.length - 1) {
+				break;
+			}
+			b.append(", ");
+		}
+		b.append(']');
+		return b.toString();
+	}
+
 }

@@ -8,7 +8,6 @@ Next steps list. A general list of things that could be done next in no particul
  litterat-bind
  - Add support and test cases for Java 16 sealed interface/class for Union.
  - Add support and test cases for Java 16 record for Record.
- - Add better toString for DataClass classes.
  - Investigate if default values for fields belong in this library.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.

@@ -16,6 +16,7 @@
 package io.litterat.bind;
 
 import java.lang.invoke.MethodHandle;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -100,4 +101,9 @@ public class DataClassRecord extends DataClass {
 		return fields;
 	}
 
+	@Override
+	public String toString() {
+		return "DataClassRecord [ typeClass=" + typeClass().getName() + ", dataClass=" + dataClass.getName()
+				+ ", fields=" + Arrays.toString(fields) + "]";
+	}
 }

@@ -141,4 +141,10 @@ public class DataClassField {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "DataClassField [index=" + index + ", name=" + name + ", type=" + type + ", isRequired=" + isRequired
+				+ "]";
+	}
 }

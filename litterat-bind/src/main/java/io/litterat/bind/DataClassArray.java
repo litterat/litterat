@@ -146,4 +146,10 @@ public class DataClassArray extends DataClass {
 		return this.get;
 	}
 
+	@Override
+	public String toString() {
+		return "DataClassArray [ typeClass=" + typeClass().getName() + ", arrayDataClass="
+				+ arrayDataClass.typeClass().getName() + "]";
+	}
+
 }
