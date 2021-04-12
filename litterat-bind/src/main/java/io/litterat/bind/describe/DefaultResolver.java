@@ -43,7 +43,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.litterat.bind.Atom;
-import io.litterat.bind.Record;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataBridge;
@@ -53,12 +52,13 @@ import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
-import io.litterat.bind.FieldOrder;
 import io.litterat.bind.Field;
+import io.litterat.bind.FieldOrder;
+import io.litterat.bind.Record;
 import io.litterat.bind.ToData;
 import io.litterat.bind.Union;
 
-public class DefaultResolver  {
+public class DefaultResolver {
 
 	private static final String TODATA_METHOD = "toData";
 	private static final String TOOBJECT_METHOD = "toObject";
@@ -71,7 +71,6 @@ public class DefaultResolver  {
 		this.allowSerializable = allowSerializable;
 		this.allowAny = allowAny;
 	}
-
 
 	public DataClass resolve(DataBindContext context, Class<?> targetClass, Type parameterizedType)
 			throws DataBindException {
@@ -230,8 +229,27 @@ public class DefaultResolver  {
 
 	private DataClassUnion resolveUnion(DataBindContext context, Class<?> targetClass) throws DataBindException {
 
-		// TODO It could be useful to map other classes to this data class.
-		return new DataClassUnion(targetClass);
+		Union union = targetClass.getAnnotation(Union.class);
+		if (union != null) {
+			if (union.value() != null && union.value().length > 0) {
+
+				DataClass[] unionMembers = new DataClass[union.value().length];
+				for (int x = 0; x < union.value().length; x++) {
+					Class<?> memberClass = union.value()[x];
+
+					unionMembers[x] = context.getDescriptor(memberClass);
+				}
+
+				return new DataClassUnion(targetClass, unionMembers, union.sealed());
+
+			} else {
+				return new DataClassUnion(targetClass);
+			}
+		}
+
+		// Might need to look for sealed classes/interfaces here.
+		throw new DataBindException("Invalid union");
+
 	}
 
 	// TODO If the targetClass is a Collection it isn't possible get the generic
@@ -804,9 +822,14 @@ public class DefaultResolver  {
 			Class<?>[] interfaces = targetClass.getInterfaces();
 			for (Class<?> targetInterface : interfaces) {
 				try {
-					DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(targetInterface);
 
-					targetUnion.addMemberType(descriptor);
+					// Only attempt to add children if the union doesn't have child types specified.
+					Union union = targetInterface.getAnnotation(Union.class);
+					if (union != null && (union.value() == null || union.value().length == 0)) {
+						DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(targetInterface);
+
+						targetUnion.addMemberType(descriptor);
+					}
 				} catch (Throwable t) {
 					// ignore.
 				}
@@ -819,9 +842,14 @@ public class DefaultResolver  {
 				// An abstract type is a union type.
 				if (Modifier.isAbstract(superClass.getModifiers())) {
 					try {
-						DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(superClass);
 
-						targetUnion.addMemberType(descriptor);
+						// Only attempt to add children if the union doesn't have child types specified.
+						Union union = superClass.getAnnotation(Union.class);
+						if (union != null && (union.value() == null || union.value().length == 0)) {
+							DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(superClass);
+
+							targetUnion.addMemberType(descriptor);
+						}
 					} catch (Throwable t) {
 						// ignore.
 					}

@@ -193,7 +193,7 @@ public class MapMapper {
 
 					DataClass instantType = context.getDescriptor(Class.forName(type));
 					if (!unionClass.isMemberType(instantType)) {
-						throw new DataBindException("instance not of expected union type");
+						throw new DataBindException(String.format("instance type '%s' not of expected union type '%s'", instantType.typeClass().getName(), unionClass.typeClass().getName()));
 					}
 
 					v = toObject(instantType, data);

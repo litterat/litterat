@@ -6,6 +6,10 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 Next steps list. A general list of things that could be done next in no particular order.
 
  litterat-bind
+ - Add support and test cases for Java 16 sealed interface/class for Union.
+ - Add support and test cases for Java 16 record for Record.
+ - Add better toString for DataClass classes.
+ - Investigate if default values for fields belong in this library.
  - Dates, timestamps and other atoms.
  - Create bind error examples and test edge cases.
  - Implement Annotation interface
@@ -22,11 +26,19 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
+## Day 54 - April 12 - Break the Union/Record loop
+
+Found a class resolution loop where a sealed Union will resolve included Record types which will in turn attempt to resolve the Union type. If a Record finds an interface or abstract base class with a Union record it will need to check if it explicitly includes Records and not attempt to resolve it if it does.
+
 ## Day 53 - April 11 - Renamed @Data to @Record
 
 Took the step to rename @Data annotation to @Record. This is feeling like the right decision as it aligns with the Java 16+ record type. It is clear to me now how Union maps directly to sealed interfaces and forcing the use of @Union instead of reusing @Data for both makes it clearer. @Data was too ambiguous. Using @Record is clear and is really about making older classes behave the same way as a Java 16+ record class. By aligning and homogenising the old and new ways of defining data it creates a simple interface to interact with both.
 
 The bind library is effectively feature complete. While the data annotation concept is still on the feature list, it isn't completely clear if that should be in this library or not. It might be better to attempt to implement this as part of the litterat-model library first and then see if it will fit back into the bind library later.
+
+Renamed DataOrder to FieldOrder to better describe what it does.
+
+Create a new test case for @Union with sealed types. Found an infinite loop where the resolver attempts to find the DataClass for the union members and the member records attempt to resolve the union data class. This will be a tricky one to resolve. Something for another night.
 
 ## Day 52 - April 10 - Embedded union filtering
 
