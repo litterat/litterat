@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
-
 import io.litterat.bind.describe.DefaultResolver;
 
 public class DataBindContext {
@@ -29,28 +28,20 @@ public class DataBindContext {
 	// Resolved class information
 	private final ConcurrentHashMap<Type, DataClass> descriptors = new ConcurrentHashMap<>();
 
-	// Resolver
-	private final DataBindContextResolver resolver;
 
 	// default resolver
-	private final DataBindContextResolver defaultResolver;
+	private final DefaultResolver dataClassResolver;
 
 	public static class Builder {
 
-		DataBindContextResolver resolver;
 
 		boolean allowAny = false;
 
 		boolean allowSerializable = false;
 
 		public Builder() {
-			this.resolver = null;
 		}
 
-		public Builder resolver(DataBindContextResolver resolver) {
-			this.resolver = resolver;
-			return this;
-		}
 
 		public Builder allowAny() {
 			allowAny = true;
@@ -73,13 +64,8 @@ public class DataBindContext {
 
 	private DataBindContext(Builder builder) {
 
-		this.defaultResolver = new DefaultResolver(builder.allowSerializable, builder.allowAny);
+		this.dataClassResolver = new DefaultResolver(builder.allowSerializable, builder.allowAny);
 
-		if (builder.resolver == null) {
-			this.resolver = defaultResolver;
-		} else {
-			this.resolver = builder.resolver;
-		}
 
 		try {
 			registerAtom(Boolean.class);
@@ -109,9 +95,6 @@ public class DataBindContext {
 
 	}
 
-	public DataBindContextResolver defaultResolver() {
-		return defaultResolver;
-	}
 
 	public void registerAtom(Class<?> targetClass) throws DataBindException {
 		register(targetClass, new DataClassAtom(targetClass));
@@ -126,7 +109,7 @@ public class DataBindContext {
 
 		DataClass descriptor = descriptors.get(parameterizedType);
 		if (descriptor == null) {
-			descriptor = resolver.resolve(this, targetClass, parameterizedType);
+			descriptor = dataClassResolver.resolve(this, targetClass, parameterizedType);
 			if (descriptor == null) {
 				throw new DataBindException(
 						String.format("Unable to find suitable data descriptor for class: %s", targetClass.getName()));
@@ -143,7 +126,7 @@ public class DataBindContext {
 		}
 	}
 
-	public <T> void register(Type targetClass, DataClass descriptor) throws DataBindException {
+	private <T> void register(Type targetClass, DataClass descriptor) throws DataBindException {
 		checkExists(targetClass);
 
 		descriptors.put(targetClass, descriptor);

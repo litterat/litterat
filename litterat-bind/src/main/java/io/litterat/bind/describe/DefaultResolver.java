@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 import io.litterat.bind.Atom;
 import io.litterat.bind.Record;
 import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataBindContextResolver;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataBridge;
 import io.litterat.bind.DataClass;
@@ -59,7 +58,7 @@ import io.litterat.bind.Field;
 import io.litterat.bind.ToData;
 import io.litterat.bind.Union;
 
-public class DefaultResolver implements DataBindContextResolver {
+public class DefaultResolver  {
 
 	private static final String TODATA_METHOD = "toData";
 	private static final String TOOBJECT_METHOD = "toObject";
@@ -73,7 +72,7 @@ public class DefaultResolver implements DataBindContextResolver {
 		this.allowAny = allowAny;
 	}
 
-	@Override
+
 	public DataClass resolve(DataBindContext context, Class<?> targetClass, Type parameterizedType)
 			throws DataBindException {
 		DataClass descriptor = null;
