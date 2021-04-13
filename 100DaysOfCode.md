@@ -27,7 +27,7 @@ Next steps list. A general list of things that could be done next in no particul
 
 Started last night and completed in the morning. While the main library is based on Java 11, I've changed the target for testing to Java 16. This allows both in built records and sealed interfaces/classes to be tested. Added a record based test case, which didn't need any additional work other than checking is Class.isRecord is true as everything else works the same.
 
-Added test case for sealed interfaces. For java 16 this requires that enable-preview is set before running. This will be cleared by Java 17 when sealed interfaces are final. Still need a test case for sealed abstract classes.
+Added test case for sealed interfaces. For java 16 this requires that enable-preview is set before running. This will be cleared by Java 17 when sealed interfaces are final. Added sealed abstract example which worked without library modifications. Also added to test case a superfluous @Union annotation on abstract class which is ignored.
 
 ## Day 54 - April 12 - Break the Union/Record loop
 

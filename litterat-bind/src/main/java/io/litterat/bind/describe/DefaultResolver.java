@@ -852,7 +852,8 @@ public class DefaultResolver {
 
 					// Only attempt to add children if the union doesn't have child types specified.
 					Union union = targetInterface.getAnnotation(Union.class);
-					if (union != null && (union.value() == null || union.value().length == 0)) {
+					if (union != null && (union.value() == null || union.value().length == 0)
+							&& !newFeatures.isSealed(targetInterface)) {
 						DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(targetInterface);
 
 						targetUnion.addMemberType(descriptor);
@@ -872,7 +873,8 @@ public class DefaultResolver {
 
 						// Only attempt to add children if the union doesn't have child types specified.
 						Union union = superClass.getAnnotation(Union.class);
-						if (union != null && (union.value() == null || union.value().length == 0)) {
+						if (union != null && (union.value() == null || union.value().length == 0)
+								&& !newFeatures.isSealed(superClass)) {
 							DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(superClass);
 
 							targetUnion.addMemberType(descriptor);
