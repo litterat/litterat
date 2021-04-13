@@ -67,9 +67,25 @@ public class ComponentInfo {
 	}
 
 	public void setUnion(Union union) throws DataBindException {
-		if (this.union != null && this.union.equals(union))
+		if (this.union != null && unionsEqual(union, this.union))
 			throw new DataBindException(String.format("Field '%s' already has Field annotation", this.name));
 		this.union = union;
+	}
+
+	private boolean unionsEqual(Union u1, Union u2) {
+		if (u1 == u2 || (u1 == null && u2 == null)) {
+			return true;
+		}
+
+		if (u1 == null || u2 == null) {
+			return false;
+		}
+
+		if (u1.value() == u2.value() && u1.sealed() == u2.sealed()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public Union getUnion() {

@@ -67,9 +67,13 @@ public class DefaultResolver {
 
 	private final boolean allowAny;
 
+	private final NewFeatures newFeatures;
+
 	public DefaultResolver(boolean allowSerializable, boolean allowAny) {
 		this.allowSerializable = allowSerializable;
 		this.allowAny = allowAny;
+
+		newFeatures = new NewFeatures();
 	}
 
 	public DataClass resolve(DataBindContext context, Class<?> targetClass, Type parameterizedType)
@@ -131,6 +135,11 @@ public class DefaultResolver {
 	}
 
 	private boolean isRecord(Class<?> targetClass) {
+
+		// If it a Java record then no annotations are required.
+		if (newFeatures.isRecord(targetClass)) {
+			return true;
+		}
 
 		// if class has annotation this is a tuple.
 		Record pepData = targetClass.getAnnotation(Record.class);

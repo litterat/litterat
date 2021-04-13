@@ -104,7 +104,8 @@ public class DataClassUnion extends DataClass {
 			}
 		}
 
-		throw new DataBindException("Union value not valid for type");
+		throw new DataBindException(String.format("Value '%s' not in valid types %s", value.getClass().getName(),
+				membersToString(memberTypes)));
 	}
 
 	@Override

@@ -544,6 +544,9 @@ public class ArrayMapper {
 		@SuppressWarnings("unused")
 		public Object toObject(Object[] s) throws DataBindException {
 			Object[] unionPair = s;
+			if (unionPair == null) {
+				return null;
+			}
 
 			String unionType = (String) unionPair[0];
 			Object unionValue = unionPair[1];
@@ -570,7 +573,7 @@ public class ArrayMapper {
 
 					value = function.toObject.invoke(unionValue);
 				} catch (Throwable e) {
-					throw new DataBindException("Failed to convert class");
+					throw new DataBindException("Failed to convert class", e);
 				}
 			}
 

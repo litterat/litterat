@@ -25,6 +25,10 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
+## Day 55 - April 13 - Update to Java 16 and create Java record test
+
+Started last night and completed in the morning. While the main library is based on Java 11, I've changed the target for testing to Java 16. This allows both inbuilt records and sealed interfaces/classes to be tested.
+
 ## Day 54 - April 12 - Break the Union/Record loop
 
 Found a class resolution loop where a sealed Union will resolve included Record types which will in turn attempt to resolve the Union type. If a Record finds an interface or abstract base class with a Union record it will need to check if it explicitly includes Records and not attempt to resolve it if it does.
