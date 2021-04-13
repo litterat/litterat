@@ -6,16 +6,14 @@ Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the 
 Next steps list. A general list of things that could be done next in no particular order.
 
  litterat-bind
- - Add support and test cases for Java 16 sealed interface/class for Union.
- - Add support and test cases for Java 16 record for Record.
  - Investigate if default values for fields belong in this library.
- - Dates, timestamps and other atoms.
- - Create bind error examples and test edge cases.
- - Implement Annotation interface
- 
+ - Dates, timestamps and other atoms. To be completed as needed.
+ - Create bind error examples and test edge cases. To be completed as issues found.
+
  litterat-model
  - Review the data model language and look at data model annotations. 
  - Review model arrays and look at multi-dimensional arrays as part of schema design.
+ - Implement Annotation interface
  
  Other
  - Implement the jvm-serializers performance test.
@@ -27,7 +25,9 @@ Next steps list. A general list of things that could be done next in no particul
 
 ## Day 55 - April 13 - Update to Java 16 and create Java record test
 
-Started last night and completed in the morning. While the main library is based on Java 11, I've changed the target for testing to Java 16. This allows both inbuilt records and sealed interfaces/classes to be tested.
+Started last night and completed in the morning. While the main library is based on Java 11, I've changed the target for testing to Java 16. This allows both in built records and sealed interfaces/classes to be tested. Added a record based test case, which didn't need any additional work other than checking is Class.isRecord is true as everything else works the same.
+
+Added test case for sealed interfaces. For java 16 this requires that enable-preview is set before running. This will be cleared by Java 17 when sealed interfaces are final. Still need a test case for sealed abstract classes.
 
 ## Day 54 - April 12 - Break the Union/Record loop
 

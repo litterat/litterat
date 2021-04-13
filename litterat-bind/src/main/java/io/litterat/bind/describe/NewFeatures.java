@@ -29,25 +29,38 @@ public class NewFeatures {
 
 	MethodHandle isRecord;
 	MethodHandle isSealed;
+	MethodHandle sealedMembers;
 
 	public NewFeatures() {
 		isRecord = getBooleanMethod("isRecord");
 		isSealed = getBooleanMethod("isSealed");
+		sealedMembers = getPermittedMethod();
 	}
 
 	private MethodHandle getBooleanMethod(String methodName) {
 		MethodHandle method;
 
-		// Get the Class class.
-		Class<?> classClass = Class.class;
-
 		try {
-			method = MethodHandles.publicLookup().findVirtual(classClass, methodName,
-					MethodType.methodType(boolean.class));
+			method = MethodHandles.lookup().findVirtual(Class.class, methodName, MethodType.methodType(boolean.class));
 		} catch (NoSuchMethodException | IllegalAccessException e) {
 			method = MethodHandles.constant(boolean.class, false);
 
-			method = MethodHandles.dropArguments(isRecord, 0, Class.class);
+			method = MethodHandles.dropArguments(method, 0, Class.class);
+		}
+
+		return method;
+	}
+
+	private MethodHandle getPermittedMethod() {
+		MethodHandle method;
+
+		try {
+			method = MethodHandles.lookup().findVirtual(Class.class, "getPermittedSubclasses",
+					MethodType.methodType(Class[].class));
+		} catch (NoSuchMethodException | IllegalAccessException e) {
+			e.printStackTrace();
+			method = MethodHandles.constant(Class[].class, new Class[0]);
+			method = MethodHandles.dropArguments(method, 0, Class.class);
 		}
 
 		return method;
@@ -68,6 +81,15 @@ public class NewFeatures {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	public Class<?>[] getPermittedSubclasses(Class<?> clss) {
+		try {
+			return (Class<?>[]) sealedMembers.invoke(clss);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			return new Class<?>[0];
 		}
 	}
 }

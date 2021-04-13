@@ -100,6 +100,12 @@ public class DefaultResolver {
 			return false;
 		}
 
+		// If the targetClass is using Java 16 sealed interfaces then it provides
+		// the union type.
+		if (newFeatures.isSealed(targetClass)) {
+			return true;
+		}
+
 		if (targetClass.isInterface()) {
 
 			// Interface needs to be marked with @Data or Serializable.
@@ -237,6 +243,18 @@ public class DefaultResolver {
 	}
 
 	private DataClassUnion resolveUnion(DataBindContext context, Class<?> targetClass) throws DataBindException {
+
+		if (newFeatures.isSealed(targetClass)) {
+			Class<?>[] members = newFeatures.getPermittedSubclasses(targetClass);
+
+			DataClass[] unionMembers = new DataClass[members.length];
+			for (int x = 0; x < members.length; x++) {
+				Class<?> memberClass = members[x];
+				unionMembers[x] = context.getDescriptor(memberClass);
+			}
+
+			return new DataClassUnion(targetClass, unionMembers, false);
+		}
 
 		Union union = targetClass.getAnnotation(Union.class);
 		if (union != null) {
