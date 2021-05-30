@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package io.litterat.model.meta;
 
-import io.litterat.model.Atom;
-import io.litterat.model.AtomAttribute;
 import io.litterat.model.Definition;
-import io.litterat.model.Encoding;
-import io.litterat.model.AtomAttribute.AtomBigEndian;
-import io.litterat.model.AtomAttribute.AtomFixedLength;
-import io.litterat.model.AtomAttribute.AtomIEEE756;
-import io.litterat.model.AtomAttribute.AtomInteger;
-import io.litterat.model.AtomAttribute.AtomLittleEndian;
-import io.litterat.model.AtomAttribute.AtomSigned;
-import io.litterat.model.AtomAttribute.AtomUnsigned;
-import io.litterat.model.AtomAttribute.AtomVariableLength;
+import io.litterat.model.atom.Atom;
+import io.litterat.model.atom.AtomAttribute;
+import io.litterat.model.atom.AtomAttribute.AtomBigEndian;
+import io.litterat.model.atom.AtomAttribute.AtomFixedLength;
+import io.litterat.model.atom.AtomAttribute.AtomIEEE756;
+import io.litterat.model.atom.AtomAttribute.AtomInteger;
+import io.litterat.model.atom.AtomAttribute.AtomLittleEndian;
+import io.litterat.model.atom.AtomAttribute.AtomSigned;
+import io.litterat.model.atom.AtomAttribute.AtomUnsigned;
+import io.litterat.model.atom.AtomAttribute.AtomVariableLength;
+import io.litterat.model.atom.Encoding;
 
 public class TypeDefinitions {
 

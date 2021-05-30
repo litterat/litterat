@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ public class Field {
 
 	private final String name;
 	private final Element type;
-	private final boolean optional;
+	private final boolean required;
 
 	@Record
-	public Field(String name, Element type, boolean optional) {
+	public Field(String name, Element type, boolean required) {
 		this.name = name;
 		this.type = type;
-		this.optional = optional;
+		this.required = required;
 	}
 
 	public Field(String name, Element type) {
@@ -44,7 +44,7 @@ public class Field {
 		return this.type;
 	}
 
-	public boolean optional() {
-		return optional;
+	public boolean isRequired() {
+		return required;
 	}
 }

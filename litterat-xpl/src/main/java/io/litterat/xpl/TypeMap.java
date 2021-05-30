@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.litterat.model.TypeException;
-import io.litterat.model.TypeLibrary;
 import io.litterat.model.TypeName;
+import io.litterat.model.library.TypeException;
+import io.litterat.model.library.TypeLibrary;
 import io.litterat.model.meta.SchemaTypes;
 import io.litterat.xpl.util.IntObjectHashMap;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.TypeException;
+import io.litterat.model.library.TypeException;
 import io.litterat.test.bind.data.SimpleArray;
 import io.litterat.test.bind.data.SimpleImmutable;
 import io.litterat.xpl.TypeInputStream;

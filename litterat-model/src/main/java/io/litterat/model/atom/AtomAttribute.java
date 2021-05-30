@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model;
+package io.litterat.model.atom;
 
 import io.litterat.bind.Record;
 import io.litterat.bind.Union;
@@ -25,33 +25,27 @@ public abstract class AtomAttribute {
 
 	@Record
 	@SchemaType(namespace = "schema", name = "atom_big_endian")
-	public static class AtomBigEndian extends AtomAttribute {
-	}
+	public static class AtomBigEndian extends AtomAttribute {}
 
 	@Record
 	@SchemaType(namespace = "schema", name = "atom_little_endian")
-	public static class AtomLittleEndian extends AtomAttribute {
-	}
+	public static class AtomLittleEndian extends AtomAttribute {}
 
 	@Record
 	@SchemaType(namespace = "schema", name = "atom_integer")
-	public static class AtomInteger extends AtomAttribute {
-	}
+	public static class AtomInteger extends AtomAttribute {}
 
 	@Record
 	@SchemaType(namespace = "schema", name = "atom_unsigned")
-	public static class AtomUnsigned extends AtomAttribute {
-	}
+	public static class AtomUnsigned extends AtomAttribute {}
 
 	@Record
 	@SchemaType(namespace = "schema", name = "atom_signed")
-	public static class AtomSigned extends AtomAttribute {
-	}
+	public static class AtomSigned extends AtomAttribute {}
 
 	@Record
 	@SchemaType(namespace = "schema", name = "atom_ieee756")
-	public static class AtomIEEE756 extends AtomAttribute {
-	}
+	public static class AtomIEEE756 extends AtomAttribute {}
 
 	@Record
 	@SchemaType(namespace = "schema", name = "atom_fixed_length")

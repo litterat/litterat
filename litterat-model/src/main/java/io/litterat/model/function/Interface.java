@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model;
+package io.litterat.model.function;
 
 import io.litterat.bind.Record;
+import io.litterat.model.Definition;
 import io.litterat.model.annotation.SchemaType;
 
 @Record
 @SchemaType(namespace = "schema", name = "interface")
 public class Interface implements Definition {
 
-	final Method[] methods;
+	final Function[] methods;
 
-	public Interface(Method[] methods) {
+	public Interface(Function[] methods) {
 		this.methods = methods;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandle;
 
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.TypeException;
+import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.CreateInstance;
 import io.litterat.xpl.lang.LitteratMachine;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 package io.litterat.model.meta;
 
 import io.litterat.model.Array;
-import io.litterat.model.Definition;
+import io.litterat.model.Element;
 import io.litterat.model.Field;
 import io.litterat.model.Record;
 import io.litterat.model.Reference;
-import io.litterat.model.TypeLibrary;
 import io.litterat.model.TypeName;
 import io.litterat.model.Union;
+import io.litterat.model.library.TypeLibrary;
 
 public class SchemaTypes {
 
@@ -57,7 +57,7 @@ public class SchemaTypes {
 	public static final TypeName UNION = new TypeName("schema", "union");
 
 	// @formatter:off
-	public static final Definition DEFINITION_DEF = new Union(
+	public static final Element DEFINITION_DEF = new Union(
 			new Reference[] {
 					new Reference(SEQUENCE),
 					new Reference(RECORD),
@@ -65,7 +65,7 @@ public class SchemaTypes {
 					new Reference(ENCODING)
 			});
 
-	public static final Definition ELEMENT_DEF = new Union(
+	public static final Element ELEMENT_DEF = new Union(
 			new Reference[] {
 					new Reference(ANY),
 					new Reference(ARRAY),
@@ -73,21 +73,21 @@ public class SchemaTypes {
 			});
 
 	// Any is really just an empty object with no fields.
-	public static final Definition ANY_DEF = new Record(
+	public static final Element ANY_DEF = new Record(
 			new Field[] {
 			});
 
-	public static final Definition ARRAY_DEF = new Record(
+	public static final Element ARRAY_DEF = new Record(
 			new Field[] {
 					new Field("type", new Reference(ELEMENT))
 			});
 
-	public static final Definition ATOM_DEF = new Record(
+	public static final Element ATOM_DEF = new Record(
 			new Field[] {
 					new Field("attributes", new Reference(ATOM_ATTRIBUTE))
 			});
 
-	public static final Definition ATOM_ATTRIBUTE_DEF = new Union(
+	public static final Element ATOM_ATTRIBUTE_DEF = new Union(
 			new Reference[] {
 					 new Reference(ATOM_BIG_ENDIAN),
 					 new Reference(ATOM_LITTLE_ENDIAN),
@@ -98,33 +98,33 @@ public class SchemaTypes {
 					 new Reference(ATOM_VARIABLE_LENGTH)
 			});
 
-	public static final Definition ATOM_BIG_ENDIAN_DEF = new Record(
+	public static final Element ATOM_BIG_ENDIAN_DEF = new Record(
 			new Field[] {
 			});
 
-	public static final Definition ATOM_LITTLE_ENDIAN_DEF = new Record(
+	public static final Element ATOM_LITTLE_ENDIAN_DEF = new Record(
 			new Field[] {
 			});
 
-	public static final Definition ATOM_SIGNED_DEF = new Record(
+	public static final Element ATOM_SIGNED_DEF = new Record(
 			new Field[] {
 			});
 
-	public static final Definition ATOM_UNSIGNED_DEF = new Record(
+	public static final Element ATOM_UNSIGNED_DEF = new Record(
 			new Field[] {
 			});
 
-	public static final Definition ATOM_IEEE756_DEF = new Record(
+	public static final Element ATOM_IEEE756_DEF = new Record(
 			new Field[] {
 			});
 
-	public static final Definition ATOM_FIXED_LENGTH_DEF = new Record(
+	public static final Element ATOM_FIXED_LENGTH_DEF = new Record(
 			new Field[] {
 					new Field("bytes", new Reference(TypeLibrary.UINT8))
 			});
 
 
-	public static final Definition SEQUENCE_DEF = new Record(
+	public static final Element SEQUENCE_DEF = new Record(
 			new Field[] {
 					new Field("fields", new Array(FIELD))
 			});

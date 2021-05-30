@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
-import io.litterat.model.TypeException;
-import io.litterat.model.TypeLibrary;
+import io.litterat.model.library.TypeException;
+import io.litterat.model.library.TypeLibrary;
 import io.litterat.test.bind.data.SimpleUUIDImmutable;
 import io.litterat.test.bind.data.UUIDBridge;
 import io.litterat.xpl.TypeInputStream;

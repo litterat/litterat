@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package io.litterat.xpl.lang;
 
+import io.litterat.bind.DataClassArray;
 import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
@@ -26,15 +27,21 @@ import io.litterat.model.annotation.SchemaType;
 @SchemaType(namespace = "xpl.lang", name = "write_array")
 public class WriteArray extends Statement {
 
+	private final DataClassArray dataClassArray;
 	private final int valueSlot;
 	private final Expression arrayExpression;
 	private final Statement writeStatement;
 
-	public WriteArray(int valueSlot, Expression arrayExpression, Statement writeStatement)
+	public WriteArray(DataClassArray dataArray, int valueSlot, Expression arrayExpression, Statement writeStatement)
 			throws NoSuchMethodException, IllegalAccessException {
+		this.dataClassArray = dataArray;
 		this.valueSlot = valueSlot;
 		this.arrayExpression = arrayExpression;
 		this.writeStatement = writeStatement;
+	}
+
+	public DataClassArray dataClassArray() {
+		return dataClassArray;
 	}
 
 	public int valueSlot() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,24 @@
 package io.litterat.xpl.lang;
 
 import io.litterat.bind.Record;
-import io.litterat.model.Signature;
 import io.litterat.model.annotation.SchemaType;
+import io.litterat.model.function.FunctionSignature;
 
 @Record
 @SchemaType(namespace = "xpl.lang", name = "lambda")
 public class Lambda {
 
-	private final Signature signature;
+	private final FunctionSignature signature;
 	private final Block block;
 	private final Class<?>[] slots;
 
-	public Lambda(Signature signature, Class<?>[] slots, Block block) {
+	public Lambda(FunctionSignature signature, Class<?>[] slots, Block block) {
 		this.signature = signature;
 		this.slots = slots;
 		this.block = block;
 	}
 
-	public Signature signature() {
+	public FunctionSignature signature() {
 		return signature;
 	}
 

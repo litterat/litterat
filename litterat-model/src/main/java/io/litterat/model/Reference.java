@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
 @SchemaType(namespace = "schema", name = "reference")
-public class Reference implements Element, Definition {
+public class Reference implements Element {
 
 	private final TypeName type;
 
@@ -32,11 +32,11 @@ public class Reference implements Element, Definition {
 	}
 
 	public Reference(String type) {
-		this.type = new TypeName(type);
+		this(new TypeName(type));
 	}
 
 	public Reference(String namespace, String type) {
-		this.type = new TypeName(namespace, type);
+		this(new TypeName(namespace, type));
 	}
 
 	public TypeName type() {

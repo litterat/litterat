@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import io.litterat.model.annotation.SchemaType;
 
 @io.litterat.bind.Record
 @SchemaType(namespace = "schema", name = "sequence")
-public class Record implements Element, Definition {
+public class Record implements Element {
 
 	private final Field[] fields;
 

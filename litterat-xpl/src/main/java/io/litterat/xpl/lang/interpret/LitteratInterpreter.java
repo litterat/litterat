@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,17 @@
  */
 package io.litterat.xpl.lang.interpret;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassArray;
-import io.litterat.model.Atom;
 import io.litterat.model.Definition;
-import io.litterat.model.Encoding;
 import io.litterat.model.Record;
 import io.litterat.model.Reference;
-import io.litterat.model.TypeException;
 import io.litterat.model.Union;
+import io.litterat.model.atom.Atom;
+import io.litterat.model.atom.Encoding;
+import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.Block;
 import io.litterat.xpl.lang.BlockArray;
@@ -174,11 +172,12 @@ public class LitteratInterpreter {
 			// can be called.
 			//
 
-			Class<?> arrayClass = Array
-					.newInstance(typeMap.library().getTypeClass(readArray.array().type()).typeClass(), 0).getClass();
-			DataClassArray pepClass = (DataClassArray) typeMap.library().pepContext().getDescriptor(arrayClass);
+			// Class<?> arrayClass = Array
+			// .newInstance(typeMap.library().getTypeClass(readArray.array().type()).typeClass(), 0).getClass();
+			// DataClassArray pepClass = (DataClassArray)
+			// typeMap.library().pepContext().getDescriptor(arrayClass);
 
-			compiledExpression = new ReadArrayInterpreter(readArray, pepClass,
+			compiledExpression = new ReadArrayInterpreter(readArray,
 					compileExpression(typeMap, readArray.readExpression()));
 		} else if (expression instanceof SlotReference) {
 			SlotReference slotReference = (SlotReference) expression;

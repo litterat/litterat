@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package io.litterat.xpl.lang;
 
+import io.litterat.bind.DataClassArray;
 import io.litterat.bind.Record;
 import io.litterat.model.Array;
 import io.litterat.model.annotation.SchemaType;
@@ -29,12 +30,19 @@ import io.litterat.model.annotation.SchemaType;
 @SchemaType(namespace = "xpl.lang", name = "read_array")
 public class ReadArray implements Expression {
 
+	private final DataClassArray dataArray;
 	private final Array arrayDef;
 	private final Expression readElement;
 
-	public ReadArray(Array arrayDef, Expression readElement) throws NoSuchMethodException, IllegalAccessException {
+	public ReadArray(DataClassArray dataArray, Array arrayDef, Expression readElement)
+			throws NoSuchMethodException, IllegalAccessException {
+		this.dataArray = dataArray;
 		this.arrayDef = arrayDef;
 		this.readElement = readElement;
+	}
+
+	public DataClassArray dataClassArray() {
+		return dataArray;
 	}
 
 	public Array array() {

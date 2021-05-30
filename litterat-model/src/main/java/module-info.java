@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -15,8 +15,11 @@ module io.litterat.model {
 
 	exports io.litterat.model;
 	exports io.litterat.model.annotation;
+	exports io.litterat.model.atom;
 	exports io.litterat.model.bind;
+	exports io.litterat.model.function;
 	exports io.litterat.model.meta;
+	exports io.litterat.model.library;
 
 	requires transitive io.litterat.bind;
 

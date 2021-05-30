@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package io.litterat.xpl.lang.interpret;
 import java.lang.invoke.MethodHandle;
 
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.TypeException;
 import io.litterat.model.bind.ModelBinder;
+import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.ConstructInstance;
 import io.litterat.xpl.lang.LitteratMachine;
@@ -47,8 +47,7 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 
 		// TODO Investigate escape analysis. The args array can be bigger than
 		// constructor, so it's possible to allocate a bigger static array and maybe it
-		// won't
-		// get put on the heap.
+		// won't get put on the heap.
 		// https://stackoverflow.com/questions/59660199/is-this-what-java-can-do-and-c-cant
 		Object[] args = new Object[params.length];
 		for (int x = 0; x < params.length; x++) {
