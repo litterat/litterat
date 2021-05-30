@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package io.litterat.xpl.lang.interpret;
 
+import io.litterat.bind.DataClassArray;
 import io.litterat.xpl.TypeOutputStream;
 import io.litterat.xpl.lang.LitteratMachine;
 import io.litterat.xpl.lang.WriteArray;
@@ -36,11 +37,16 @@ public class WriteArrayInterpreter implements StatementInterpreter {
 	@Override
 	public Object execute(LitteratMachine m) throws Throwable {
 
-		// TODO What about int[] or other primitive arrays? or Collections?
-		Object[] array = (Object[]) arrayExpr.execute(m);
-		((TypeOutputStream) m.getVariable(LitteratMachine.VAR_TRANSPORT)).output().writeUVarInt32(array.length);
-		for (int x = 0; x < array.length; x++) {
-			m.setVariable(writeArray.valueSlot(), array[x]);
+		DataClassArray arrayClass = writeArray.dataClassArray();
+
+		Object arrayData = arrayExpr.execute(m);
+		int length = (int) arrayClass.size().invoke(arrayData);
+		Object iterator = arrayClass.iterator().invoke(arrayData);
+
+		((TypeOutputStream) m.getVariable(LitteratMachine.VAR_TRANSPORT)).output().writeUVarInt32(length);
+		for (int x = 0; x < length; x++) {
+			Object av = arrayClass.get().invoke(arrayData, iterator);
+			m.setVariable(writeArray.valueSlot(), av);
 			writeElement.execute(m);
 		}
 

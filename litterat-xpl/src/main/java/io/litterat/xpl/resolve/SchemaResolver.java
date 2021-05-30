@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.model.Array;
-import io.litterat.model.Atom;
 import io.litterat.model.Definition;
-import io.litterat.model.Encoding;
 import io.litterat.model.Field;
 import io.litterat.model.Record;
 import io.litterat.model.Reference;
-import io.litterat.model.Signature;
-import io.litterat.model.TypeException;
-import io.litterat.model.TypeLibrary;
 import io.litterat.model.TypeName;
 import io.litterat.model.Union;
+import io.litterat.model.atom.Atom;
+import io.litterat.model.atom.Encoding;
+import io.litterat.model.function.FunctionSignature;
+import io.litterat.model.library.TypeException;
+import io.litterat.model.library.TypeLibrary;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.TypeMapEntry;
@@ -122,6 +124,7 @@ public class SchemaResolver implements TypeResolver {
 		throw new TypeException("unable to map reverse");
 	}
 
+	// TODO this needs more work. Should start as DataClass and look at each type.
 	private static TypeWriter generateSequenceWriter(TypeMap typeMap, Record sequence, TypeName typeName,
 			DataClassRecord dataClass) throws TypeException {
 		try {
@@ -130,8 +133,15 @@ public class SchemaResolver implements TypeResolver {
 
 			int varObject = slots.getSlot(dataClass.typeClass());
 
+			DataClassField[] dataClassFields = dataClass.fields();
+			Field[] sequenceFields = sequence.fields();
+
 			List<Statement> statements = new ArrayList<>();
-			for (Field field : sequence.fields()) {
+			for (int x = 0; x < dataClassFields.length; x++) {
+
+				Field field = sequenceFields[x];
+				DataClassField dataClassField = dataClassFields[x];
+
 				if (field.type() instanceof Reference) {
 					Reference reference = (Reference) field.type();
 					Statement writeField = new WriteValue(reference.type(),
@@ -140,25 +150,25 @@ public class SchemaResolver implements TypeResolver {
 				} else if (field.type() instanceof Array) {
 
 					Array array = (Array) field.type();
+					DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
 
 					Class<?> arrayClss = typeMap.library().getTypeClass(array.type()).typeClass();
 					int loopSlot = slots.getSlot(arrayClss);
 					Expression readField = new FieldRead(new SlotReference(varObject), typeName, field.name());
 					Statement writeElement = new WriteValue(array.type(), new SlotReference(loopSlot));
 
-					Statement loop = new WriteArray(loopSlot, readField, writeElement);
+					Statement loop = new WriteArray(dataArray, loopSlot, readField, writeElement);
 					statements.add(loop);
 				} else {
 					throw new TypeException("Not recognised field element");
 				}
-
 			}
 
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new Signature(new Reference(TypeLibrary.VOID), new Reference("vm", "output"),
-					new Reference(typeName)), slots.getSlots(), blockNode);
+			Lambda lambda = new Lambda(new FunctionSignature(new Reference(TypeLibrary.VOID),
+					new Reference("vm", "output"), new Reference(typeName)), slots.getSlots(), blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
 			// LitteratGenerator compiler = new LitteratGenerator();
@@ -184,7 +194,11 @@ public class SchemaResolver implements TypeResolver {
 			List<Statement> statements = new ArrayList<>();
 			statements.add(new SlotSet(varName, new ConstructInstance(typeName, new Expression[0])));
 
-			for (Field field : sequence.fields()) {
+			DataClassField[] dataClassFields = dataClass.fields();
+			Field[] sequenceFields = sequence.fields();
+
+			for (int x = 0; x < sequenceFields.length; x++) {
+				Field field = sequenceFields[x];
 				if (field.type() instanceof Reference) {
 					Reference reference = (Reference) field.type();
 					statements.add(new FieldSet(new SlotReference(varName), new ReadValue(reference.type()), typeName,
@@ -196,7 +210,7 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new Signature(new Reference(typeName), new Reference("vm", "input")),
+			Lambda lambda = new Lambda(new FunctionSignature(new Reference(typeName), new Reference("vm", "input")),
 					slots.getSlots(), blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
@@ -222,9 +236,13 @@ public class SchemaResolver implements TypeResolver {
 			List<Statement> statements = new ArrayList<>();
 
 			Expression[] constructorBlock = new Expression[sequence.fields().length];
-			for (int x = 0; x < sequence.fields().length; x++) {
 
-				Field field = sequence.fields()[x];
+			DataClassField[] dataClassFields = dataClass.fields();
+			Field[] sequenceFields = sequence.fields();
+
+			for (int x = 0; x < sequenceFields.length; x++) {
+				Field field = sequenceFields[x];
+				DataClassField dataClassField = dataClassFields[x];
 
 				if (field.type() instanceof Reference) {
 					Reference reference = (Reference) field.type();
@@ -234,8 +252,9 @@ public class SchemaResolver implements TypeResolver {
 					constructorBlock[x] = new ReadValue(reference.type());
 				} else if (field.type() instanceof Array) {
 					Array array = (Array) field.type();
+					DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
 
-					constructorBlock[x] = new ReadArray(array, new ReadValue(array.type()));
+					constructorBlock[x] = new ReadArray(dataArray, array, new ReadValue(array.type()));
 				} else {
 					throw new TypeException("not recognised type: " + field.type().getClass().getName());
 				}
@@ -251,7 +270,7 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new Signature(new Reference(typeName), new Reference("vm", "input")),
+			Lambda lambda = new Lambda(new FunctionSignature(new Reference(typeName), new Reference("vm", "input")),
 					slots.getSlots(), blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.test.json;
+package io.litterat.test.xpl;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.json.JsonMapper;
+import io.litterat.model.library.TypeException;
 import io.litterat.test.bind.data.ListOfString;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 
 public class ListOfStringTest {
 
@@ -35,29 +36,25 @@ public class ListOfStringTest {
 
 	ListOfString test = new ListOfString(testList);
 
-	DataBindContext context;
-
-	@BeforeEach
-	public void setup() {
-		context = DataBindContext.builder().build();
-	}
-
 	@Test
-	public void testToJson() throws Throwable {
+	public void testWriteAndReadSimpleArray() throws IOException, TypeException {
 
-		String json = JsonMapper.toJson(test);
+		// Test writing out a Point.
+		byte[] buffer = new byte[500];
+		TypeOutputStream out = new TypeOutputStream(buffer);
+		out.writeObject(test);
+		out.close();
 
-		System.out.println("json: " + json);
-
-		ListOfString object = JsonMapper.fromJson(json, ListOfString.class);
+		TypeInputStream in = new TypeInputStream(buffer);
+		ListOfString object = in.readObject();
 
 		// validate result.
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ListOfString);
-		Assertions.assertEquals(3, object.list().size());
 
 		Assertions.assertEquals(TEST_ONE, object.list().get(0));
 		Assertions.assertEquals(TEST_TWO, object.list().get(1));
 		Assertions.assertEquals(TEST_THREE, object.list().get(2));
+
 	}
 }

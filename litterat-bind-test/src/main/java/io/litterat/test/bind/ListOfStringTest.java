@@ -24,7 +24,7 @@ public class ListOfStringTest {
 
 	List<String> testList = List.of(TEST_ONE, TEST_TWO, TEST_THREE);
 
-	ListOfString test = new ListOfString(List.of(testList));
+	ListOfString test = new ListOfString(testList);
 
 	DataBindContext context;
 
@@ -68,9 +68,9 @@ public class ListOfStringTest {
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ListOfString);
 
-		Assertions.assertEquals(TEST_ONE, object.list().get(0).get(0));
-		Assertions.assertEquals(TEST_TWO, object.list().get(0).get(1));
-		Assertions.assertEquals(TEST_THREE, object.list().get(0).get(2));
+		Assertions.assertEquals(TEST_ONE, object.list().get(0));
+		Assertions.assertEquals(TEST_TWO, object.list().get(1));
+		Assertions.assertEquals(TEST_THREE, object.list().get(2));
 
 	}
 
@@ -89,9 +89,9 @@ public class ListOfStringTest {
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ListOfString);
 
-		Assertions.assertEquals(TEST_ONE, object.list().get(0).get(0));
-		Assertions.assertEquals(TEST_TWO, object.list().get(0).get(1));
-		Assertions.assertEquals(TEST_THREE, object.list().get(0).get(2));
+		Assertions.assertEquals(TEST_ONE, object.list().get(0));
+		Assertions.assertEquals(TEST_TWO, object.list().get(1));
+		Assertions.assertEquals(TEST_THREE, object.list().get(2));
 	}
 
 	@Test

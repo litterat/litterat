@@ -21,14 +21,14 @@ import io.litterat.bind.Record;
 
 public class ListOfString {
 
-	private final List<List<String>> list;
+	private final List<String> list;
 
 	@Record
-	public ListOfString(List<List<String>> list) {
+	public ListOfString(List<String> list) {
 		this.list = list;
 	}
 
-	public List<List<String>> list() {
+	public List<String> list() {
 		return this.list;
 	}
 }

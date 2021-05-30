@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ public class ReadArrayInterpreter implements ExpressionInterpreter {
 
 	private final ExpressionInterpreter readElement;
 
-	public ReadArrayInterpreter(ReadArray readArray, DataClassArray arrayClass, ExpressionInterpreter readElement) {
+	public ReadArrayInterpreter(ReadArray readArray, ExpressionInterpreter readElement) {
 
 		this.readArray = readArray;
-		this.arrayClass = arrayClass;
+		this.arrayClass = readArray.dataClassArray();
 		this.readElement = readElement;
 	}
 
@@ -40,17 +40,17 @@ public class ReadArrayInterpreter implements ExpressionInterpreter {
 	public Object execute(LitteratMachine m) throws Throwable {
 
 		TypeInputStream in = ((TypeInputStream) m.getVariable(LitteratMachine.VAR_TRANSPORT));
-
-		// TODO What about int[] or other primitive arrays? or Collections?
 		int length = in.input().readUVarInt32();
 
-		Object[] array = (Object[]) arrayClass.constructor().invoke(length);
+		Object arrayData = arrayClass.constructor().invoke(length);
+		Object iterator = arrayClass.iterator().invoke(arrayData);
 
-		for (int x = 0; x < array.length; x++) {
-			array[x] = readElement.execute(m);
+		for (int x = 0; x < length; x++) {
+			Object v = readElement.execute(m);
+			arrayClass.put().invoke(arrayData, iterator, v);
 		}
 
-		return array;
+		return arrayData;
 
 	}
 
