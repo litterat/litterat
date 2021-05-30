@@ -12,16 +12,164 @@ Next steps list. A general list of things that could be done next in no particul
 
  litterat-model
  - Review the data model language and look at data model annotations. 
+ - Rewrite the ModelBinder to use updated model and bind DataClasses correctly.
  - Review model arrays and look at multi-dimensional arrays as part of schema design.
  - Implement Annotation interface
  
+ litterat-xpl
+ - Review the lang package and SchemaResolver to match more correctly to the model.
+ 
  Other
  - Implement the jvm-serializers performance test.
+ - Investigate how litterat could be used in a web service such as Helidon.
  
  
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
+
+
+## Day 62 - May 30 - Refactoring XPL array reading and writing
+
+I had a test case for XPL that involved a List<String>. The original implementation for XPL only allowed reading/writing array classes. By passing down the DataClassArray I was able to use the correct technique to read/write the list. Noticed that both the dataClass -> model and the model -> xpl.lang required more work to align the models.
+
+## Day 61 - May 29 - Back at it
+
+Over a month of being busy with other things. Good to get back at it.
+
+Finished off a month ago with an infinite resolution loop. Resolved by not resolving the members of unions during resolution. This requires making DataClassUnion hold its member types as Class instead of DataClass. 
+
+## Day 60 - April 24 - Naming and namespaces
+
+The concept of naming and namespaces can be very complex. It represents another conceptual domain that is being put together with the rest of the system. The naming is also very closely associated with versioning. My investigation into versioning showed that it was probably better to not use versioning at all as it complicates the solution. 
+
+It would be nice to completely remove the concept of namespaces for now, but it is likely they will be needed. For now the namespace is a simple string. The other concept close to namespaces is specification files. A single specification file could relate to a single namespace or reference/import multiple other namespaces.
+
+A few changes to TypeName tonight to remove versioning and attribute which shouldn't be needed. Better to strip things away until needed later for now.
+
+## Day 59 - April 23 - Slim down the data model
+
+A conclusion from yesterdays thinking is that attempting to merge domains such as how atoms are specified and how records/unions are defined is the wrong approach. Each domain has its own design and trying to use one to define the other is incorrect. For now the main addition to the design is:
+
+    definition: union( [ element, atom ] );
+    
+This separates the two domains but combines the naming approach. Definition in this instance is the right hand side of the rule. It allows the investigation into the various atom types and definitions to occur later. An entry is thus:
+
+    entry: record( [ field( "name", identifier, true ), 
+                     field( "definition", definition, true ) ] );
+                    
+Spent some time moving around the classes in the model library. The definition classes are ok with atoms and functions moved to other packages. However, the other area that needs work is the namespace and naming concepts.
+
+
+## Day 58 - April 22 - Continuing on the data model
+
+One clear issue with the model currently is that Atoms and concepts like Envelope and Encoding don't fit the model very well. The concept of using an Atom as a record and then having a single union for atom_attributes isn't fitting nicely. Here's another attempt:
+
+    atom: union( boolean_def, integer_def, real_def, string_def );
+    integer_def: record( [ field( "attributes" , integer_attrs, true ) ] );
+    integer_attrs: union( ... )
+    
+This starts to get complex pretty quickly. It seems to make sense to use a union at the atom level. However, delving into the individual concepts of an integer brings up lots of questions. Questions that have up until now been avoided. :) So possibly time to revisit those issues.
+
+The issue is how close to the physical representation does/should the modeling language go. Most schemas provide a limited set of known types and do not allow the introduction of new types. ASN.1 provides a generalised concept of INTEGER, but does not specify the implementation. When you add min, max or enumerations to the list of requirements, it requires adding instance values which is somewhat recursive and may require the concept of macro expansion.
+
+Working backwards using an example of an enumerated type and a min/max range:
+
+    myEnum: enum( [ uint8:0, unint8:10 ] );
+    myRange: range( uint8:0, uint8:10 );
+
+Both of these examples have an assumption of knowing the type. This is where the concept of a lambda might become useful:
+
+    myEnum: enumOfType( uint8 ).of( [ uint8:0, uint8:10 ] );
+    
+There a few issues being interwoven here.
+
+ 1. Definition of an atom or type of atoms. For instance integers, real and string are different types of atoms.
+ 2. Definition of a subset of a type. These are things like int8, int32, utf8-string, etc.
+ 3. Restrictions on atoms. This is where the user wants to restrict a range on a type.
+ 
+Added to this is the fact that plenty of languages and systems don't offer restrictions like in8 or even have separations between integer or real. However, plenty of languages and systems to have clear separations, so it is not easy to pull apart cleanly. It is likely that no matter what design choice is made it will be wrong.
+
+One initial answer is not to attempt to combine the solution for atom definitions with the solution for schemas. They seem to be different enough that providing different solutions for each would make some sense. This would allow the schema language to focus on structure, while the atom language can focus on types. It is also a nice way to defer the problem. This makes the following a complete set of base structures:
+
+    definition: record( [ field( "name", type_name, true ), 
+      			   	    field( "definition", element, true) ] );
+    element: union( [record, array, union, type_name] );
+    record: record( [ field( "fields", array( field ), true ) ] ); 
+    array: record( [ field( "type", type_name, true ) ] ); 
+    field: record( [ field( "name", identifier, true ), 
+                  field( "type", type_name, true ), 
+                  field( "required", boolean, true ) ] );
+    union: record( [ field( "members", array( type_name ), true ) ] );
+    type_name: identifier;
+    identifier: string;
+       
+This design restricts fields to only use a type_name as the type. This is the same for unions. A possible relaxation of that rule would be:
+
+    definition: record( [ field( "name", type_name, true ), 
+      			   	    field( "definition", element, true) ] );
+    element: union( [record, array, union, type_name] );
+    record: record( [ field( "fields", array( field ), true ) ] ); 
+    array: record( [ field( "type", element, true ) ] ); 
+    field: record( [ field( "name", type_name, true ), 
+                  field( "type", element, true ), 
+                  field( "required", boolean, true ) ] );
+    union: record( [ field( "members", array( element ), true ) ] );
+    type_name: identifier;
+    identifier: string;
+    
+Another possible change is to not reference type_name directly in the element union. Mixing records with atoms for Java is not easy, so adding the reference concept back in creates:
+
+    definition: record( [ field( "name", type_name, true ), 
+      			   	    field( "definition", element, true) ] );
+    element: union( [record, array, union, reference] );
+    record: record( [ field( "fields", array( field ), true ) ] ); 
+    array: record( [ field( "type", element, true ) ] ); 
+    field: record( [ field( "name", identifier, true ), 
+                  field( "type", element, true ), 
+                  field( "required", boolean, true ) ] );
+    union: record( [ field( "members", array( element ), true ) ] );
+    reference: record( [ field( "type", identifier, true ) ] );
+    identifier: string;
+    
+This is probably a good design as a starting point that does not attempt to solve all the other problems relating to atoms for now. It aligns closely with the bind library and allows implementing the core capabilities. The only non-defined type is "string" which will be a fixed type for now.
+
+## Day 57 - April 20 - Investigating the data model
+
+The litterat data model is the internal representation of a schema. Ideally, this will be able to capture the concepts of multiple schema syntaxes. Using the concept of algebraic data types and the litterat theory this results in the concepts of Record, Field, Union, Array, and Atom as has been implemented in the bind library. However, the bind library connects these concepts with the Java language, the model connects them with schemas. Schemas add type names and namespaces as well as various concepts introduced by the Schema itself.
+
+The existing model has unions for Definition and Element and these can get a bit confusing. Here's a first attempt at creating definitions for these using the litterat concepts.
+
+
+
+    definition: record( [ field( "name", type_name, true ), 
+      					 field( "definition", element, true) ] );
+ 
+ This is a definition of the core concepts of element, record, array, field and union:
+ 
+    element: union( [record, array, union] );
+    record: record( [ field( "fields", array( field ), true ) ] ); 
+    array: record( [ field( "type", type_name, true ) ] ); 
+    field: record( [ field( "name", identifier, true ), 
+                  field( "type", type_name, true ), 
+                  field( "required", boolean, true ) ] );
+    union: record( [ field( "members", array( type_name ), true ) ] );
+                   
+I think atoms need to be revisited; this is a mix of old and new concepts for atoms.
+
+    atom: record( [ field( "attributes", array( atom_attributes ), true ) ] ); 
+    atom_attributes: union( encoding, integer_attributes, float_attributes );
+    integer_attributes: union( atom_integer, atom_bigendian, atom_littleendian, atom_signed, atom_unsigned ) 
+    type_name: identifier; 
+    identifier: string; 
+    string: ## todo is this an atom or array?
+        
+
+## Day 56 - April 18 - Update to amber mailing list.
+
+It seemed to be a good time to pause and review what has been done and update the amber mailing list. Spent the last few days drafting (a message)[https://mail.openjdk.java.net/pipermail/amber-dev/2021-April/007001.html]. 
+
+The next phase is to return to the litterat.model and work on the binding between Java bind and the model. From there it should be possible to look at exporting to a schema.
 
 ## Day 55 - April 13 - Update to Java 16 and create Java record test
 
