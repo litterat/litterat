@@ -28,14 +28,16 @@ import java.util.Arrays;
  * <li>embedded union: A class with one or more fields where only one is present at any one time.
  * </ul>
  *
+ * The members are the actual classes instead of a DataClass. This is to ensure that infinite
+ * resolution loops do not occur.
  */
 public class DataClassUnion extends DataClass {
 
-	private DataClass[] memberTypes;
+	private Class<?>[] memberTypes;
 
 	private boolean isSealed;
 
-	public DataClassUnion(Class<?> targetType, DataClass[] members, boolean isSealed) {
+	public DataClassUnion(Class<?> targetType, Class<?>[] members, boolean isSealed) {
 		super(targetType, DataClassType.UNION);
 
 		this.memberTypes = members;
@@ -44,10 +46,10 @@ public class DataClassUnion extends DataClass {
 	}
 
 	public DataClassUnion(Class<?> targetType) {
-		this(targetType, new DataClass[0], false);
+		this(targetType, new Class[0], false);
 	}
 
-	public DataClass[] memberTypes() {
+	public Class<?>[] memberTypes() {
 		return memberTypes;
 	}
 
@@ -55,13 +57,13 @@ public class DataClassUnion extends DataClass {
 		return isSealed;
 	}
 
-	public boolean isMemberType(DataClass dataClass) {
+	public boolean isMemberType(Class<?> dataClass) {
 		boolean found = false;
 
 		// Get a reference to latest version as this method isn't synchronized.
 		// Probably a better way to do this.
-		DataClass[] types = this.memberTypes;
-		for (DataClass dClass : types) {
+		Class<?>[] types = this.memberTypes;
+		for (Class<?> dClass : types) {
 			if (dClass.equals(dataClass)) {
 				found = true;
 				break;
@@ -79,13 +81,17 @@ public class DataClassUnion extends DataClass {
 	 * 
 	 * @throws DataBindException
 	 */
-	public synchronized void addMemberType(DataClass newType) throws DataBindException {
+	public synchronized void addMemberType(Class<?> newType) throws DataBindException {
+
+		if (isMemberType(newType)) {
+			return;
+		}
 
 		if (isSealed) {
 			throw new DataBindException("Union type is sealed. No addition member types can be added.");
 		}
 
-		DataClass[] newMemberTypes = Arrays.copyOf(memberTypes, memberTypes.length + 1);
+		Class<?>[] newMemberTypes = Arrays.copyOf(memberTypes, memberTypes.length + 1);
 		newMemberTypes[newMemberTypes.length - 1] = newType;
 
 		this.memberTypes = newMemberTypes;
@@ -97,9 +103,9 @@ public class DataClassUnion extends DataClass {
 			return value;
 		}
 
-		DataClass[] values = this.memberTypes;
-		for (DataClass dataClass : values) {
-			if (dataClass.typeClass() == value.getClass()) {
+		Class<?>[] values = this.memberTypes;
+		for (Class<?> dataClass : values) {
+			if (dataClass == value.getClass()) {
 				return value;
 			}
 		}
@@ -114,7 +120,7 @@ public class DataClassUnion extends DataClass {
 				+ ", isSealed=" + isSealed + "]";
 	}
 
-	private String membersToString(DataClass[] dataClass) {
+	private String membersToString(Class<?>[] dataClass) {
 
 		if (dataClass == null || dataClass.length == 0) {
 			return "[]";
@@ -123,7 +129,7 @@ public class DataClassUnion extends DataClass {
 		StringBuilder b = new StringBuilder();
 		b.append('[');
 		for (int x = 0; x < dataClass.length; x++) {
-			b.append(String.valueOf(dataClass[x].typeClass().getName()));
+			b.append(String.valueOf(dataClass[x].getName()));
 			if (x == dataClass.length - 1) {
 				break;
 			}

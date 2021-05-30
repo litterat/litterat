@@ -71,17 +71,19 @@ public class SealedInterfaceUnionTest {
 		Assertions.assertEquals(SealedInterfaceUnion.class, descriptor.typeClass());
 
 		// A union initially has no implementations.
-		DataClass[] components = descriptor.memberTypes();
+		Class<?>[] components = descriptor.memberTypes();
 		Assertions.assertNotNull(components);
 		Assertions.assertEquals(2, components.length);
 
-		DataClass memberType = components[0];
+		Class<?> memberClass = components[0];
+		DataClass memberType = context.getDescriptor(memberClass);
 		Assertions.assertTrue(memberType instanceof DataClassRecord);
 		Assertions.assertEquals(SealedInterfaceUnionPoint.class, memberType.typeClass());
 
-		DataClass memberCircle = components[1];
-		Assertions.assertTrue(memberCircle instanceof DataClassRecord);
-		Assertions.assertEquals(SealedInterfaceUnionCircle.class, memberCircle.typeClass());
+		Class<?> memberClassCircle = components[1];
+		DataClass memberTypeCircle = context.getDescriptor(memberClassCircle);
+		Assertions.assertTrue(memberTypeCircle instanceof DataClassRecord);
+		Assertions.assertEquals(SealedInterfaceUnionCircle.class, memberTypeCircle.typeClass());
 	}
 
 	@Test

@@ -73,8 +73,8 @@ public class EmbeddedUnionTest {
 		Assertions.assertEquals(2, union.memberTypes().length);
 		Assertions.assertTrue(union.isSealed());
 
-		Assertions.assertTrue(union.memberTypes()[0] instanceof DataClassAtom);
-		Assertions.assertTrue(union.memberTypes()[1] instanceof DataClassAtom);
+		Assertions.assertTrue(context.getDescriptor(union.memberTypes()[0]) instanceof DataClassAtom);
+		Assertions.assertTrue(context.getDescriptor(union.memberTypes()[0]) instanceof DataClassAtom);
 	}
 
 	@Test

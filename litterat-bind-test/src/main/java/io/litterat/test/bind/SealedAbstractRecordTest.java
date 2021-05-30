@@ -61,15 +61,17 @@ public class SealedAbstractRecordTest {
 		Assertions.assertEquals(SealedShape.class, descriptor.typeClass());
 
 		// A union initially has no implementations.
-		DataClass[] components = descriptor.memberTypes();
+		Class<?>[] components = descriptor.memberTypes();
 		Assertions.assertNotNull(components);
 		Assertions.assertEquals(2, components.length);
 
-		DataClass memberType = components[0];
+		Class<?> memberClass = components[0];
+		DataClass memberType = context.getDescriptor(memberClass);
 		Assertions.assertTrue(memberType instanceof DataClassRecord);
 		Assertions.assertEquals(RecordPoint.class, memberType.typeClass());
 
-		DataClass memberCircle = components[1];
+		Class<?> memberClassCircle = components[1];
+		DataClass memberCircle = context.getDescriptor(memberClassCircle);
 		Assertions.assertTrue(memberCircle instanceof DataClassRecord);
 		Assertions.assertEquals(RecordCircle.class, memberCircle.typeClass());
 	}

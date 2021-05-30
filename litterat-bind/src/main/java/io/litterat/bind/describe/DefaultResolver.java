@@ -247,10 +247,10 @@ public class DefaultResolver {
 		if (newFeatures.isSealed(targetClass)) {
 			Class<?>[] members = newFeatures.getPermittedSubclasses(targetClass);
 
-			DataClass[] unionMembers = new DataClass[members.length];
+			Class<?>[] unionMembers = new Class[members.length];
 			for (int x = 0; x < members.length; x++) {
 				Class<?> memberClass = members[x];
-				unionMembers[x] = context.getDescriptor(memberClass);
+				unionMembers[x] = memberClass;
 			}
 
 			return new DataClassUnion(targetClass, unionMembers, false);
@@ -260,11 +260,14 @@ public class DefaultResolver {
 		if (union != null) {
 			if (union.value() != null && union.value().length > 0) {
 
-				DataClass[] unionMembers = new DataClass[union.value().length];
+				Class<?>[] unionMembers = new Class[union.value().length];
 				for (int x = 0; x < union.value().length; x++) {
 					Class<?> memberClass = union.value()[x];
 
-					unionMembers[x] = context.getDescriptor(memberClass);
+					// The members of the union are not resolved at this point as we
+					// can end up in an infinite loop. By using the actual member classes
+					// the resolution loop is broken.
+					unionMembers[x] = memberClass;
 				}
 
 				return new DataClassUnion(targetClass, unionMembers, union.sealed());
@@ -755,23 +758,22 @@ public class DefaultResolver {
 								throw new DataBindException("Union annotation must have one or more classes");
 							}
 
-							DataClass[] unionTypes = new DataClass[union.value().length];
+							Class<?>[] unionTypes = new Class[union.value().length];
 							for (int z = 0; z < union.value().length; z++) {
 								Class<?> clss = union.value()[z];
 								if (!unionClass.isAssignableFrom(clss)) {
 									throw new DataBindException("Union types not assignable from class type");
 								}
 
-								unionTypes[z] = context.getDescriptor(clss);
-								if (unionTypes[z] instanceof DataClassUnion
-										|| unionTypes[z] instanceof DataClassArray) {
-									// Embedded unions will require more work to decide on how valid other unions or
-									// arrays would be. Unions with unknown type sets is problematic. If another union
-									// member set is known it might be ok to add all children to the parent. Something
-									// for future.
-									throw new DataBindException(
-											"Embedded union types can not include other unions or arrays");
-								}
+								unionTypes[z] = clss;
+								/*
+								 * if (unionTypes[z] instanceof DataClassUnion || unionTypes[z] instanceof
+								 * DataClassArray) { // Embedded unions will require more work to decide on how valid
+								 * other unions or // arrays would be. Unions with unknown type sets is problematic. If
+								 * another union // member set is known it might be ok to add all children to the
+								 * parent. Something // for future. throw new DataBindException(
+								 * "Embedded union types can not include other unions or arrays"); }
+								 */
 							}
 
 							DataClassUnion dataUnion = new DataClassUnion(unionClass, unionTypes, union.sealed());
@@ -856,7 +858,7 @@ public class DefaultResolver {
 							&& !newFeatures.isSealed(targetInterface)) {
 						DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(targetInterface);
 
-						targetUnion.addMemberType(descriptor);
+						targetUnion.addMemberType(targetClass);
 					}
 				} catch (Throwable t) {
 					// ignore.
@@ -877,7 +879,7 @@ public class DefaultResolver {
 								&& !newFeatures.isSealed(superClass)) {
 							DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(superClass);
 
-							targetUnion.addMemberType(descriptor);
+							targetUnion.addMemberType(targetClass);
 						}
 					} catch (Throwable t) {
 						// ignore.

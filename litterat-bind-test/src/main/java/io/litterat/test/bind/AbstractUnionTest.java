@@ -62,7 +62,7 @@ public class AbstractUnionTest {
 		Assertions.assertEquals(AbstractUnion.class, descriptor.typeClass());
 
 		// A union initially has no implementations.
-		DataClass[] components = descriptor.memberTypes();
+		Class<?>[] components = descriptor.memberTypes();
 		Assertions.assertNotNull(components);
 		Assertions.assertEquals(0, components.length);
 
@@ -73,9 +73,10 @@ public class AbstractUnionTest {
 		components = descriptor.memberTypes();
 		Assertions.assertEquals(1, components.length);
 
-		DataClass memberType = components[0];
-		Assertions.assertTrue(memberType instanceof DataClassRecord);
-		Assertions.assertEquals(AbstractUnionCircle.class, memberType.typeClass());
+		Class<?> memberType = components[0];
+		DataClass dataClass = context.getDescriptor(memberType);
+		Assertions.assertTrue(dataClass instanceof DataClassRecord);
+		Assertions.assertEquals(AbstractUnionCircle.class, dataClass.typeClass());
 
 	}
 

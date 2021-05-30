@@ -63,7 +63,7 @@ public class InterfaceUnionTest {
 		Assertions.assertEquals(InterfaceUnion.class, descriptor.typeClass());
 
 		// A union initially has no implementations.
-		DataClass[] components = descriptor.memberTypes();
+		Class<?>[] components = descriptor.memberTypes();
 		Assertions.assertNotNull(components);
 		Assertions.assertEquals(0, components.length);
 
@@ -74,7 +74,8 @@ public class InterfaceUnionTest {
 		components = descriptor.memberTypes();
 		Assertions.assertEquals(1, components.length);
 
-		DataClass memberType = components[0];
+		Class<?> memberClass = components[0];
+		DataClass memberType = context.getDescriptor(memberClass);
 		Assertions.assertTrue(memberType instanceof DataClassRecord);
 		Assertions.assertEquals(InterfaceUnionPoint.class, memberType.typeClass());
 	}

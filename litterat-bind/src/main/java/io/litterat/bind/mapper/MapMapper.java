@@ -99,7 +99,7 @@ public class MapMapper {
 
 				// Make sure this class is a member of the union before writing it.
 				DataClass unionInstanceClass = context.getDescriptor(object.getClass());
-				if (!unionClass.isMemberType(unionInstanceClass)) {
+				if (!unionClass.isMemberType(unionInstanceClass.typeClass())) {
 					throw new IllegalArgumentException(
 							String.format("Class '%s' not a member of union type.", object.getClass().getName()));
 				}
@@ -192,8 +192,9 @@ public class MapMapper {
 					String type = (String) map.get("type");
 
 					DataClass instantType = context.getDescriptor(Class.forName(type));
-					if (!unionClass.isMemberType(instantType)) {
-						throw new DataBindException(String.format("instance type '%s' not of expected union type '%s'", instantType.typeClass().getName(), unionClass.typeClass().getName()));
+					if (!unionClass.isMemberType(instantType.typeClass())) {
+						throw new DataBindException(String.format("instance type '%s' not of expected union type '%s'",
+								instantType.typeClass().getName(), unionClass.typeClass().getName()));
 					}
 
 					v = toObject(instantType, data);

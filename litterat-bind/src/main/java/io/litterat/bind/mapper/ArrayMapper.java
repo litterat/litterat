@@ -465,7 +465,7 @@ public class ArrayMapper {
 
 					DataClass dataClass = context.getDescriptor(v.getClass());
 
-					if (!unionClass.isMemberType(dataClass)) {
+					if (!unionClass.isMemberType(dataClass.typeClass())) {
 						throw new DataBindException("Class not of union type");
 					}
 
@@ -480,7 +480,7 @@ public class ArrayMapper {
 				try {
 					unionPair[1] = function.toArray.invoke(v);
 				} catch (Throwable e) {
-					throw new DataBindException("Failed to convert class");
+					throw new DataBindException("Failed to convert class", e);
 				}
 			} else {
 				unionPair[0] = "null";
@@ -559,7 +559,7 @@ public class ArrayMapper {
 					if (function == null) {
 
 						DataClass dataClass = context.getDescriptor(Class.forName(unionType));
-						if (!unionClass.isMemberType(dataClass)) {
+						if (!unionClass.isMemberType(dataClass.typeClass())) {
 							throw new DataBindException("Class not of union type");
 						}
 
