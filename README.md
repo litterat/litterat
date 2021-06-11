@@ -14,7 +14,7 @@ This repository contains a number of projects currently under active development
 
 - litterat-bind: Litterat Java language binding.
 - litterat-model: Format independent abstract serialization model.
-- litterat-json: JSON encoder/decoder using GSON and PEP.
+- litterat-json: JSON encoder/decoder using GSON and litterat-bind.
 - litterat-xpl: Binary encoding/decoding library with similar properties to inbuilt Java serialization.
 
 See the readme for each project for more information.

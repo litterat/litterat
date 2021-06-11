@@ -30,7 +30,6 @@ repositories {
 }
 
 dependencies {
-    // litterat-pep
     implementation project(":litterat-bind")
 }
 

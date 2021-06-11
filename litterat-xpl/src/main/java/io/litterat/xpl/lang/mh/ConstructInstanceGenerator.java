@@ -50,8 +50,6 @@ public class ConstructInstanceGenerator implements ExpressionGenerator {
 	public MethodHandle bind(LitteratMachine am)
 			throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, TypeException {
 
-		// TODO this should execute the params into an array and call the PEP
-		// constructor.
 		for (int x = 0; x < params.length; x++) {
 			@SuppressWarnings("unused")
 			MethodHandle arg = params[x].bind(am);

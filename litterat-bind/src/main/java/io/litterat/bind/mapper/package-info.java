@@ -16,12 +16,12 @@
 package io.litterat.bind.mapper;
 /**
  * 
- * These are examples of how to use the Pep library.
+ * These are examples of how to use the Litterat bind library.
  * 
  * @formatter:off
  * 
- * PepArrayMapper - converts to and from an Object[] 
- * PepMapMapper - converts to and from a Map<String,Object>
+ * ArrayMapper - converts to and from an Object[] 
+ * MapMapper - converts to and from a Map<String,Object>
  * 
  * @formatter:on
  */

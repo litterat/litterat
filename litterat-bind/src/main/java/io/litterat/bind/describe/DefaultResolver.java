@@ -109,8 +109,8 @@ public class DefaultResolver {
 		if (targetClass.isInterface()) {
 
 			// Interface needs to be marked with @Data or Serializable.
-			Union pepData = targetClass.getAnnotation(Union.class);
-			if (pepData != null) {
+			Union unionAnnotation = targetClass.getAnnotation(Union.class);
+			if (unionAnnotation != null) {
 				return true;
 			}
 
@@ -129,8 +129,8 @@ public class DefaultResolver {
 			}
 
 			// Interface needs to be marked with @Data or Serializable.
-			Union pepData = targetClass.getAnnotation(Union.class);
-			if (pepData != null) {
+			Union unionAnnotation = targetClass.getAnnotation(Union.class);
+			if (unionAnnotation != null) {
 				return true;
 			}
 
@@ -148,16 +148,16 @@ public class DefaultResolver {
 		}
 
 		// if class has annotation this is a tuple.
-		Record pepData = targetClass.getAnnotation(Record.class);
-		if (pepData != null) {
+		Record recordAnnotation = targetClass.getAnnotation(Record.class);
+		if (recordAnnotation != null) {
 			return true;
 		}
 
 		// Check for annotation on constructor.
 		Constructor<?>[] constructors = targetClass.getConstructors();
 		for (Constructor<?> constructor : constructors) {
-			pepData = constructor.getAnnotation(Record.class);
-			if (pepData != null) {
+			recordAnnotation = constructor.getAnnotation(Record.class);
+			if (recordAnnotation != null) {
 				return true;
 			}
 		}
@@ -166,8 +166,8 @@ public class DefaultResolver {
 		Method[] methods = targetClass.getDeclaredMethods();
 		for (Method method : methods) {
 
-			pepData = method.getAnnotation(Record.class);
-			if (Modifier.isStatic(method.getModifiers()) && pepData != null) {
+			recordAnnotation = method.getAnnotation(Record.class);
+			if (Modifier.isStatic(method.getModifiers()) && recordAnnotation != null) {
 				return true;
 			}
 		}
@@ -208,16 +208,16 @@ public class DefaultResolver {
 		}
 
 		// Check for class annoation
-		Atom pepAtom = targetClass.getAnnotation(Atom.class);
-		if (pepAtom != null) {
+		Atom atomAnnotation = targetClass.getAnnotation(Atom.class);
+		if (atomAnnotation != null) {
 			return true;
 		}
 
 		// Check for annotation on constructor.
 		Constructor<?>[] constructors = targetClass.getConstructors();
 		for (Constructor<?> constructor : constructors) {
-			pepAtom = constructor.getAnnotation(Atom.class);
-			if (pepAtom != null) {
+			atomAnnotation = constructor.getAnnotation(Atom.class);
+			if (atomAnnotation != null) {
 				return true;
 			}
 		}
@@ -226,8 +226,8 @@ public class DefaultResolver {
 		Method[] methods = targetClass.getDeclaredMethods();
 		for (Method method : methods) {
 
-			pepAtom = method.getAnnotation(Atom.class);
-			if (Modifier.isStatic(method.getModifiers()) && pepAtom != null) {
+			atomAnnotation = method.getAnnotation(Atom.class);
+			if (Modifier.isStatic(method.getModifiers()) && atomAnnotation != null) {
 				return true;
 			}
 		}
@@ -360,8 +360,8 @@ public class DefaultResolver {
 			// Check for annotation on constructor.
 			Constructor<?>[] constructors = targetClass.getConstructors();
 			for (Constructor<?> constructor : constructors) {
-				Atom pepAtom = constructor.getAnnotation(Atom.class);
-				if (pepAtom != null) {
+				Atom atomAnnotation = constructor.getAnnotation(Atom.class);
+				if (atomAnnotation != null) {
 					Parameter[] params = constructor.getParameters();
 					if (params.length != 1 || !isPrimitive(params[0].getType())) {
 						throw new DataBindException(
@@ -374,7 +374,7 @@ public class DefaultResolver {
 					MethodHandle toObject = MethodHandles.lookup().unreflectConstructor(constructor);
 
 					// TODO Should do additional checks. Is return type same as constructor type.
-					// Also should check for ToData interface implementation or @PepAtom on specific
+					// Also should check for ToData interface implementation or @Atom on specific
 					// method as could be different
 					// ways to say which method is toData.
 					Method toDataMethod = targetClass.getDeclaredMethod(TODATA_METHOD);
@@ -391,8 +391,8 @@ public class DefaultResolver {
 			Method[] methods = targetClass.getDeclaredMethods();
 			for (Method method : methods) {
 
-				Atom pepAtom = method.getAnnotation(Atom.class);
-				if (Modifier.isStatic(method.getModifiers()) && pepAtom != null) {
+				Atom atomAnnotation = method.getAnnotation(Atom.class);
+				if (Modifier.isStatic(method.getModifiers()) && atomAnnotation != null) {
 					Parameter[] params = method.getParameters();
 					if (params.length != 1 || !isPrimitive(params[0].getType())) {
 						throw new DataBindException("Atom static method must have a single primitive value");

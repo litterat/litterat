@@ -1,10 +1,10 @@
 
 
 
-Litterat:pep (projection-embedded pairs)
+Litterat:bind (Litterat data binding library)
 ------------------
 
-[![GitHub](https://img.shields.io/github/license/litterat/pep-java)](https://github.com/litterat/pep-java/blob/master/LICENSE)
+[![GitHub](https://img.shields.io/github/license/litterat/litterat)](https://github.com/litterat/litterat/blob/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.litterat/litterat-pep.svg)](https://search.maven.org/search?q=io.litterat.litterat-pep)
 [![badge-jdk](https://img.shields.io/badge/jdk-11-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 [![Follow Litterat](https://img.shields.io/twitter/follow/litterat_io.svg?style=social)](https://twitter.com/litterat_io)
@@ -16,7 +16,7 @@ This library is an implementation of some of the ideas written in [Towards Bette
 It is not a serialization library in itself, but a way of describing how a class should be
 serialized. It is based on a discussion on the Java Amber mailing on [embedded-projection pairs](https://mail.openjdk.java.net/pipermail/amber-dev/2020-August/006445.html) and [object classification](https://mail.openjdk.java.net/pipermail/amber-dev/2020-August/006492.html). 
 
-The library is used to generate a class descriptor which can be used to for data extraction from objects. The aim for the library is that is possible to write mappings between objects and data simply. For example the sample PepArrayMapper is used as follows:
+The library is used to generate a class descriptor which can be used to for data extraction from objects. The aim for the library is that is possible to write mappings between objects and data simply. For example the sample ArrayMapper is used as follows:
 
 
 ```java
@@ -24,10 +24,10 @@ The library is used to generate a class descriptor which can be used to for data
 Point p1 = new Point(1,2);
 
 // Create a context and a descriptor for the target class.
-PepContext context = PepContext.builder().build();
+DataBindContext context = DataBindContext.builder().build();
 
 // Create a mapper using the context.
-PepArrayMapper arrayMap = new PepArrayMapper(context);
+ArrayMapper arrayMap = new ArrayMapper(context);
 
 // Extract the values to an array. Contains [ 1, 2 ]
 Object[] values = arrayMap.toData(p1);
@@ -36,17 +36,17 @@ Object[] values = arrayMap.toData(p1);
 Point p2 = arrayMap.toObject(Point.class, values);
 ```
 
-The PepArrayMapper and PepMapMapper are both examples of how the library can be used. The PepArrayMapper is implemented using MethodHandles to demonstrate how the library might be used to generate highly efficient serialization code. The PepMapMapper provides a procedural example to show a more simple use of the library. 
+The ArrayMapper and MapMapper are both examples of how the library can be used. The ArrayMapper is implemented using MethodHandles to demonstrate how the library might be used to generate highly efficient serialization code. The MapMapper provides a procedural example to show a more simple use of the library. 
 
 
 ## Maven dependencies
 
-Library is available from the [Maven repository](https://mvnrepository.com/artifact/io.litterat/litterat-pep) using dependency:
+Library is available from the [Maven repository](https://mvnrepository.com/artifact/io.litterat/litterat-bind) using dependency:
 
 ```
 <dependency>
   <groupId>io.litterat</groupId>
-  <artifactId>litterat-pep</artifactId>
+  <artifactId>litterat-bind</artifactId>
   <version>0.5.0</version>
 </dependency>
 ```
@@ -54,8 +54,8 @@ Library is available from the [Maven repository](https://mvnrepository.com/artif
 or for Gradle
 
 ```
-// https://mvnrepository.com/artifact/io.litterat/litterat-pep
-implementation group: 'io.litterat', name: 'litterat-pep', version: '0.5.0'
+// https://mvnrepository.com/artifact/io.litterat/litterat-bind
+implementation group: 'io.litterat', name: 'litterat-bind', version: '0.5.0'
 ```
 
 ## Building
@@ -65,7 +65,7 @@ Gradle 6.5 has been used for building the library. The library has been designed
 
 ## License
 
-Litterat-pep is available under the Apache 2 License. Please see the LICENSE file for more information.
+Litterat-bind is available under the Apache 2 License. Please see the LICENSE file for more information.
 
 
 ## Background & Design
@@ -129,7 +129,7 @@ While the export and import function can easily standardised in the platform, th
   * n-field components - A list of names, types and MethodHandle which returns the value of the component.
   * export/import - Two MethodHandles which perform optional export/import of the tuple into the class.
 
-The library accomplishes this by creating reflection based wrappers around each of the of the data styles and create the PepDataClass and PepDataComponents. These provide a standard interface to create and access tuples classes.
+The library accomplishes this by creating reflection based wrappers around each of the of the data styles and create the DataClass. These provide a standard interface to create and access tuples classes.
 
  * constructor: A MethodHandle with N-arg constructor representing all fields in data object.
  * components: Fields with name and type for each element in data. A MethodHandle that returns the value of the field.
@@ -154,7 +154,7 @@ toPrimitive: extract(object)
 toObject/primitive: inject(primitive)
 ```
 
-The PepDataClass provides the conversion of these with:
+The DataClass provides the conversion of these with:
 
  * constructor: not defined
  * components: empty set.
@@ -172,7 +172,7 @@ toArray: export(object)
 toObject: import(array)
 ```
 
-The PepDataClass provides the conversion of these with:
+The DataClass provides the conversion of these with:
 
  * constructor: A MethodHandle to create the target array.
  * components: empty set.
@@ -190,24 +190,24 @@ The library is currently under heavy development so expect some rough edges. Thi
 
 ## Reference
 
-#### PepContext
+#### DataBindContext
 
-The PepContext provides a library of PepDataClass descriptors. Each instance of a PepContext can have one mapping for a particular target class. This allows different communication streams to define different toData/toObject functions depending on the context of the
+The DataBindContext provides a library of DataClass descriptors. Each instance of a DataBindContext can have one mapping for a particular target class. This allows different communication streams to define different toData/toObject functions depending on the context of the
 communications. The interface has a simple interface with three functions.
 
 ```java
 // get the class descriptor for the target class.
-public PepDataClass getDescriptor(Class<?> targetClass) throws PepException;
+public DataClass getDescriptor(Class<?> targetClass) throws DataBindException;
 ```
 
-A PepException will be thrown if a descriptor could not be found or generated for the target class.
+A DataBindException will be thrown if a descriptor could not be found or generated for the target class.
 
-### PepDataClass & PepDataCompoment
+### DataClass 
 
-The PepDataClass provides the descriptor of any provided class such that it can be used by a serialization library to serialize
-an object instance. A PepDataComponent provides the components or fields of a data class. Both PepDataClass and PepDataComponent are immutable.
+The DataClass provides the descriptor of any provided class such that it can be used by a serialization library to serialize
+an object instance. A DataClassField provides the components or fields of a data class. Both DataClass and DataClassField are immutable.
 
-The PepDataClass has the following fields:
+The DataClass has the following fields:
 
 ```java
 // The target class.
@@ -226,7 +226,7 @@ private final MethodHandle toData;
 private final MethodHandle toObject;
 
 // All fields in the projected class. Only valid for data
-private final PepDataComponent[] dataComponents;
+private final DataClassField[] fields;
 
 // Target class is data.
 private final boolean isData;
@@ -238,7 +238,7 @@ private final boolean isAtom;
 private final boolean isArray;
 ```
 
-The PepDataComponent has the following fields:
+The DataClassField has the following fields:
 
 ```java
 // name of the field
@@ -248,7 +248,7 @@ private final String name;
 private final Class<?> type;
 
 // Reference for the type.
-private final PepDataClass dataClass;
+private final DataClass dataClass;
 
 // accessor read handle. signature: type t = object.getT();
 private final MethodHandle accessor;
@@ -310,8 +310,8 @@ LocationData with two float values.
 Location loc1 = new Location(-37,14, 144, 26);
 
 // Create a context and a descriptor for the target class.
-PepContext context = PepContext.builder().build();
-PepArrayMapper arrayMap = new PepArrayMapper(context);
+DataBindContext context = DataBindContext.builder().build();
+ArrayMapper arrayMap = new ArrayMapper(context);
 
 // Extract the values to an array
 Object[] values = arrayMap.project(loc1);
@@ -374,13 +374,13 @@ The bridge is registered with the context prior to converting the target class.
 Location loc1 = new Location(-37,14, 144, 26);
 
 // Create a context and a descriptor for the target class.
-PepContext context = PepContext.builder().build();
+DataBindContext context = DataBindContext.builder().build();
 
 // register the bridge.
 context.register(Location.class, new LocationDataBridge() );
 
 // create the mapper based on the context.
-PepArrayMapper arrayMap = new PepArrayMapper(context);
+ArrayMapper arrayMap = new ArrayMapper(context);
 
 // Extract the values to an array
 Object[] values = arrayMap.project(loc1);
@@ -451,7 +451,7 @@ An interesting property of Java reflection is that unless a runtime parameter is
 line, the names of the constructor parameters can not be discovered. As such, it is not possible at runtime
 to determine the order of x and y in the Point constructor example above. 
 
-The Pep library uses byte code
+The bind library uses byte code
 analysis to determine the ordering of the constructor parameters. The byte code analysis currently only works for
 simple constructor param to field assignments, as such the Field annotation may be required. In the
 example below the x and y values are modified which will currently fool the code analysis. As
@@ -533,12 +533,12 @@ public class Point {
       this.y = y;
    }
    
-   @PepField(name="xx")
+   @Field(name="xx")
    public int getX() {
       return x;
    }
    
-   @PepField(name="yy")
+   @Field(name="yy")
    public int getY() {
       return y;
    }

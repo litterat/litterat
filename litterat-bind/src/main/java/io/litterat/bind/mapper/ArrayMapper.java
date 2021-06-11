@@ -32,7 +32,7 @@ import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 
 /**
- * Sample showing how to use the Pep library to convert an Object to/from Object[]
+ * Sample showing how to use the Litterat bind library to convert an Object to/from Object[]
  *
  * This is intentionally using MethodHandles throughout to demonstrate pre-building method handles
  * for each type. This is the method likely to be used by serialization libraries to improve

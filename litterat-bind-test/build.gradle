@@ -107,14 +107,14 @@ nexusStaging {
     packageGroup = "io.litterat" 
 }
 
-archivesBaseName = 'litterat-pep-test'
+archivesBaseName = 'litterat-bind-test'
 group = "io.litterat"
 version = LITTERAT_VERSION
 
 modifyPom {
   project {
-        name = 'litterat-pep-test'
-        description = 'Litterat serialization test samples'
+        name = 'litterat-bind-test'
+        description = 'Litterat bind test samples'
         url = 'http://litterat.io/'
         licenses {
             license {

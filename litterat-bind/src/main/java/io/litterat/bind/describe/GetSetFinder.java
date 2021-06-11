@@ -49,10 +49,10 @@ public class GetSetFinder implements ComponentFinder {
 
 				ComponentInfo info = new ComponentInfo(classField.getName(), classField.getType());
 
-				Field pepField = classField.getAnnotation(Field.class);
-				if (pepField != null) {
+				Field fieldAnnotation = classField.getAnnotation(Field.class);
+				if (fieldAnnotation != null) {
 					// Found a matching setter/getter pair, so add to fields.
-					info.setField(pepField);
+					info.setField(fieldAnnotation);
 				}
 
 				try {
@@ -176,8 +176,8 @@ public class GetSetFinder implements ComponentFinder {
 			int modifiers = classField.getModifiers();
 			if (Modifier.isPrivate(modifiers) && !Modifier.isTransient(modifiers) && !Modifier.isStatic(modifiers)) {
 
-				Field pepField = classField.getAnnotation(Field.class);
-				if (pepField != null) {
+				Field fieldAnnotation = classField.getAnnotation(Field.class);
+				if (fieldAnnotation != null) {
 
 					ComponentInfo info = fields.stream().filter(e -> e.getName().equals(classField.getName()))
 							.findFirst().orElse(null);
@@ -187,7 +187,7 @@ public class GetSetFinder implements ComponentFinder {
 					}
 
 					// Found a matching setter/getter pair, so add to fields.
-					info.setField(pepField);
+					info.setField(fieldAnnotation);
 				}
 			}
 		}

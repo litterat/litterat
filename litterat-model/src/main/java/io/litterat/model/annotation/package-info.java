@@ -18,5 +18,5 @@ package io.litterat.model.annotation;
  *
  * Annotations for the type library add additional meta data to a class to
  * provide enough information to generate the correct schema from the class.
- * This is required where the PEP library doesn't provide enough information.
+ * This is required where the bind library doesn't provide enough information.
  */

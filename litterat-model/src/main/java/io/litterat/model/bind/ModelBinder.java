@@ -38,8 +38,8 @@ import io.litterat.model.library.TypeLibrary;
 
 /**
  *
- * The PEP Schema binders job is to either create a schema definition from the information provided
- * by the PepDataClass or using a schema definition, bind the schema to an existing PepDataClass.
+ * The Litterat model binders job is to either create a schema definition from the information provided
+ * by the DataClass or using a schema definition, bind the schema to an existing DataClass.
  *
  */
 
@@ -49,72 +49,64 @@ public class ModelBinder {
 	 *
 	 * TODO this needs to be rewritten.
 	 */
-	public Definition createDefinition(TypeLibrary library, Class<?> clss) throws TypeException {
+	public Definition createDefinition(TypeLibrary library, DataClass dataClass) throws TypeException {
 
-		try {
+		if (dataClass instanceof DataClassRecord) {
+			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
+			List<Field> fields = new ArrayList<>();
 
-			// This might throw an exception.
-			DataClass dataClass = library.pepContext().getDescriptor(clss);
+			DataClassField[] dataFields = dataClassRecord.fields();
+			for (DataClassField dataClassField : dataFields) {
+				String name = dataClassField.name();
 
-			if (dataClass instanceof DataClassRecord) {
-				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
-				List<Field> fields = new ArrayList<>();
+				DataClass fieldDataClass = dataClassField.dataClass();
+				if (fieldDataClass instanceof DataClassArray) {
+					DataClassArray dataClassArray = (DataClassArray) fieldDataClass;
 
-				DataClassField[] dataFields = dataClassRecord.fields();
-				for (DataClassField dataClassField : dataFields) {
-					String name = dataClassField.name();
+					TypeName typeName = library.getTypeName(dataClassArray.arrayDataClass().typeClass());
 
-					DataClass fieldDataClass = dataClassField.dataClass();
-					if (fieldDataClass instanceof DataClassArray) {
-						DataClassArray dataClassArray = (DataClassArray) fieldDataClass;
+					fields.add(new Field(name, new Array(typeName)));
 
-						TypeName typeName = library.getTypeName(dataClassArray.arrayDataClass().typeClass());
+				} else if (fieldDataClass instanceof DataClassAtom) {
+					DataClassAtom fieldDataClassAtom = (DataClassAtom) fieldDataClass;
 
-						fields.add(new Field(name, new Array(typeName)));
+					TypeName typeName = library.getTypeName(fieldDataClassAtom.dataClass());
 
-					} else if (fieldDataClass instanceof DataClassAtom) {
-						DataClassAtom fieldDataClassAtom = (DataClassAtom) fieldDataClass;
+					// TODO - What about required?
 
-						TypeName typeName = library.getTypeName(fieldDataClassAtom.dataClass());
+					fields.add(new Field(name, new Reference(typeName), false));
+				} else if (fieldDataClass instanceof DataClassRecord) {
+					DataClassRecord fieldDataClassRecord = (DataClassRecord) fieldDataClass;
 
-						// TODO - What about required?
+					TypeName typeName = library.getTypeName(fieldDataClassRecord.dataClass());
 
-						fields.add(new Field(name, new Reference(typeName), false));
-					} else if (fieldDataClass instanceof DataClassRecord) {
-						DataClassRecord fieldDataClassRecord = (DataClassRecord) fieldDataClass;
+					// TODO - What about required?
 
-						TypeName typeName = library.getTypeName(fieldDataClassRecord.dataClass());
+					fields.add(new Field(name, new Reference(typeName), false));
+				} else if (fieldDataClass instanceof DataClassUnion) {
+					DataClassUnion fieldDataClassUnion = (DataClassUnion) fieldDataClass;
 
-						// TODO - What about required?
+					TypeName typeName = library.getTypeName(fieldDataClassUnion.typeClass());
 
-						fields.add(new Field(name, new Reference(typeName), false));
-					} else if (fieldDataClass instanceof DataClassUnion) {
-						DataClassUnion fieldDataClassUnion = (DataClassUnion) fieldDataClass;
+					// TODO - What about required?
 
-						TypeName typeName = library.getTypeName(fieldDataClassUnion.typeClass());
-
-						// TODO - What about required?
-
-						fields.add(new Field(name, new Reference(typeName), false));
-					}
+					fields.add(new Field(name, new Reference(typeName), false));
 				}
-
-				Field[] finalFields = new Field[fields.size()];
-				return new Record(fields.toArray(finalFields));
-			} else if (dataClass instanceof DataClassAtom) {
-				// TODO rewrite this
-				throw new TypeException("Could not generate descriptor for " + clss.getName());
-			} else if (dataClass instanceof DataClassArray) {
-				// TODO implement this.
-				throw new TypeException("Could not generate descriptor for " + clss.getName());
-			} else if (dataClass instanceof DataClassUnion) {
-				// TODO implement this.
-				throw new TypeException("Could not generate descriptor for " + clss.getName());
-			} else {
-				throw new TypeException("Could not generate descriptor for " + clss.getName());
 			}
-		} catch (DataBindException e) {
-			throw new TypeException("Could not get data descriptor for class.", e);
+
+			Field[] finalFields = new Field[fields.size()];
+			return new Record(fields.toArray(finalFields));
+		} else if (dataClass instanceof DataClassAtom) {
+			// TODO rewrite this
+			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
+		} else if (dataClass instanceof DataClassArray) {
+			// TODO implement this.
+			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
+		} else if (dataClass instanceof DataClassUnion) {
+			// TODO implement this.
+			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
+		} else {
+			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
 		}
 
 	}

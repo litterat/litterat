@@ -69,7 +69,7 @@ public class TypeLibrary {
 
 	public static final TypeName STRING = new TypeName("string");
 
-	private final DataBindContext pepContext;
+	private final DataBindContext bindContext;
 
 	private final ConcurrentMap<TypeName, TypeLibraryEntry> types;
 
@@ -78,8 +78,8 @@ public class TypeLibrary {
 	// This probably belongs somewhere else.
 	private final ModelBinder binder;
 
-	public TypeLibrary(DataBindContext pepContext) {
-		this.pepContext = pepContext;
+	public TypeLibrary(DataBindContext bindContext) {
+		this.bindContext = bindContext;
 		this.types = new ConcurrentHashMap<>();
 		this.classes = new ConcurrentHashMap<>();
 		this.binder = new ModelBinder();
@@ -87,25 +87,26 @@ public class TypeLibrary {
 		try {
 
 			// Atoms
-			register(TypeLibrary.FLOAT, TypeDefinitions.FLOAT, pepContext.getDescriptor(float.class));
+			register(TypeLibrary.FLOAT, TypeDefinitions.FLOAT, bindContext.getDescriptor(float.class));
 			registerAlias(TypeLibrary.FLOAT, Float.class);
-			register(TypeLibrary.BOOLEAN, TypeDefinitions.BOOLEAN, pepContext.getDescriptor(boolean.class));
-			register(TypeLibrary.STRING, TypeDefinitions.STRING, pepContext.getDescriptor(String.class));
-			register(TypeLibrary.INT32, TypeDefinitions.INT32, pepContext.getDescriptor(int.class));
+			register(TypeLibrary.BOOLEAN, TypeDefinitions.BOOLEAN, bindContext.getDescriptor(boolean.class));
+			register(TypeLibrary.STRING, TypeDefinitions.STRING, bindContext.getDescriptor(String.class));
+			register(TypeLibrary.INT32, TypeDefinitions.INT32, bindContext.getDescriptor(int.class));
 			registerAlias(TypeLibrary.INT32, Integer.class);
 
 			// Schema types.
-			register(SchemaTypes.SEQUENCE, SchemaTypes.SEQUENCE_DEF, pepContext.getDescriptor(Record.class));
-			register(SchemaTypes.ELEMENT, SchemaTypes.ELEMENT_DEF, pepContext.getDescriptor(Element.class));
-			register(SchemaTypes.FIELD, binder.createDefinition(this, Field.class),
-					pepContext.getDescriptor(Field.class));
-			register(SchemaTypes.DEFINITION, SchemaTypes.DEFINITION_DEF, pepContext.getDescriptor(Definition.class));
-			register(SchemaTypes.TYPE_NAME_DEFINITION, binder.createDefinition(this, TypeNameDefinition.class),
-					pepContext.getDescriptor(TypeNameDefinition.class));
-			register(SchemaTypes.REFERENCE, binder.createDefinition(this, Reference.class),
-					pepContext.getDescriptor(Reference.class));
-			register(SchemaTypes.ARRAY, binder.createDefinition(this, Array.class),
-					pepContext.getDescriptor(Array.class));
+			register(SchemaTypes.SEQUENCE, SchemaTypes.SEQUENCE_DEF, bindContext.getDescriptor(Record.class));
+			register(SchemaTypes.ELEMENT, SchemaTypes.ELEMENT_DEF, bindContext.getDescriptor(Element.class));
+			register(SchemaTypes.FIELD, binder.createDefinition(this, bindContext.getDescriptor(Field.class)),
+					bindContext.getDescriptor(Field.class));
+			register(SchemaTypes.DEFINITION, SchemaTypes.DEFINITION_DEF, bindContext.getDescriptor(Definition.class));
+			register(SchemaTypes.TYPE_NAME_DEFINITION,
+					binder.createDefinition(this, bindContext.getDescriptor(TypeNameDefinition.class)),
+					bindContext.getDescriptor(TypeNameDefinition.class));
+			register(SchemaTypes.REFERENCE, binder.createDefinition(this, bindContext.getDescriptor(Reference.class)),
+					bindContext.getDescriptor(Reference.class));
+			register(SchemaTypes.ARRAY, binder.createDefinition(this, bindContext.getDescriptor(Array.class)),
+					bindContext.getDescriptor(Array.class));
 
 		} catch (DataBindException | TypeException e) {
 			throw new RuntimeException("Unexpected error", e);
@@ -116,8 +117,8 @@ public class TypeLibrary {
 		this(DataBindContext.builder().build());
 	}
 
-	public DataBindContext pepContext() {
-		return pepContext;
+	public DataBindContext bindContext() {
+		return bindContext;
 	}
 
 	public void reserve(TypeName type) {
@@ -150,8 +151,8 @@ public class TypeLibrary {
 
 			Class<?> clss = Class.forName(className);
 			try {
-				DataClass dataClass = pepContext.getDescriptor(clss);
-				Definition definition = binder.createDefinition(this, clss);
+				DataClass dataClass = bindContext.getDescriptor(clss);
+				Definition definition = binder.createDefinition(this, dataClass);
 
 				register(typeName, definition, dataClass);
 
@@ -196,8 +197,8 @@ public class TypeLibrary {
 		if (typeName == null) {
 
 			try {
-				DataClass dataClass = pepContext.getDescriptor(clss);
-				Definition definition = binder.createDefinition(this, clss);
+				DataClass dataClass = bindContext.getDescriptor(clss);
+				Definition definition = binder.createDefinition(this, dataClass);
 				typeName = generateTypeName(clss);
 				register(typeName, definition, dataClass);
 			} catch (DataBindException e) {
@@ -210,7 +211,6 @@ public class TypeLibrary {
 
 	private TypeName generateTypeName(Class<?> clss) {
 
-		// TODO this should be part of Pep.
 		SchemaType data = clss.getAnnotation(SchemaType.class);
 		if (data != null) {
 			return new TypeName(data.namespace(), data.name());

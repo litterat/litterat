@@ -20,7 +20,7 @@ TypeInputStream in = new TypeInputStream(buffer);
 Point p2 = in.readObject();
 ```
 
-Objects to be serialized are tagged using the Litterat-pep library. For example:
+Objects to be serialized are tagged using the Litterat-bind library. For example:
 
 ```.java
 public class Point {

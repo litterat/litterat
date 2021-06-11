@@ -168,15 +168,6 @@ public class LitteratInterpreter {
 		} else if (expression instanceof ReadArray) {
 			ReadArray readArray = (ReadArray) expression;
 
-			// This is some nasty stuff to find the array pepDataClass so the constructor
-			// can be called.
-			//
-
-			// Class<?> arrayClass = Array
-			// .newInstance(typeMap.library().getTypeClass(readArray.array().type()).typeClass(), 0).getClass();
-			// DataClassArray pepClass = (DataClassArray)
-			// typeMap.library().pepContext().getDescriptor(arrayClass);
-
 			compiledExpression = new ReadArrayInterpreter(readArray,
 					compileExpression(typeMap, readArray.readExpression()));
 		} else if (expression instanceof SlotReference) {

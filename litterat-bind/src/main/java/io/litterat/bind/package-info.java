@@ -18,7 +18,7 @@ package io.litterat.bind;
  * 
  * @formatter:off
  * 
- * The Pep library provides a way of categorising classes into one of the following:
+ * The Litterat bind library provides a way of categorising classes into one of the following:
  * 
  * atom - Primitive or accepts single argument to construct.
  * data - Has multiple values and tagged as data class.

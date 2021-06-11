@@ -1,7 +1,7 @@
 
 # Litterat:json (Java JSON reader and writer)
 
-[![GitHub](https://img.shields.io/github/license/litterat/pep-java)](https://github.com/litterat/litterat-json/blob/master/LICENSE)
+[![GitHub](https://img.shields.io/github/license/litterat/litterat)](https://github.com/litterat/litterat/blob/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.litterat/litterat-json.svg)](https://search.maven.org/search?q=io.litterat.litterat-json)
 [![badge-jdk](https://img.shields.io/badge/jdk-11-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 [![Follow Litterat](https://img.shields.io/twitter/follow/litterat_io.svg?style=social)](https://twitter.com/litterat_io)
@@ -9,7 +9,7 @@
 
 NOTE: In development as part of Litterat currently in single project at https://github.com/litterat/litterat
 
-This is an implementation of a JSON reader and writer (decoder/encoder) for Java 11 that uses the [Litterat-pep](https://github.com/litterat/pep-java) library. Litterat-pep is used to tag and prepare Java classes for serialization. It uses the GSON tokenizer and combines it with Litterat-pep to provide a small/fast JSON library that reads/writes full JSON messages. Typical usage is as follows:
+This is an implementation of a JSON reader and writer (decoder/encoder) for Java 11 that uses the [Litterat-bind](https://github.com/litterat/litterat/litterat-bind) library. Litterat-json is used to tag and prepare Java classes for JSON serialization. It uses the GSON tokenizer and combines it with Litterat-bind to provide a small/fast JSON library that reads/writes full JSON messages. Typical usage is as follows:
 
 ```java
 // Create an instance object to be written to JSON
@@ -39,7 +39,7 @@ Library is available from the [Maven repository](https://mvnrepository.com/artif
 or for Gradle
 
 ```
-// https://mvnrepository.com/artifact/io.litterat/litterat-pep
+// https://mvnrepository.com/artifact/io.litterat/litterat-bind
 implementation group: 'io.litterat', name: 'litterat-json', version: '1.0.0'
 ```
 
