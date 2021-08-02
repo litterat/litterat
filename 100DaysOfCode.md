@@ -29,6 +29,68 @@ Next steps list. A general list of things that could be done next in no particul
  - Litterat serialization guide. For people writing serialization formats.
 
 
+## Day 69 - August 2 - Planning the refactor
+
+Given the structural problems discovered in the last week. It's time to refactor. At this stage I think this will involve combining the model and bind libraries into one. I don't think it makes sense to use them separately. This will roughly involve:
+
+ 1. Prepare by committing and making sure current tests pass.
+ 2. Create litterat-core. 
+ 3. Move over the central parts of the model code.
+ 4. Create generation of model from test classes.
+ 5. Move over the bind library.
+ 6. Generate the bind code based on the model.
+ 7. Refactor the main interfaces.
+ 8. Move over the test code and other example code.
+ 
+This is not going to be a particularly fun task, but I think its required before the project can move forward.
+
+## Day 68 - August 1 - Stepping back and re-thinking
+
+Developed a presentation slide deck to describe the concept of building Litterat based on first principles. In the process realised that the ordering between the bind library and the model is wrong. In a code first development process it should be:
+
+ Write code -> Extract Model -> Share schema -> Bind model to code.
+ 
+ In a schema first development process:
+ 
+ Get Schema -> Read schema into Model -> Generate code -> Bind model to code.
+ 
+The problem is that the current bind library is going from code to bind model. This is making it difficult to develop the model library in the right way. I've been feeling blocked on the implementation and I think this is part of the problem.
+
+## Day 67 - July 22 - Writing tests for the model
+
+Created the litterat-model-test library and implemented an initial test. The test highlights the need to implement the model to bind validation. I might need to further implement a basic JSON Schema reader to model and shift the json reader/writer to depend on the model. This continues to highlight the similarities between the bind data classes and model types. The underlying issue is that the reader/writers need the bind data classes but not the model. There needs to be a clearer distinction between when to use the model, bind classes and/or some combination of the two.
+
+Added some very basic implementations for various atom types including integer, real, boolean and string. The atom types need a lot more work.
+
+## Day 66 - July 17 - More model binding
+
+Continued to document and refactor the Litterat model. I had shifted the Atom class into its own package, but moved it back as it is an unsealed union of future atom types. Makes more sense for the Definition to be a sealed union of element and atom.
+
+Also implemented BigInteger for unsigned long values for input/output in XPL. Also added BigInteger as a default atom in the bind library, 
+
+
+## Day 65 - July 13 - Removed the Reference
+
+Looking at the Litterat model again and noticed that the Reference class was a wrapper around the TypeName. When looking again at Backus-Nuar form the name of the rule and the name of the type in the rule definition are the same thing. Making the TypeName implement Element simplifies the overall model.
+
+When thinking about the binding between code and model, there's two distinct paths that need to be considered. A code first path requires that the model is generated and added to the model based on the structure of the code. In a schema first path, the schema is first imported into the model and then model is bound to the code. 
+
+## Day 64 - June 16 - Head banging
+
+Spent some more time banging my head against the model binder.
+
+## Day 64 - June 14 - Code first model binding
+
+Looking at refactoring the code first model binding code. Trying to simplify and make it easier to read. The main problem is the concept of the difference between when to create new type names. For instance, if you have a Record that includes an array. It is possible to define the array inline as part of the record, or create a new definition for the array give it a name. In the end, this will need to be the developers choice, so additional annotations may be required.
+
+Pulled on the thread and found that the way TypeLibrary registers and binds classes will need to be refactored. The problem is that currently, the TypeLibrary will attempt to create new definitions for any class. From a security point of view that's not a great idea as you could load jars and potentially inject other unexpected data classes into a stream. It would be better that the developer is in control and initially binds the classes to the TypeLibrary.
+
+## Day 63 - June 11 - A few updates
+
+Removed references to PEP in most of the documentation and code. The concept of projected embedded pairs was the basis for the early implementation. The concepts are still there but don't really correctly describe that the design. It's also not something that needs to be exposed to developers.
+
+Also updated gradlew and got buildkite running on the new machine correctly. Builds are green again!
+
 ## Day 62 - May 30 - Refactoring XPL array reading and writing
 
 I had a test case for XPL that involved a List<String>. The original implementation for XPL only allowed reading/writing array classes. By passing down the DataClassArray I was able to use the correct technique to read/write the list. Noticed that both the dataClass -> model and the model -> xpl.lang required more work to align the models.
