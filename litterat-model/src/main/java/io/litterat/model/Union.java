@@ -18,17 +18,24 @@ package io.litterat.model;
 import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
+/**
+ * 
+ * A Union is a record that represents a choice between a list of rules. The list of rules are
+ * included as a Reference using TypeNames.
+ *
+ */
+
 @Record
 @SchemaType(namespace = "schema", name = "union")
 public class Union implements Element {
 
-	private final Reference[] map;
+	private final TypeName[] map;
 
-	public Union(Reference[] map) {
+	public Union(TypeName[] map) {
 		this.map = map;
 	}
 
-	public Reference[] map() {
+	public TypeName[] map() {
 		return map;
 	}
 }

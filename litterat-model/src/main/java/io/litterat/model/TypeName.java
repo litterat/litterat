@@ -21,8 +21,9 @@ import java.util.regex.Pattern;
 import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
-//@formatter:off
 /**
+ * 
+ * @formatter:off
  *
  * A type name provides a unique identifier into the type library. A type name
  * is uniquely identified using the namespace, name, optional attribute and
@@ -36,11 +37,13 @@ import io.litterat.model.annotation.SchemaType;
  *
  * A type version must be specified for any type in the type library. A TypeName used for a
  * reference can specify a version of 0 to specify an unknown version.
+ * 
+ * @formatter:on
+ * 
  */
-//@formatter:on
 
 @SchemaType(namespace = "schema", name = "type_name")
-public class TypeName {
+public class TypeName implements Element {
 
 	public static final String ROOT_NAMESPACE = "";
 

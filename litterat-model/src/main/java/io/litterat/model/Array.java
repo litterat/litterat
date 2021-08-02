@@ -18,6 +18,15 @@ package io.litterat.model;
 import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
+/**
+ * 
+ * An array is a structural element which defines a repeated element type.
+ * 
+ * In the future it might be useful to introduce restrictions on the array type to specify a min/max
+ * elements.
+ *
+ */
+
 @Record
 @SchemaType(namespace = "schema", name = "array")
 public class Array implements Element {

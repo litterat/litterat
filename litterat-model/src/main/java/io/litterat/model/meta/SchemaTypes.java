@@ -19,7 +19,6 @@ import io.litterat.model.Array;
 import io.litterat.model.Element;
 import io.litterat.model.Field;
 import io.litterat.model.Record;
-import io.litterat.model.Reference;
 import io.litterat.model.TypeName;
 import io.litterat.model.Union;
 import io.litterat.model.library.TypeLibrary;
@@ -49,7 +48,6 @@ public class SchemaTypes {
 	public static final TypeName METHOD = new TypeName("schema", "method");
 	public static final TypeName NAMESPACE = new TypeName("schema", "namespace");
 	public static final TypeName RECORD = new TypeName("schema", "record");
-	public static final TypeName REFERENCE = new TypeName("schema", "reference");
 	public static final TypeName SEQUENCE = new TypeName("schema", "sequence");
 	public static final TypeName SIGNATURE = new TypeName("schema", "signature");
 	public static final TypeName TYPE_NAME = new TypeName("schema", "type_name");
@@ -58,19 +56,10 @@ public class SchemaTypes {
 
 	// @formatter:off
 	public static final Element DEFINITION_DEF = new Union(
-			new Reference[] {
-					new Reference(SEQUENCE),
-					new Reference(RECORD),
-					new Reference(UNION),
-					new Reference(ENCODING)
-			});
+			new TypeName[] { SEQUENCE, RECORD, UNION, ENCODING });
 
 	public static final Element ELEMENT_DEF = new Union(
-			new Reference[] {
-					new Reference(ANY),
-					new Reference(ARRAY),
-					new Reference(REFERENCE)
-			});
+			new TypeName[] { ANY, ARRAY });
 
 	// Any is really just an empty object with no fields.
 	public static final Element ANY_DEF = new Record(
@@ -79,23 +68,17 @@ public class SchemaTypes {
 
 	public static final Element ARRAY_DEF = new Record(
 			new Field[] {
-					new Field("type", new Reference(ELEMENT))
+					new Field("type", ELEMENT)
 			});
 
 	public static final Element ATOM_DEF = new Record(
 			new Field[] {
-					new Field("attributes", new Reference(ATOM_ATTRIBUTE))
+					new Field("attributes", ATOM_ATTRIBUTE)
 			});
 
 	public static final Element ATOM_ATTRIBUTE_DEF = new Union(
-			new Reference[] {
-					 new Reference(ATOM_BIG_ENDIAN),
-					 new Reference(ATOM_LITTLE_ENDIAN),
-					 new Reference(ATOM_SIGNED),
-					 new Reference(ATOM_UNSIGNED),
-					 new Reference(ATOM_IEEE756),
-					 new Reference(ATOM_FIXED_LENGTH),
-					 new Reference(ATOM_VARIABLE_LENGTH)
+			new TypeName[] { ATOM_BIG_ENDIAN, ATOM_LITTLE_ENDIAN, ATOM_SIGNED, ATOM_UNSIGNED,
+							ATOM_IEEE756, ATOM_FIXED_LENGTH, ATOM_VARIABLE_LENGTH
 			});
 
 	public static final Element ATOM_BIG_ENDIAN_DEF = new Record(
@@ -120,7 +103,7 @@ public class SchemaTypes {
 
 	public static final Element ATOM_FIXED_LENGTH_DEF = new Record(
 			new Field[] {
-					new Field("bytes", new Reference(TypeLibrary.UINT8))
+					new Field("bytes", TypeLibrary.UINT8)
 			});
 
 

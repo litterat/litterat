@@ -17,6 +17,12 @@ package io.litterat.model;
 
 import io.litterat.model.annotation.SchemaType;
 
+/**
+ * 
+ * A Record represents the
+ *
+ */
+
 @io.litterat.bind.Record
 @SchemaType(namespace = "schema", name = "sequence")
 public class Record implements Element {

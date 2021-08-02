@@ -18,7 +18,14 @@ package io.litterat.model;
 import io.litterat.bind.Union;
 import io.litterat.model.annotation.SchemaType;
 
-@Union
+/**
+ * 
+ * A definition is how each rule is defined in the library. A definition is itself a union type of
+ * either an Element or Atom.
+ *
+ */
+
+@Union(value = { Element.class, Atom.class }, sealed = true)
 @SchemaType(namespace = "schema", name = "definition")
 public interface Definition {
 

@@ -54,8 +54,7 @@ public class TypeMap {
 			register(5, resolver.map(SchemaTypes.SEQUENCE));
 			register(6, resolver.map(SchemaTypes.FIELD));
 			register(7, resolver.map(SchemaTypes.ELEMENT));
-			register(8, resolver.map(SchemaTypes.REFERENCE));
-			register(9, resolver.map(SchemaTypes.ARRAY));
+			register(8, resolver.map(SchemaTypes.ARRAY));
 		} catch (TypeException e) {
 			throw new RuntimeException("Initialization error", e);
 		}

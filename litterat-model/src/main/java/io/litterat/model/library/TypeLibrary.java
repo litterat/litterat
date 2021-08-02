@@ -27,7 +27,6 @@ import io.litterat.model.Definition;
 import io.litterat.model.Element;
 import io.litterat.model.Field;
 import io.litterat.model.Record;
-import io.litterat.model.Reference;
 import io.litterat.model.TypeName;
 import io.litterat.model.annotation.SchemaType;
 import io.litterat.model.bind.ModelBinder;
@@ -73,7 +72,7 @@ public class TypeLibrary {
 
 	private final ConcurrentMap<TypeName, TypeLibraryEntry> types;
 
-	private final ConcurrentMap<Class<?>, TypeName> classes;
+	private final ConcurrentMap<DataClass, TypeName> classes;
 
 	// This probably belongs somewhere else.
 	private final ModelBinder binder;
@@ -88,11 +87,11 @@ public class TypeLibrary {
 
 			// Atoms
 			register(TypeLibrary.FLOAT, TypeDefinitions.FLOAT, bindContext.getDescriptor(float.class));
-			registerAlias(TypeLibrary.FLOAT, Float.class);
+			registerAlias(TypeLibrary.FLOAT, bindContext.getDescriptor(Float.class));
 			register(TypeLibrary.BOOLEAN, TypeDefinitions.BOOLEAN, bindContext.getDescriptor(boolean.class));
 			register(TypeLibrary.STRING, TypeDefinitions.STRING, bindContext.getDescriptor(String.class));
 			register(TypeLibrary.INT32, TypeDefinitions.INT32, bindContext.getDescriptor(int.class));
-			registerAlias(TypeLibrary.INT32, Integer.class);
+			registerAlias(TypeLibrary.INT32, bindContext.getDescriptor(Integer.class));
 
 			// Schema types.
 			register(SchemaTypes.SEQUENCE, SchemaTypes.SEQUENCE_DEF, bindContext.getDescriptor(Record.class));
@@ -103,8 +102,6 @@ public class TypeLibrary {
 			register(SchemaTypes.TYPE_NAME_DEFINITION,
 					binder.createDefinition(this, bindContext.getDescriptor(TypeNameDefinition.class)),
 					bindContext.getDescriptor(TypeNameDefinition.class));
-			register(SchemaTypes.REFERENCE, binder.createDefinition(this, bindContext.getDescriptor(Reference.class)),
-					bindContext.getDescriptor(Reference.class));
 			register(SchemaTypes.ARRAY, binder.createDefinition(this, bindContext.getDescriptor(Array.class)),
 					bindContext.getDescriptor(Array.class));
 
@@ -131,7 +128,7 @@ public class TypeLibrary {
 		TypeLibraryEntry entry = new TypeLibraryEntry(TypeLibraryState.BOUND, type, definition, dataClass);
 
 		types.putIfAbsent(type, entry);
-		classes.putIfAbsent(dataClass.typeClass(), type);
+		classes.putIfAbsent(dataClass, type);
 	}
 
 	/**
@@ -141,8 +138,8 @@ public class TypeLibrary {
 	 * @param typeName
 	 * @param clss
 	 */
-	public void registerAlias(TypeName typeName, Class<?> clss) {
-		classes.putIfAbsent(clss, typeName);
+	public void registerAlias(TypeName typeName, DataClass dataClass) {
+		classes.putIfAbsent(dataClass, typeName);
 	}
 
 	private TypeLibraryEntry registerOrThrow(TypeName typeName) throws TypeException {
@@ -190,23 +187,28 @@ public class TypeLibrary {
 		return entry.typeClass();
 	}
 
-	public TypeName getTypeName(Class<?> clss) throws TypeException {
-		Objects.requireNonNull(clss, "class value required");
+	public TypeName getTypeName(DataClass dataClass) throws TypeException {
+		Objects.requireNonNull(dataClass, "class value required");
 
-		TypeName typeName = this.classes.get(clss);
+		TypeName typeName = this.classes.get(dataClass);
 		if (typeName == null) {
 
-			try {
-				DataClass dataClass = bindContext.getDescriptor(clss);
-				Definition definition = binder.createDefinition(this, dataClass);
-				typeName = generateTypeName(clss);
-				register(typeName, definition, dataClass);
-			} catch (DataBindException e) {
-				throw new TypeException("Failed to get class data", e);
-			}
+			Definition definition = binder.createDefinition(this, dataClass);
+			typeName = generateTypeName(dataClass.typeClass());
+			register(typeName, definition, dataClass);
 
 		}
 		return typeName;
+	}
+
+	public TypeName getTypeName(Class<?> clss) throws TypeException {
+		Objects.requireNonNull(clss, "class value required");
+
+		try {
+			return getTypeName(bindContext.getDescriptor(clss));
+		} catch (DataBindException e) {
+			throw new TypeException("Failed to class descriptor", e);
+		}
 	}
 
 	private TypeName generateTypeName(Class<?> clss) {

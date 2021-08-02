@@ -18,6 +18,13 @@ package io.litterat.model;
 import io.litterat.bind.Record;
 import io.litterat.model.annotation.SchemaType;
 
+/**
+ * 
+ * A field is a structural element of a record. It is of a specific element type and is either
+ * required or not.
+ *
+ */
+
 @SchemaType(namespace = "schema", name = "field")
 public class Field {
 

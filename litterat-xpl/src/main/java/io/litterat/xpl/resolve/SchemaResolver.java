@@ -25,14 +25,13 @@ import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.model.Array;
+import io.litterat.model.Atom;
 import io.litterat.model.Definition;
 import io.litterat.model.Field;
 import io.litterat.model.Record;
-import io.litterat.model.Reference;
 import io.litterat.model.TypeName;
 import io.litterat.model.Union;
-import io.litterat.model.atom.Atom;
-import io.litterat.model.atom.Encoding;
+import io.litterat.model.atom.StringAtom;
 import io.litterat.model.function.FunctionSignature;
 import io.litterat.model.library.TypeException;
 import io.litterat.model.library.TypeLibrary;
@@ -96,21 +95,16 @@ public class SchemaResolver implements TypeResolver {
 				new TypeMapEntry(0, name, definition, TransportHandles.getReader(name),
 						TransportHandles.getWriter(name));
 			}
-		} else if (definition instanceof Reference) {
-			Reference reference = (Reference) definition;
-			TypeReader refReader = typeMap.getEntry(reference.type()).reader();
-			TypeWriter refWriter = typeMap.getEntry(reference.type()).writer();
+		} else if (definition instanceof TypeName) {
+			TypeName type = (TypeName) definition;
+			TypeReader refReader = typeMap.getEntry(type).reader();
+			TypeWriter refWriter = typeMap.getEntry(type).writer();
 			result = new TypeMapEntry(0, name, definition, refReader, refWriter);
-		} else if (definition instanceof Encoding) {
-			// Strings need more work.
-			if (name.equals(TypeLibrary.STRING)) {
-				result = new TypeMapEntry(0, name, definition, new StringReaderWriter.StringReader(),
-						new StringReaderWriter.StringWriter());
-			} else {
-				throw new TypeException(
-						"failed to map " + name.toString() + " with definition " + definition.getClass().getName());
+		} else if (definition instanceof StringAtom) {
 
-			}
+			result = new TypeMapEntry(0, name, definition, new StringReaderWriter.StringReader(),
+					new StringReaderWriter.StringWriter());
+
 		} else {
 			throw new TypeException(
 					"failed to map " + name.toString() + " with definition " + definition.getClass().getName());
@@ -142,9 +136,9 @@ public class SchemaResolver implements TypeResolver {
 				Field field = sequenceFields[x];
 				DataClassField dataClassField = dataClassFields[x];
 
-				if (field.type() instanceof Reference) {
-					Reference reference = (Reference) field.type();
-					Statement writeField = new WriteValue(reference.type(),
+				if (field.type() instanceof TypeName) {
+					TypeName type = (TypeName) field.type();
+					Statement writeField = new WriteValue(type,
 							new FieldRead(new SlotReference(varObject), typeName, field.name()));
 					statements.add(writeField);
 				} else if (field.type() instanceof Array) {
@@ -167,8 +161,8 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new FunctionSignature(new Reference(TypeLibrary.VOID),
-					new Reference("vm", "output"), new Reference(typeName)), slots.getSlots(), blockNode);
+			Lambda lambda = new Lambda(new FunctionSignature(TypeLibrary.VOID, new TypeName("vm", "output"), typeName),
+					slots.getSlots(), blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
 			// LitteratGenerator compiler = new LitteratGenerator();
@@ -199,10 +193,10 @@ public class SchemaResolver implements TypeResolver {
 
 			for (int x = 0; x < sequenceFields.length; x++) {
 				Field field = sequenceFields[x];
-				if (field.type() instanceof Reference) {
-					Reference reference = (Reference) field.type();
-					statements.add(new FieldSet(new SlotReference(varName), new ReadValue(reference.type()), typeName,
-							field.name()));
+				if (field.type() instanceof TypeName) {
+					TypeName type = (TypeName) field.type();
+					statements
+							.add(new FieldSet(new SlotReference(varName), new ReadValue(type), typeName, field.name()));
 				}
 			}
 			statements.add(new ReturnNode(new SlotReference(varName)));
@@ -210,8 +204,8 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new FunctionSignature(new Reference(typeName), new Reference("vm", "input")),
-					slots.getSlots(), blockNode);
+			Lambda lambda = new Lambda(new FunctionSignature(typeName, new TypeName("vm", "input")), slots.getSlots(),
+					blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
 			// LitteratGenerator compiler = new LitteratGenerator();
@@ -244,12 +238,12 @@ public class SchemaResolver implements TypeResolver {
 				Field field = sequenceFields[x];
 				DataClassField dataClassField = dataClassFields[x];
 
-				if (field.type() instanceof Reference) {
-					Reference reference = (Reference) field.type();
+				if (field.type() instanceof TypeName) {
+					TypeName type = (TypeName) field.type();
 					// int varReadSlot = slots.getSlot(clss);
 					// statements.add(new SlotSet(varReadSlot, new
 					// ReadType(field.type().toString())));
-					constructorBlock[x] = new ReadValue(reference.type());
+					constructorBlock[x] = new ReadValue(type);
 				} else if (field.type() instanceof Array) {
 					Array array = (Array) field.type();
 					DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
@@ -270,8 +264,8 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new FunctionSignature(new Reference(typeName), new Reference("vm", "input")),
-					slots.getSlots(), blockNode);
+			Lambda lambda = new Lambda(new FunctionSignature(typeName, new TypeName("vm", "input")), slots.getSlots(),
+					blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
 			// LitteratGenerator compiler = new LitteratGenerator();

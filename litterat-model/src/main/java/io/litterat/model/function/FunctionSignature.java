@@ -16,26 +16,26 @@
 package io.litterat.model.function;
 
 import io.litterat.bind.Record;
-import io.litterat.model.Reference;
+import io.litterat.model.TypeName;
 import io.litterat.model.annotation.SchemaType;
 
 @Record
 @SchemaType(namespace = "schema", name = "signature")
 public class FunctionSignature {
 
-	private final Reference[] arguments;
-	private final Reference returnType;
+	private final TypeName[] arguments;
+	private final TypeName returnType;
 
-	public FunctionSignature(Reference returnType, Reference... arguments) {
+	public FunctionSignature(TypeName returnType, TypeName... arguments) {
 		this.arguments = arguments;
 		this.returnType = returnType;
 	}
 
-	public Reference[] arguments() {
+	public TypeName[] arguments() {
 		return arguments;
 	}
 
-	public Reference returnType() {
+	public TypeName returnType() {
 		return returnType;
 	}
 }

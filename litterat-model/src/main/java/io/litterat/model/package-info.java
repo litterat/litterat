@@ -16,6 +16,17 @@
 package io.litterat.model;
 /**
  * 
+ * The litterat model represents the meta rules of a data definition. The model
+ * doesn't have an actual format and in theory could be represented by a subset of JSON-Schema
+ * or XML Schema.
+ * 
+ * The litterat model core meta rules define the structural rules of the data. At the lowest level
+ * these rules represent order of elements on a stream. The elements here are very closely related
+ * to Backus-Nuar form and 
+ * 
+ * 
+ * The model itself is also represented by the litterat model using the following definitions:
+ * 
  * @formatter:off
  * 
  * definition: record( [ field( "name", type_name, true ), 

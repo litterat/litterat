@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.litterat.bind.DataBindException;
+import io.litterat.model.Atom;
 import io.litterat.model.Definition;
 import io.litterat.model.Record;
-import io.litterat.model.Reference;
+import io.litterat.model.TypeName;
 import io.litterat.model.Union;
-import io.litterat.model.atom.Atom;
-import io.litterat.model.atom.Encoding;
+import io.litterat.model.atom.StringAtom;
 import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.Block;
@@ -94,13 +94,13 @@ public class LitteratInterpreter {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
 
-			} else if (def instanceof Reference) {
+			} else if (def instanceof TypeName) {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
 			} else if (def instanceof Union) {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
-			} else if (def instanceof Encoding) {
+			} else if (def instanceof StringAtom) {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
 			} else {
@@ -155,12 +155,11 @@ public class LitteratInterpreter {
 				compiledExpression = new ReadAtomInterpreter(readType);
 			} else if (def instanceof Record) {
 				compiledExpression = new ReadObjectInterpreter(readType);
-
-			} else if (def instanceof Reference) {
+			} else if (def instanceof TypeName) {
 				compiledExpression = new ReadObjectInterpreter(readType);
 			} else if (def instanceof Union) {
 				compiledExpression = new ReadObjectInterpreter(readType);
-			} else if (def instanceof Encoding) {
+			} else if (def instanceof StringAtom) {
 				compiledExpression = new ReadObjectInterpreter(readType);
 			} else {
 				throw new IllegalArgumentException("Write type not recognised: " + def.getClass().getName());
