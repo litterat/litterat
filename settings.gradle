@@ -3,6 +3,7 @@ rootProject.name = 'litterat'
 include ':litterat-bind', 
         ':litterat-bind-test',
         ':litterat-model',
+	':litterat-model-test',
         ':litterat-json',
         ':litterat-json-test',
         ':litterat-xpl',
