@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 package io.litterat.model.atom;
-
-import io.litterat.bind.Record;
-import io.litterat.model.Definition;
-import io.litterat.model.annotation.SchemaType;
-
-@SchemaType(namespace = "schema", name = "encoding")
-public class Encoding implements Definition {
-
-	private final String encoding;
-
-	@Record
-	public Encoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	public String encoding() {
-		return encoding;
-	}
-}
+/**
+ * 
+ * This package contains definitions for atom types. This could do with a refactor as it would be
+ * better if the various types had their own well defined definition.
+ * 
+ */

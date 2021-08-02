@@ -19,18 +19,28 @@ import io.litterat.bind.Record;
 import io.litterat.model.Definition;
 import io.litterat.model.annotation.SchemaType;
 
-@SchemaType(namespace = "schema", name = "atom")
-public class Atom implements Definition {
+/**
+ * 
+ * Definition of a string atom.
+ * 
+ * @formatter:off
+ * TODO This should extend or implement Atom.
+ * TODO Common string restrictions such as min/max length required. 
+ * TODO Should be able to base one string on a previous definition.
+ * @formatter:on
+ * 
+ */
+@SchemaType(namespace = "schema", name = "encoding")
+public class StringAtom implements Definition {
 
-	private final AtomAttribute[] attributes;
+	private final String encoding;
 
 	@Record
-	public Atom(AtomAttribute[] attributes) {
-		this.attributes = attributes;
+	public StringAtom(String encoding) {
+		this.encoding = encoding;
 	}
 
-	public AtomAttribute[] attributes() {
-		return attributes;
+	public String encoding() {
+		return encoding;
 	}
-
 }

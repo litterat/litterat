@@ -15,18 +15,18 @@
  */
 package io.litterat.model.meta;
 
+import io.litterat.model.Atom;
 import io.litterat.model.Definition;
-import io.litterat.model.atom.Atom;
 import io.litterat.model.atom.AtomAttribute;
-import io.litterat.model.atom.AtomAttribute.AtomBigEndian;
 import io.litterat.model.atom.AtomAttribute.AtomFixedLength;
-import io.litterat.model.atom.AtomAttribute.AtomIEEE756;
-import io.litterat.model.atom.AtomAttribute.AtomInteger;
-import io.litterat.model.atom.AtomAttribute.AtomLittleEndian;
-import io.litterat.model.atom.AtomAttribute.AtomSigned;
-import io.litterat.model.atom.AtomAttribute.AtomUnsigned;
 import io.litterat.model.atom.AtomAttribute.AtomVariableLength;
-import io.litterat.model.atom.Encoding;
+import io.litterat.model.atom.StringAtom;
+import io.litterat.model.atom.IntegerAtom.AtomBigEndian;
+import io.litterat.model.atom.IntegerAtom.AtomInteger;
+import io.litterat.model.atom.IntegerAtom.AtomLittleEndian;
+import io.litterat.model.atom.IntegerAtom.AtomSigned;
+import io.litterat.model.atom.IntegerAtom.AtomUnsigned;
+import io.litterat.model.atom.RealAtom.AtomIEEE756;
 
 public class TypeDefinitions {
 
@@ -174,7 +174,7 @@ public class TypeDefinitions {
 	});
 
 	// TODO Need a better definition for strings.
-	public static final Definition STRING = new Encoding("utf8");
+	public static final Definition STRING = new StringAtom("utf8");
 
 
 	// @formatter:on
