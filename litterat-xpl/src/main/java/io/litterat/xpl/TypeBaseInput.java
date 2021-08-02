@@ -16,14 +16,14 @@
 package io.litterat.xpl;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  *
- * The base input interfaces specifies the underlying way of reading data from
- * the underlying transport (stream,byte[],ByteBuffer). You should have no need
- * to interact with this interface and is here for compatibility with older
- * style serialization libraries. Check the @TypeReaderWriter for further
- * information.
+ * The base input interfaces specifies the underlying way of reading data from the underlying
+ * transport (stream,byte[],ByteBuffer). You should have no need to interact with this interface and
+ * is here for compatibility with older style serialization libraries. Check the @TypeReaderWriter
+ * for further information.
  *
  */
 public interface TypeBaseInput {
@@ -62,16 +62,13 @@ public interface TypeBaseInput {
 
 	public long readInt64() throws IOException;
 
-	public long readUInt64() throws IOException;
+	public BigInteger readUInt64() throws IOException;
 
 	default public long readLeInt64() throws IOException {
 		return Long.reverseBytes(readInt64());
 	}
 
-	// TODO This needs to be updated to BigInteger.
-	default public long readLeUInt64() throws IOException {
-		return Long.reverseBytes(readUInt64());
-	}
+	public BigInteger readLeUInt64() throws IOException;
 
 	// Variable length signed integer using zig-zag encoding.
 	default public int readVarInt32() throws IOException {

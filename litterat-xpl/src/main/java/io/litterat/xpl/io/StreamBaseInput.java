@@ -18,6 +18,7 @@ package io.litterat.xpl.io;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 
 import io.litterat.xpl.TypeBaseInput;
 
@@ -116,8 +117,11 @@ public class StreamBaseInput implements TypeBaseInput {
 				| ((f & 0xff) << 40) | ((g & 0xff) << 48) | (h & 0xff) << 56);
 	}
 
+	// https://stackoverflow.com/questions/55752927/how-to-convert-an-unsigned-long-to-biginteger
+	private static final BigInteger UNSIGNED_LONG_MASK = BigInteger.ONE.shiftLeft(Long.SIZE).subtract(BigInteger.ONE);
+
 	@Override
-	public long readUInt64() throws IOException {
+	public BigInteger readUInt64() throws IOException {
 		int a = input.read();
 		int b = input.read();
 		int c = input.read();
@@ -130,8 +134,40 @@ public class StreamBaseInput implements TypeBaseInput {
 			throw new EOFException();
 		}
 
-		return (((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | ((d & 0xff) << 24) | ((e & 0xff) << 32)
-				| ((f & 0xff) << 40) | ((g & 0xff) << 48) | (h & 0xff) << 56);
+		long rawBits = (((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | ((d & 0xff) << 24)
+				| ((e & 0xff) << 32) | ((f & 0xff) << 40) | ((g & 0xff) << 48) | (h & 0xff) << 56);
+
+		rawBits = Long.reverseBytes(rawBits);
+		if (rawBits > 0) {
+			return BigInteger.valueOf(rawBits);
+		} else {
+			return BigInteger.valueOf(rawBits).and(UNSIGNED_LONG_MASK);
+		}
+	}
+
+	@Override
+	public BigInteger readLeUInt64() throws IOException {
+		int a = input.read();
+		int b = input.read();
+		int c = input.read();
+		int d = input.read();
+		int e = input.read();
+		int f = input.read();
+		int g = input.read();
+		int h = input.read();
+		if ((a | b | c | d | e | f | g | h) < 0) {
+			throw new EOFException();
+		}
+
+		long rawBits = (((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | ((d & 0xff) << 24)
+				| ((e & 0xff) << 32) | ((f & 0xff) << 40) | ((g & 0xff) << 48) | (h & 0xff) << 56);
+
+		rawBits = Long.reverseBytes(rawBits);
+		if (rawBits > 0) {
+			return BigInteger.valueOf(rawBits);
+		} else {
+			return BigInteger.valueOf(rawBits).and(UNSIGNED_LONG_MASK);
+		}
 	}
 
 	@Override

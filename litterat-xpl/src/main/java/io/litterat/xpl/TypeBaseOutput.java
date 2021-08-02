@@ -16,14 +16,14 @@
 package io.litterat.xpl;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  *
- * The base output interfaces specifies the underlying way of writing data to
- * the underlying transport (stream,byte[],ByteBuffer). You should have no need
- * to interact with this interface and is here for compatibility with older
- * style serialization libraries. Check the @TypeReaderWriter for further
- * information.
+ * The base output interfaces specifies the underlying way of writing data to the underlying
+ * transport (stream,byte[],ByteBuffer). You should have no need to interact with this interface and
+ * is here for compatibility with older style serialization libraries. Check the @TypeReaderWriter
+ * for further information.
  *
  */
 public interface TypeBaseOutput {
@@ -87,12 +87,15 @@ public interface TypeBaseOutput {
 		writeInt64(Long.reverseBytes(b));
 	}
 
-	// TODO Update this to BigInteger.
 	default public void writeLeUInt64(long b) throws IOException {
 		writeUInt64(Long.reverseBytes(b));
 	}
 
-	public void writeUVarInt64(long s) throws IOException;
+	public void writeLeUInt64(BigInteger v) throws IOException;
+
+	public void writeUVarInt64(long v) throws IOException;
+
+	public void writeUVarInt64(BigInteger v) throws IOException;
 
 	default public void writeVarInt64(long s) throws IOException {
 		writeUVarInt64((s << 1) ^ (s >> 63));

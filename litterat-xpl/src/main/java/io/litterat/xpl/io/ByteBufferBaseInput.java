@@ -16,6 +16,7 @@
 package io.litterat.xpl.io;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 import io.litterat.xpl.TypeBaseInput;
@@ -65,9 +66,28 @@ public class ByteBufferBaseInput implements TypeBaseInput {
 		return input.getLong();
 	}
 
+	// https://stackoverflow.com/questions/55752927/how-to-convert-an-unsigned-long-to-biginteger
+	private static final BigInteger UNSIGNED_LONG_MASK = BigInteger.ONE.shiftLeft(Long.SIZE).subtract(BigInteger.ONE);
+
 	@Override
-	public long readUInt64() throws IOException {
-		return input.getLong();
+	public BigInteger readUInt64() throws IOException {
+		long rawBits = input.getLong();
+		if (rawBits > 0) {
+			return BigInteger.valueOf(rawBits);
+		} else {
+			return BigInteger.valueOf(rawBits).and(UNSIGNED_LONG_MASK);
+		}
+
+	}
+
+	@Override
+	public BigInteger readLeUInt64() throws IOException {
+		long rawBits = Long.reverseBytes(input.getLong());
+		if (rawBits > 0) {
+			return BigInteger.valueOf(rawBits);
+		} else {
+			return BigInteger.valueOf(rawBits).and(UNSIGNED_LONG_MASK);
+		}
 	}
 
 	@Override

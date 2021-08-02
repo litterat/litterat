@@ -17,6 +17,7 @@ package io.litterat.xpl.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 
 import io.litterat.xpl.TypeBaseOutput;
 
@@ -134,6 +135,18 @@ public class StreamBaseOutput implements TypeBaseOutput {
 			}
 			out.write(b);
 		} while (s != 0);
+	}
+
+	@Override
+	public void writeLeUInt64(BigInteger v) throws IOException {
+		// TODO Auto-generated method stub
+		throw new IOException("not implemented");
+	}
+
+	@Override
+	public void writeUVarInt64(BigInteger v) throws IOException {
+		// TODO Auto-generated method stub
+		throw new IOException("not implemented");
 	}
 
 	@Override

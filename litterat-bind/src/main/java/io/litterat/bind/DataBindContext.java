@@ -19,8 +19,10 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
+
 import io.litterat.bind.describe.DefaultResolver;
 
 public class DataBindContext {
@@ -28,12 +30,10 @@ public class DataBindContext {
 	// Resolved class information
 	private final ConcurrentHashMap<Type, DataClass> descriptors = new ConcurrentHashMap<>();
 
-
 	// default resolver
 	private final DefaultResolver dataClassResolver;
 
 	public static class Builder {
-
 
 		boolean allowAny = false;
 
@@ -41,7 +41,6 @@ public class DataBindContext {
 
 		public Builder() {
 		}
-
 
 		public Builder allowAny() {
 			allowAny = true;
@@ -66,7 +65,6 @@ public class DataBindContext {
 
 		this.dataClassResolver = new DefaultResolver(builder.allowSerializable, builder.allowAny);
 
-
 		try {
 			registerAtom(Boolean.class);
 			registerAtom(boolean.class);
@@ -84,9 +82,9 @@ public class DataBindContext {
 			registerAtom(float.class);
 			registerAtom(Double.class);
 			registerAtom(double.class);
+			registerAtom(BigInteger.class);
 			registerAtom(Void.class);
 			registerAtom(String.class);
-
 			registerAtom(Date.class);
 
 		} catch (DataBindException e) {
@@ -94,7 +92,6 @@ public class DataBindContext {
 		}
 
 	}
-
 
 	public void registerAtom(Class<?> targetClass) throws DataBindException {
 		register(targetClass, new DataClassAtom(targetClass));

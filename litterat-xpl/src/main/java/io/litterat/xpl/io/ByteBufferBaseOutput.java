@@ -16,6 +16,7 @@
 package io.litterat.xpl.io;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 import io.litterat.xpl.TypeBaseOutput;
@@ -94,6 +95,18 @@ public class ByteBufferBaseOutput implements TypeBaseOutput {
 			}
 			output.put((byte) b);
 		} while (s != 0);
+	}
+
+	@Override
+	public void writeLeUInt64(BigInteger v) throws IOException {
+		// TODO Auto-generated method stub
+		throw new IOException("not implemented");
+	}
+
+	@Override
+	public void writeUVarInt64(BigInteger v) throws IOException {
+		// TODO Auto-generated method stub
+		throw new IOException("not implemented");
 	}
 
 	@Override

@@ -17,6 +17,7 @@ package io.litterat.xpl.io;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.math.BigInteger;
 
 import io.litterat.xpl.TypeBaseInput;
 
@@ -83,12 +84,36 @@ public class ByteArrayBaseInput implements TypeBaseInput {
 				| ((buffer[pos++] & 0xff) << 24));
 	}
 
+	// https://stackoverflow.com/questions/55752927/how-to-convert-an-unsigned-long-to-biginteger
+	private static final BigInteger UNSIGNED_LONG_MASK = BigInteger.ONE.shiftLeft(Long.SIZE).subtract(BigInteger.ONE);
+
 	@Override
-	public long readUInt64() throws IOException {
+	public BigInteger readUInt64() throws IOException {
 		checkAvailable(8);
-		return (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8) | ((buffer[pos++] & 0xff) << 16)
+		long rawBits = (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8) | ((buffer[pos++] & 0xff) << 16)
 				| ((buffer[pos++] & 0xff) << 24)) | ((buffer[pos++] & 0xff) << 32) | ((buffer[pos++] & 0xff) << 40)
 				| ((buffer[pos++] & 0xff) << 48) | ((buffer[pos++] & 0xff) << 56);
+
+		if (rawBits > 0) {
+			return BigInteger.valueOf(rawBits);
+		} else {
+			return BigInteger.valueOf(rawBits).and(UNSIGNED_LONG_MASK);
+		}
+	}
+
+	@Override
+	public BigInteger readLeUInt64() throws IOException {
+		checkAvailable(8);
+		long rawBits = (((buffer[pos++] & 0xff) << 0) | ((buffer[pos++] & 0xff) << 8) | ((buffer[pos++] & 0xff) << 16)
+				| ((buffer[pos++] & 0xff) << 24)) | ((buffer[pos++] & 0xff) << 32) | ((buffer[pos++] & 0xff) << 40)
+				| ((buffer[pos++] & 0xff) << 48) | ((buffer[pos++] & 0xff) << 56);
+
+		rawBits = Long.reverseBytes(rawBits);
+		if (rawBits > 0) {
+			return BigInteger.valueOf(rawBits);
+		} else {
+			return BigInteger.valueOf(rawBits).and(UNSIGNED_LONG_MASK);
+		}
 	}
 
 	// https://en.wikipedia.org/wiki/LEB128
