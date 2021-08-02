@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.model.library.TypeException;
@@ -34,6 +35,8 @@ public class ImmutableAtomTest {
 
 	ImmutableAtom test = new ImmutableAtom(ENUM_TEST, STR_TEST, BOOL_TEST, OPTION_TEST);
 
+	// Disabled until after refactor.
+	@Disabled
 	@Test
 	public void testWriteAndReadImmutableAtom() throws IOException, TypeException {
 

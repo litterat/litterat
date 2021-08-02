@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandle;
 
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.bind.ModelBinder;
+import io.litterat.model.bind.ModelHelper;
 import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldSet;
@@ -46,7 +46,7 @@ public class FieldSetInterpreter implements StatementInterpreter {
 		DataClassRecord dataClass = (DataClassRecord) typeMap.library().getTypeClass(fieldSet.type());
 
 		// find the getter.
-		return ModelBinder.resolveFieldSetter(dataClass, fieldSet.field());
+		return ModelHelper.resolveFieldSetter(dataClass, fieldSet.field());
 	}
 
 	@Override

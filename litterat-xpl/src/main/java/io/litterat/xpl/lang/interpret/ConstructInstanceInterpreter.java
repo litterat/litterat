@@ -16,9 +16,12 @@
 package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.bind.ModelBinder;
 import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.ConstructInstance;
@@ -39,7 +42,7 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 
 		DataClassRecord typeClass = (DataClassRecord) typeMap.library().getTypeClass(createInstance.type());
 		this.constructor = typeClass.constructor();
-		this.toObject = ModelBinder.collectToObject(typeClass);
+		this.toObject = collectToObject(typeClass);
 	}
 
 	@Override
@@ -59,5 +62,29 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 
 	public ConstructInstance createInstance() {
 		return createInstance;
+	}
+
+	public static MethodHandle[] collectToObject(DataClassRecord dataClass) {
+
+		MethodHandle[] toObject = new MethodHandle[dataClass.fields().length];
+
+		DataClassField[] fields = dataClass.fields();
+
+		for (int x = 0; x < fields.length; x++) {
+			DataClassField field = dataClass.fields()[x];
+			DataClass fieldDataClass = field.dataClass();
+
+			if (fieldDataClass instanceof DataClassAtom) {
+				DataClassAtom fieldAtom = (DataClassAtom) fieldDataClass;
+				toObject[x] = fieldAtom.toObject();
+			} else if (fieldDataClass instanceof DataClassRecord) {
+				DataClassRecord fieldRecord = (DataClassRecord) fieldDataClass;
+				toObject[x] = fieldRecord.toObject();
+			} else {
+				toObject[x] = MethodHandles.identity(field.dataClass().typeClass());
+			}
+		}
+
+		return toObject;
 	}
 }

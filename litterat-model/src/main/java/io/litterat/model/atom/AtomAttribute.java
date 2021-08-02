@@ -24,30 +24,6 @@ import io.litterat.model.annotation.SchemaType;
 public abstract class AtomAttribute {
 
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_big_endian")
-	public static class AtomBigEndian extends AtomAttribute {}
-
-	@Record
-	@SchemaType(namespace = "schema", name = "atom_little_endian")
-	public static class AtomLittleEndian extends AtomAttribute {}
-
-	@Record
-	@SchemaType(namespace = "schema", name = "atom_integer")
-	public static class AtomInteger extends AtomAttribute {}
-
-	@Record
-	@SchemaType(namespace = "schema", name = "atom_unsigned")
-	public static class AtomUnsigned extends AtomAttribute {}
-
-	@Record
-	@SchemaType(namespace = "schema", name = "atom_signed")
-	public static class AtomSigned extends AtomAttribute {}
-
-	@Record
-	@SchemaType(namespace = "schema", name = "atom_ieee756")
-	public static class AtomIEEE756 extends AtomAttribute {}
-
-	@Record
 	@SchemaType(namespace = "schema", name = "atom_fixed_length")
 	public static class AtomFixedLength extends AtomAttribute {
 

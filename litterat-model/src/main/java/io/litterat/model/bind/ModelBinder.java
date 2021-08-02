@@ -15,12 +15,9 @@
  */
 package io.litterat.model.bind;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClassAtom;
@@ -29,21 +26,98 @@ import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.model.Array;
 import io.litterat.model.Definition;
+import io.litterat.model.Element;
 import io.litterat.model.Field;
 import io.litterat.model.Record;
-import io.litterat.model.Reference;
 import io.litterat.model.TypeName;
+import io.litterat.model.Union;
 import io.litterat.model.library.TypeException;
 import io.litterat.model.library.TypeLibrary;
+import io.litterat.model.meta.TypeDefinitions;
 
 /**
  *
- * The Litterat model binders job is to either create a schema definition from the information provided
- * by the DataClass or using a schema definition, bind the schema to an existing DataClass.
+ * The Litterat model binder creates a model definition from a DataClass. This allows 'code first'
+ * schema development.
+ * 
+ * Another task that is required to to bind a @DataClass to a Litterat model @Definition. In this
+ * case it should attempt to match as closely as possible to the @DataClass and create any
+ * additional filters required to bind successfully to the @DataClass. If no binding can be found
+ * then an exception should be thrown.
  *
  */
 
 public class ModelBinder {
+
+	public Element elementFromDataClass(TypeLibrary library, DataClass dataClass) throws TypeException {
+
+		Element result = null;
+
+		if (dataClass instanceof DataClassRecord) {
+			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
+
+			List<Field> fields = new ArrayList<>();
+
+			DataClassField[] dataFields = dataClassRecord.fields();
+			for (DataClassField dataClassField : dataFields) {
+				String name = dataClassField.name();
+
+				DataClass fieldDataClass = dataClassField.dataClass();
+
+				if (fieldDataClass instanceof DataClassArray) {
+					DataClassArray dataClassArray = (DataClassArray) fieldDataClass;
+
+					TypeName typeName = library.getTypeName(dataClassArray.arrayDataClass());
+
+					fields.add(new Field(name, new Array(typeName)));
+
+				} else if (fieldDataClass instanceof DataClassAtom || fieldDataClass instanceof DataClassRecord
+						|| fieldDataClass instanceof DataClassUnion) {
+					// This currently assumes that any atom,record,or union will have its own type name rather than
+					// be an embedded type.
+					TypeName typeName = library.getTypeName(fieldDataClass);
+
+					// TODO - What about required?
+
+					fields.add(new Field(name, typeName, false));
+				}
+
+			}
+
+			Field[] finalFields = new Field[fields.size()];
+			result = new Record(fields.toArray(finalFields));
+
+		} else if (dataClass instanceof DataClassUnion) {
+			DataClassUnion dataClassUnion = (DataClassUnion) dataClass;
+
+			TypeName[] members = new TypeName[dataClassUnion.memberTypes().length];
+			for (int x = 0; x < members.length; x++) {
+				members[x] = library.getTypeName(dataClassUnion.memberTypes()[x]);
+			}
+
+			result = new Union(members);
+
+		} else if (dataClass instanceof DataClassArray) {
+			DataClassArray dataClassArray = (DataClassArray) dataClass;
+			// TODO implement this.
+
+			TypeName arrayElementType = library.getTypeName(dataClassArray.arrayDataClass());
+
+			result = new Array(arrayElementType);
+
+		} else if (dataClass instanceof DataClassAtom) {
+			@SuppressWarnings("unused")
+			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
+
+			// Atomic types need to be already registered.
+			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
+		} else {
+			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
+		}
+
+		return result;
+
+	}
 
 	/*
 	 *
@@ -63,41 +137,50 @@ public class ModelBinder {
 				if (fieldDataClass instanceof DataClassArray) {
 					DataClassArray dataClassArray = (DataClassArray) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(dataClassArray.arrayDataClass().typeClass());
+					TypeName typeName = library.getTypeName(dataClassArray.arrayDataClass());
 
 					fields.add(new Field(name, new Array(typeName)));
 
 				} else if (fieldDataClass instanceof DataClassAtom) {
 					DataClassAtom fieldDataClassAtom = (DataClassAtom) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(fieldDataClassAtom.dataClass());
+					TypeName typeName = library.getTypeName(fieldDataClassAtom);
 
 					// TODO - What about required?
 
-					fields.add(new Field(name, new Reference(typeName), false));
+					fields.add(new Field(name, typeName, false));
 				} else if (fieldDataClass instanceof DataClassRecord) {
 					DataClassRecord fieldDataClassRecord = (DataClassRecord) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(fieldDataClassRecord.dataClass());
+					TypeName typeName = library.getTypeName(fieldDataClassRecord);
 
 					// TODO - What about required?
 
-					fields.add(new Field(name, new Reference(typeName), false));
+					fields.add(new Field(name, typeName, false));
 				} else if (fieldDataClass instanceof DataClassUnion) {
 					DataClassUnion fieldDataClassUnion = (DataClassUnion) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(fieldDataClassUnion.typeClass());
+					TypeName typeName = library.getTypeName(fieldDataClassUnion);
 
 					// TODO - What about required?
 
-					fields.add(new Field(name, new Reference(typeName), false));
+					fields.add(new Field(name, typeName, false));
 				}
 			}
 
 			Field[] finalFields = new Field[fields.size()];
 			return new Record(fields.toArray(finalFields));
 		} else if (dataClass instanceof DataClassAtom) {
-			// TODO rewrite this
+
+			// TODO this needs more work.
+			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
+			if (dataClassAtom.dataClass() == String.class) {
+				return TypeDefinitions.STRING;
+			} else if (dataClassAtom.dataClass() == int.class) {
+				return TypeDefinitions.INT32;
+			}
+			System.out.println("dataClassAtom:" + dataClassAtom);
+
 			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
 		} else if (dataClass instanceof DataClassArray) {
 			// TODO implement this.
@@ -109,116 +192,6 @@ public class ModelBinder {
 			throw new TypeException("Could not generate descriptor for " + dataClass.typeClass().getName());
 		}
 
-	}
-
-	public static MethodHandle resolveFieldGetter(DataClassRecord dataClass, String fieldName)
-			throws DataBindException {
-
-		for (DataClassField dataField : dataClass.fields()) {
-			if (dataField.name().equalsIgnoreCase(fieldName)) {
-
-				MethodHandle toData = null;
-				// Pass the accessor through the toData handle to get the correct data type.
-				// toData will be identity function if no change required.
-				DataClass componentClass = dataField.dataClass();
-				if (componentClass instanceof DataClassAtom) {
-					DataClassAtom dataClassAtom = (DataClassAtom) componentClass;
-
-					toData = MethodHandles.filterArguments(dataClassAtom.toData(), 0, dataField.accessor());
-
-					if (!dataClassAtom.dataClass().isPrimitive()) {
-						toData = checkIsPresent(dataClass, dataField, toData, dataClassAtom.dataClass());
-					}
-
-				} else if (componentClass instanceof DataClassRecord) {
-
-					DataClassRecord dataClassRecord = (DataClassRecord) componentClass;
-
-					MethodHandle fieldToData = dataClassRecord.toData();
-
-					toData = MethodHandles.filterArguments(fieldToData, 0, dataField.accessor());
-
-					if (!dataClassRecord.dataClass().isPrimitive()) {
-						toData = checkIsPresent(dataClass, dataField, toData, dataClassRecord.dataClass());
-					}
-
-				} else {
-					toData = dataField.accessor();
-				}
-
-				return toData;
-
-			}
-		}
-
-		throw new DataBindException(
-				String.format("Field '%s' not found in dataClass '%s'", fieldName, dataClass.dataClass().getName()));
-	}
-
-	// If the value is primitive don't wrap it in guard with test. This is mainly because
-	// MethodHandles.constant will throw a NPE for primitives. Also relates to a bigger issue
-	// of design of XPL passing nulls around which will need to be refactored to remove.
-	// TODO refactor so that design of interpreter doesn't need to pass around nulls.
-	private static MethodHandle checkIsPresent(DataClassRecord dataClass, DataClassField dataField, MethodHandle toData,
-			Class<?> fieldDataClass) {
-		// Check for is a value is present prior to reading.
-		MethodHandle isPresent = dataField.isPresent();
-
-		MethodHandle returnNull = MethodHandles.constant(fieldDataClass, null);
-		returnNull = MethodHandles.dropArguments(returnNull, 0, dataClass.typeClass());
-
-		return MethodHandles.guardWithTest(isPresent, toData, returnNull);
-	}
-
-	public static MethodHandle resolveFieldSetter(DataClassRecord dataClass, String field) throws DataBindException {
-		for (DataClassField component : dataClass.fields()) {
-			if (component.name().equalsIgnoreCase(field)) {
-
-				MethodHandle setter = component.setter()
-						.orElseThrow(() -> new DataBindException("No setter available"));
-
-				// Pass the object through the toObject method handle to get the correct type
-				// for the setter. toObject will be identity function if no change required.
-				DataClass componentClass = component.dataClass();
-				if (componentClass instanceof DataClassAtom) {
-					MethodHandle toObject = ((DataClassAtom) componentClass).toObject();
-
-					return MethodHandles.filterArguments(setter, 0, toObject);
-				} else if (componentClass instanceof DataClassRecord) {
-					MethodHandle toObject = ((DataClassRecord) componentClass).toObject();
-
-					return MethodHandles.filterArguments(setter, 0, toObject);
-				} else {
-					return setter;
-				}
-			}
-		}
-
-		throw new DataBindException("Field not found");
-	}
-
-	public static MethodHandle[] collectToObject(DataClassRecord dataClass) {
-
-		MethodHandle[] toObject = new MethodHandle[dataClass.fields().length];
-
-		DataClassField[] fields = dataClass.fields();
-
-		for (int x = 0; x < fields.length; x++) {
-			DataClassField field = dataClass.fields()[x];
-			DataClass fieldDataClass = field.dataClass();
-
-			if (fieldDataClass instanceof DataClassAtom) {
-				DataClassAtom fieldAtom = (DataClassAtom) fieldDataClass;
-				toObject[x] = fieldAtom.toObject();
-			} else if (fieldDataClass instanceof DataClassRecord) {
-				DataClassRecord fieldRecord = (DataClassRecord) fieldDataClass;
-				toObject[x] = fieldRecord.toObject();
-			} else {
-				toObject[x] = MethodHandles.identity(field.dataClass().typeClass());
-			}
-		}
-
-		return toObject;
 	}
 
 }

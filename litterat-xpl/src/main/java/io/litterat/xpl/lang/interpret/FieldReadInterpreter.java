@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandle;
 
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.bind.ModelBinder;
+import io.litterat.model.bind.ModelHelper;
 import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldRead;
@@ -44,7 +44,7 @@ public class FieldReadInterpreter implements ExpressionInterpreter {
 		DataClassRecord dataClass = (DataClassRecord) typeMap.library().getTypeClass(fieldRead.type());
 
 		// find the getter.
-		return ModelBinder.resolveFieldGetter(dataClass, fieldRead.field());
+		return ModelHelper.resolveFieldGetter(dataClass, fieldRead.field());
 	}
 
 	@Override
