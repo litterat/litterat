@@ -13,12 +13,11 @@
  */
 open module io.litterat.test.xpl {
 
-	requires io.litterat.bind;
+	requires io.litterat.core;
 	requires io.litterat.xpl;
-	requires io.litterat.model;
 
 	// The test data.
-	requires io.litterat.test.bind;
+	requires io.litterat.test.core;
 
 	requires org.junit.jupiter.api;
 

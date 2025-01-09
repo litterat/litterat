@@ -19,9 +19,9 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+import io.litterat.core.TypeException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.ConstructInstance;
 import io.litterat.xpl.lang.LitteratMachine;
@@ -37,7 +37,7 @@ public class ConstructInstanceGenerator implements ExpressionGenerator {
 		this.createInstance = createInstance;
 		this.params = params;
 
-		DataClass dataClass = typeMap.library().getTypeClass(createInstance.type());
+		DataClass dataClass = typeMap.context().getDescriptor(createInstance.type());
 		if (dataClass instanceof DataClassRecord) {
 			this.constructor = ((DataClassRecord) dataClass).constructor();
 		} else {

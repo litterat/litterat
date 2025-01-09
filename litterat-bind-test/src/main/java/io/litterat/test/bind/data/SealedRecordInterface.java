@@ -17,8 +17,8 @@ package io.litterat.test.bind.data;
 
 import java.util.List;
 
-import io.litterat.bind.Field;
-import io.litterat.bind.Union;
+import io.litterat.bind.annotation.Field;
+import io.litterat.bind.annotation.Union;
 
 public class SealedRecordInterface {
 

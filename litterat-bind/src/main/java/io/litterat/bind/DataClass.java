@@ -33,7 +33,7 @@ public abstract class DataClass {
 	// The data class type.
 	private final DataClassType dataClassType;
 
-	public DataClass(Class<?> targetType, DataClassType dataType) {
+	public DataClass( Class<?> targetType, DataClassType dataType) {
 
 		this.typeClass = targetType;
 

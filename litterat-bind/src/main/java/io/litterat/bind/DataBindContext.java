@@ -23,7 +23,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.litterat.bind.describe.DefaultResolver;
+import io.litterat.bind.analysis.DefaultClassBinder;
 
 public class DataBindContext {
 
@@ -31,7 +31,7 @@ public class DataBindContext {
 	private final ConcurrentHashMap<Type, DataClass> descriptors = new ConcurrentHashMap<>();
 
 	// default resolver
-	private final DefaultResolver dataClassResolver;
+	private final DefaultClassBinder dataClassResolver;
 
 	public static class Builder {
 
@@ -63,7 +63,7 @@ public class DataBindContext {
 
 	private DataBindContext(Builder builder) {
 
-		this.dataClassResolver = new DefaultResolver(builder.allowSerializable, builder.allowAny);
+		this.dataClassResolver = new DefaultClassBinder(true);
 
 		try {
 			registerAtom(Boolean.class);
@@ -129,7 +129,7 @@ public class DataBindContext {
 		descriptors.put(targetClass, descriptor);
 	}
 
-	public void registerAtom(Class<?> targetClass, DataBridge<?, ?> bridge) throws DataBindException {
+	public DataClassAtom registerAtom(Class<?> targetClass, DataBridge<?, ?> bridge) throws DataBindException {
 		checkExists(targetClass);
 
 		Class<?> bridgeClass = bridge.getClass();
@@ -141,7 +141,9 @@ public class DataBindContext {
 			MethodHandle toData = MethodHandles.publicLookup().unreflect(toDataMethod).bindTo(bridge);
 			MethodHandle toObject = MethodHandles.publicLookup().unreflect(toObjectMethod).bindTo(bridge);
 
-			register(targetClass, new DataClassAtom(targetClass, toDataMethod.getReturnType(), toData, toObject));
+			DataClassAtom dataClass = new DataClassAtom(targetClass, toDataMethod.getReturnType(), toData, toObject);
+			register(targetClass, dataClass);
+			return dataClass;
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | DataBindException e) {
 			throw new DataBindException("Failed to register atom bridge", e);
 		}

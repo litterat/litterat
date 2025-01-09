@@ -18,7 +18,7 @@ package io.litterat.test.bind.data;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.litterat.bind.Atom;
+import io.litterat.bind.annotation.Atom;
 
 /**
  * This tests the concept of an immutable atom. The constructor uses a static method to return the

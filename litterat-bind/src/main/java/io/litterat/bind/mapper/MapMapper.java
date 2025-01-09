@@ -15,18 +15,11 @@
  */
 package io.litterat.bind.mapper;
 
+import io.litterat.bind.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassAtom;
-import io.litterat.bind.DataClassField;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassUnion;
 
 /**
  *
@@ -56,68 +49,67 @@ public class MapMapper {
 
 		try {
 			Object v = null;
-			if (dataClass instanceof DataClassAtom) {
-				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-				v = dataClassAtom.toData().invoke(object);
-			} else if (dataClass instanceof DataClassRecord) {
-				DataClassRecord dataRecord = (DataClassRecord) dataClass;
-				Object data = dataRecord.toData().invoke(object);
+            switch (dataClass) {
+                case DataClassAtom dataClassAtom -> v = dataClassAtom.toData().invoke(object);
 
-				Map<String, Object> map = new HashMap<>();
+/*			} else if (dataClass instanceof DataClassProxy) {
+				DataClassProxy dataProxy = (DataClassProxy) dataClass;
+				v = toMap(dataProxy.toData().invoke(object));
+ */
+                case DataClassRecord dataRecord -> {
 
-				DataClassField[] fields = dataRecord.fields();
-				for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
-					DataClassField field = fields[fieldIndex];
+                    Map<String, Object> map = new HashMap<>();
 
-					if (field.isPresent(data)) {
-						DataClass fieldDataClass = field.dataClass();
-						Object fv = toMap(fieldDataClass, field.get(data));
-						map.put(field.name(), fv);
-					}
-				}
+                    DataClassField[] fields = dataRecord.fields();
+                    for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+                        DataClassField field = fields[fieldIndex];
 
-				v = map;
+                        if (field.isPresent(object)) {
+                            DataClass fieldDataClass = field.dataClass();
+                            Object fv = toMap(fieldDataClass, field.get(object));
+                            map.put(field.name(), fv);
+                        }
+                    }
 
-			} else if (dataClass instanceof DataClassArray) {
-				DataClassArray arrayClass = (DataClassArray) dataClass;
+                    v = map;
+                }
+                case DataClassArray arrayClass -> {
 
-				Object arrayData = object;
-				int length = (int) arrayClass.size().invoke(arrayData);
-				Object[] outputArray = new Object[length];
-				Object iterator = arrayClass.iterator().invoke(arrayData);
+                    Object arrayData = object;
+                    int length = (int) arrayClass.size().invoke(arrayData);
+                    Object[] outputArray = new Object[length];
+                    Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				DataClass arrayDataClass = arrayClass.arrayDataClass();
+                    DataClass arrayDataClass = arrayClass.arrayDataClass();
 
-				for (int x = 0; x < length; x++) {
-					Object av = arrayClass.get().invoke(arrayData, iterator);
-					outputArray[x] = toMap(arrayDataClass, av);
-				}
+                    for (int x = 0; x < length; x++) {
+                        Object av = arrayClass.get().invoke(arrayData, iterator);
+                        outputArray[x] = toMap(arrayDataClass, av);
+                    }
 
-				v = outputArray;
-			} else if (dataClass instanceof DataClassUnion) {
-				DataClassUnion unionClass = (DataClassUnion) dataClass;
+                    v = outputArray;
+                }
+                case DataClassUnion unionClass -> {
 
-				// Make sure this class is a member of the union before writing it.
-				DataClass unionInstanceClass = context.getDescriptor(object.getClass());
-				if (!unionClass.isMemberType(unionInstanceClass.typeClass())) {
-					throw new IllegalArgumentException(
-							String.format("Class '%s' not a member of union type.", object.getClass().getName()));
-				}
+                    // Make sure this class is a member of the union before writing it.
+                    DataClass unionInstanceClass = context.getDescriptor(object.getClass());
+                    if (!unionClass.isMemberType(unionInstanceClass.typeClass())) {
+                        throw new IllegalArgumentException(
+                                String.format("Class '%s' not a member of union type.", object.getClass().getName()));
+                    }
 
-				// A union needs to know the type being written so it can be picked up by
-				// the reader later.
-				v = toMap(unionInstanceClass, object);
-				if (v instanceof Map) {
-					@SuppressWarnings("rawtypes")
-					Map baseMap = (Map) v;
+                    // A union needs to know the type being written so it can be picked up by
+                    // the reader later.
+                    v = toMap(unionInstanceClass, object);
+                    if (v instanceof @SuppressWarnings("rawtypes")Map baseMap) {
 
-					// Using the full class name here as an example. A better/more complete implementation
-					// would use a schema based name.
-					baseMap.put("type", object.getClass().getName());
-				}
-			} else {
-				throw new IllegalArgumentException("Unknown data class");
-			}
+                        // Using the full class name here as an example. A better/more complete implementation
+                        // would use a schema based name.
+                        baseMap.put("type", object.getClass().getName());
+                    }
+                }
+                case null, default -> throw new IllegalArgumentException("Unknown data class");
+            }
 			return v;
 		} catch (Throwable t) {
 			throw new DataBindException(String.format("Failed to convert %s to Map", dataClass.typeClass()), t);
@@ -139,74 +131,74 @@ public class MapMapper {
 
 		try {
 			Object v = null;
-			if (dataClass instanceof DataClassAtom) {
-				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-				v = dataClassAtom.toObject().invoke(data);
-			} else if (dataClass instanceof DataClassRecord) {
-				DataClassRecord dataRecord = (DataClassRecord) dataClass;
-				Map<String, Object> map = (Map<String, Object>) data;
-				DataClassField[] fields = dataRecord.fields();
-				Object[] construct = new Object[fields.length];
-				for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
-					DataClassField field = fields[fieldIndex];
+            switch (dataClass) {
+                case DataClassAtom dataClassAtom -> v = dataClassAtom.toObject().invoke(data);
 
-					Object fv = map.get(field.name());
+/*			} else if (dataClass instanceof DataClassProxy) {
+				DataClassProxy dataProxy = (DataClassProxy) dataClass;
+				v = dataProxy.toObject().invoke(toObject(dataProxy.proxyDataClass(), data));
+ */
+                case DataClassRecord dataRecord -> {
+                    Map<String, Object> map = (Map<String, Object>) data;
+                    DataClassField[] fields = dataRecord.fields();
+                    Object[] construct = new Object[fields.length];
+                    for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+                        DataClassField field = fields[fieldIndex];
 
-					// Recursively convert maps back to objects.
-					if (fv != null) {
-						DataClass fieldDataClass = field.dataClass();
+                        Object fv = map.get(field.name());
 
-						fv = toObject(fieldDataClass, fv);
+                        // Recursively convert maps back to objects.
+                        if (fv != null) {
+                            DataClass fieldDataClass = field.dataClass();
 
-					}
-					construct[fieldIndex] = fv;
-				}
+                            fv = toObject(fieldDataClass, fv);
 
-				v = dataRecord.constructor().invoke(construct);
+                        }
+                        construct[fieldIndex] = fv;
+                    }
 
-				v = dataRecord.toObject().invoke(v);
-			} else if (dataClass instanceof DataClassArray) {
-				DataClassArray arrayClass = (DataClassArray) dataClass;
+                    v = dataRecord.constructor().invoke(construct);
+                }
+                case DataClassArray arrayClass -> {
 
-				Object[] inputArray = (Object[]) data;
+                    Object[] inputArray = (Object[]) data;
 
-				int length = inputArray.length;
-				Object arrayData = arrayClass.constructor().invoke(length);
-				Object iterator = arrayClass.iterator().invoke(arrayData);
+                    int length = inputArray.length;
+                    Object arrayData = arrayClass.constructor().invoke(length);
+                    Object iterator = arrayClass.iterator().invoke(arrayData);
 
-				DataClass arrayDataClass = arrayClass.arrayDataClass();
+                    DataClass arrayDataClass = arrayClass.arrayDataClass();
 
-				for (int x = 0; x < length; x++) {
-					arrayClass.put().invoke(arrayData, iterator, toObject(arrayDataClass, inputArray[x]));
-				}
+                    for (Object o : inputArray) {
+                        arrayClass.put().invoke(arrayData, iterator, toObject(arrayDataClass, o));
+                    }
 
-				v = arrayData;
-			} else if (dataClass instanceof DataClassUnion) {
-				DataClassUnion unionClass = (DataClassUnion) dataClass;
+                    v = arrayData;
+                }
+                case DataClassUnion unionClass -> {
 
-				if (data instanceof Map) {
+                    if (data instanceof Map) {
 
-					Map<String, Object> map = (Map<String, Object>) data;
+                        Map<String, Object> map = (Map<String, Object>) data;
 
-					// A tagged union uses "type" for the class name.
-					String type = (String) map.get("type");
+                        // A tagged union uses "type" for the class name.
+                        String type = (String) map.get("type");
 
-					DataClass instantType = context.getDescriptor(Class.forName(type));
-					if (!unionClass.isMemberType(instantType.typeClass())) {
-						throw new DataBindException(String.format("instance type '%s' not of expected union type '%s'",
-								instantType.typeClass().getName(), unionClass.typeClass().getName()));
-					}
+                        DataClass instantType = context.getDescriptor(Class.forName(type));
+                        if (!unionClass.isMemberType(instantType.typeClass())) {
+                            throw new DataBindException(String.format("instance type '%s' not of expected union type '%s'",
+                                    instantType.typeClass().getName(), unionClass.typeClass().getName()));
+                        }
 
-					v = toObject(instantType, data);
-				} else {
-					DataClass unionType = context.getDescriptor(data.getClass());
+                        v = toObject(instantType, data);
+                    } else {
+                        DataClass unionType = context.getDescriptor(data.getClass());
 
-					v = toObject(unionType, data);
-				}
-
-			} else {
-				throw new IllegalArgumentException("unrecognised type");
-			}
+                        v = toObject(unionType, data);
+                    }
+                }
+                case null, default -> throw new IllegalArgumentException("unrecognised type");
+            }
 			return v;
 		} catch (Throwable t) {
 			throw new DataBindException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);

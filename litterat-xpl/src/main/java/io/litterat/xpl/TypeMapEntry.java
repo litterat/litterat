@@ -15,40 +15,46 @@
  */
 package io.litterat.xpl;
 
-import io.litterat.model.Definition;
-import io.litterat.model.TypeName;
-import io.litterat.model.library.TypeNameDefinition;
+import io.litterat.bind.DataClass;
+import io.litterat.core.meta.Definition;
+import io.litterat.core.meta.Typename;
 
 public class TypeMapEntry {
 
-	private final TypeNameDefinition nameDefinition;
+	private final int streamId;
+	private final Typename typename;
+	private final Definition definition;
+	private final DataClass dataClass;
 	private final TypeReader reader;
 	private final TypeWriter writer;
 
-	public TypeMapEntry(int streamId, TypeName typeName, Definition definition, TypeReader reader, TypeWriter writer) {
-		this.nameDefinition = new TypeNameDefinition(streamId, typeName, definition);
+	public TypeMapEntry(int streamId, Typename typename, Definition definition, DataClass dataClass, TypeReader reader, TypeWriter writer) {
+		this.streamId = streamId;
+		this.dataClass = dataClass;
+		this.typename = typename;
+		this.definition = definition;
 		this.reader = reader;
 		this.writer = writer;
 	}
 
 	public TypeMapEntry(int streamId, TypeMapEntry entry) {
-		this(streamId, entry.typeName(), entry.definition(), entry.reader(), entry.writer());
+		this(streamId, entry.typename(),entry.definition, entry.dataClass(), entry.reader(), entry.writer());
 	}
 
 	public int streamId() {
-		return nameDefinition.streamId();
+		return streamId;
 	}
 
-	public TypeName typeName() {
-		return nameDefinition.typeName();
+	public DataClass dataClass() {
+		return dataClass;
+	}
+
+	public Typename typename() {
+		return typename;
 	}
 
 	public Definition definition() {
-		return nameDefinition.definition();
-	}
-
-	public TypeNameDefinition nameDefinition() {
-		return nameDefinition;
+		return definition;
 	}
 
 	public TypeReader reader() {

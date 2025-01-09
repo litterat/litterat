@@ -29,9 +29,9 @@ repositories {
 }
 
 dependencies {
-
    implementation project(":litterat-bind")
-   implementation project(":litterat-bind-test")
+   implementation project(":litterat-core")
+   implementation project(":litterat-core-test")
    implementation project(":litterat-json")
    
    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
@@ -43,22 +43,22 @@ dependencies {
 }
 
 // This is to enable sealed interfaces to be tested. To be removed when Java 17 is released.
-tasks.withType(JavaCompile) {
-    options.compilerArgs += "--enable-preview"
-}
-tasks.withType(Test) {
-    jvmArgs += "--enable-preview"
-}
-tasks.withType(JavaExec) {
-    jvmArgs += "--enable-preview"
-}
+//tasks.withType(JavaCompile) {
+//    options.compilerArgs += "--enable-preview"
+//}
+//tasks.withType(Test) {
+//    jvmArgs += "--enable-preview"
+//}
+//tasks.withType(JavaExec) {
+//    jvmArgs += "--enable-preview"
+//}
 
-java {
-   modularity.inferModulePath = true
-   
-   sourceCompatibility = JavaVersion.VERSION_16
-   targetCompatibility = JavaVersion.VERSION_16
-}
+//java {
+//   modularity.inferModulePath = true
+//
+//   sourceCompatibility = JavaVersion.VERSION_17
+//   targetCompatibility = JavaVersion.VERSION_17
+//}
 
 test {
 	useJUnitPlatform()

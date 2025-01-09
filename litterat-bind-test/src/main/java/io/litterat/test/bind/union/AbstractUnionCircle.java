@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.union;
 
-import io.litterat.bind.Record;
+import io.litterat.bind.annotation.Record;
 
 @Record
 public class AbstractUnionCircle extends AbstractUnion {

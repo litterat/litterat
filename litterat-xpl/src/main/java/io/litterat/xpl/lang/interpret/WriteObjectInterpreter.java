@@ -17,7 +17,7 @@ package io.litterat.xpl.lang.interpret;
 
 import java.io.IOException;
 
-import io.litterat.model.TypeName;
+import io.litterat.core.meta.Typename;
 import io.litterat.xpl.TypeOutputStream;
 import io.litterat.xpl.lang.LitteratMachine;
 import io.litterat.xpl.lang.WriteValue;
@@ -25,11 +25,11 @@ import io.litterat.xpl.lang.WriteValue;
 public class WriteObjectInterpreter implements StatementInterpreter {
 
 	private final ExpressionInterpreter expression;
-	private final TypeName typeName;
+	private final Typename typename;
 
 	public WriteObjectInterpreter(WriteValue writeType, ExpressionInterpreter expression) {
 		this.expression = expression;
-		this.typeName = writeType.type();
+		this.typename = writeType.type();
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class WriteObjectInterpreter implements StatementInterpreter {
 
 		try {
 
-			((TypeOutputStream) m.getVariable(LitteratMachine.VAR_TRANSPORT)).writeObject(typeName,
+			((TypeOutputStream) m.getVariable(LitteratMachine.VAR_TRANSPORT)).writeObject(typename,
 					expression.execute(m));
 		} catch (Throwable e) {
 			throw new IOException(e);

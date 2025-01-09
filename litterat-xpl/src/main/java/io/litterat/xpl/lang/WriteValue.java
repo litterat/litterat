@@ -15,27 +15,26 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
+import io.litterat.core.meta.Typename;
 
 /**
  * Writes a particular type
  */
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "write_value")
+@io.litterat.bind.annotation.Typename(namespace = "xpl", name = "write_value")
 public class WriteValue extends Statement {
 
-	private final TypeName type;
+	private final Typename type;
 	private final Expression expressionNode;
 
-	public WriteValue(TypeName type, Expression expressionNode) throws NoSuchMethodException, IllegalAccessException {
+	public WriteValue(Typename type, Expression expressionNode) throws NoSuchMethodException, IllegalAccessException {
 		this.type = type;
 		this.expressionNode = expressionNode;
 	}
 
-	public TypeName type() {
+	public Typename type() {
 		return type;
 	}
 

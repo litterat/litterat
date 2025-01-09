@@ -25,11 +25,11 @@ import java.util.Optional;
  * present the accessor MethodHandle can be called to return the value. The accessor returns the
  * value as primitive or class object. If a method to set the value is present a MethodHandle for
  * setter is available.
- * 
+ * <p>
  * The field wraps Optional, OptionalInt, OptionalLong, and OptionalDouble so that isPresent will
  * proxy the call through to the Optional object. Calling the accessor will proxy the call to the
  * Optional.get call.
- * 
+ * <p>
  * If the dataClass type is a Record or Atom then toData and toObject methodhandles should be
  * called. Here's an example from the MapMapper.
  * 
@@ -67,7 +67,7 @@ public class DataClassField {
 	// setter write handle. signature object.setT( type t);
 	private final Optional<MethodHandle> setter;
 
-	public DataClassField(int index, String name, Class<?> type, DataClass dataClass, boolean isRequired,
+	public DataClassField(int index, String name, Class<?> type,  DataClass dataClass, boolean isRequired,
 			MethodHandle isPresent, MethodHandle readHandle, MethodHandle setter) {
 		this.index = index;
 		this.name = name;
@@ -144,7 +144,7 @@ public class DataClassField {
 
 	@Override
 	public String toString() {
-		return "DataClassField [index=" + index + ", name=" + name + ", type=" + type + ", isRequired=" + isRequired
+		return "DataClassField [index=" + index + ", name=" + name + ", type=" + dataClass + ", isRequired=" + isRequired
 				+ "]";
 	}
 }

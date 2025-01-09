@@ -17,13 +17,13 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
+import io.litterat.core.TypeException;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.bind.ModelHelper;
-import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldRead;
 import io.litterat.xpl.lang.LitteratMachine;
+import io.litterat.xpl.resolve.ModelHelper;
 
 public class FieldReadInterpreter implements ExpressionInterpreter {
 
@@ -38,10 +38,10 @@ public class FieldReadInterpreter implements ExpressionInterpreter {
 		this.fieldGetter = resolveFieldGetter(typeMap);
 	}
 
-	private MethodHandle resolveFieldGetter(TypeMap typeMap) throws DataBindException, TypeException {
+	private MethodHandle resolveFieldGetter(TypeMap typeMap) throws TypeException {
 
 		// Get the class
-		DataClassRecord dataClass = (DataClassRecord) typeMap.library().getTypeClass(fieldRead.type());
+		DataClassRecord dataClass = (DataClassRecord) typeMap.context().getDescriptor(fieldRead.type());
 
 		// find the getter.
 		return ModelHelper.resolveFieldGetter(dataClass, fieldRead.field());

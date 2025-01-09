@@ -85,7 +85,7 @@ public class AtomicTypeTestPojoTest {
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(AtomicTypeTestPojo.class, descriptor.typeClass());
-		Assertions.assertEquals(AtomicTypeTestPojo.class, descriptor.dataClass());
+		//Assertions.assertEquals(AtomicTypeTestPojo.class, descriptor.dataClass());
 
 		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);

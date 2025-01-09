@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="io.litterat.test.core.ProjectImmutableTest" tests="4" skipped="4" failures="0" errors="0" timestamp="2025-01-02T01:06:28" hostname="Davids-MacBook-Air-2.local" time="0.0">
+  <properties/>
+  <testcase name="testMapToObjectException()" classname="io.litterat.test.core.ProjectImmutableTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testToArray()" classname="io.litterat.test.core.ProjectImmutableTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testToMap()" classname="io.litterat.test.core.ProjectImmutableTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="checkDescriptor()" classname="io.litterat.test.core.ProjectImmutableTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

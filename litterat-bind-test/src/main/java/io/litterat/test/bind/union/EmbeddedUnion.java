@@ -15,8 +15,8 @@
  */
 package io.litterat.test.bind.union;
 
-import io.litterat.bind.Record;
-import io.litterat.bind.Union;
+import io.litterat.bind.annotation.Record;
+import io.litterat.bind.annotation.Union;
 
 @Record
 public class EmbeddedUnion {

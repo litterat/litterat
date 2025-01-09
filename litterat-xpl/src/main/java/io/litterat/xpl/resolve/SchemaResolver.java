@@ -16,113 +16,81 @@
 package io.litterat.xpl.resolve;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassField;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.model.Array;
-import io.litterat.model.Atom;
-import io.litterat.model.Definition;
-import io.litterat.model.Field;
-import io.litterat.model.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.Union;
-import io.litterat.model.atom.StringAtom;
-import io.litterat.model.function.FunctionSignature;
-import io.litterat.model.library.TypeException;
-import io.litterat.model.library.TypeLibrary;
+import io.litterat.bind.*;
+import io.litterat.core.TypeContext;
+import io.litterat.core.TypeException;
+import io.litterat.core.meta.*;
+import io.litterat.core.meta.Record;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.TypeMapEntry;
 import io.litterat.xpl.TypeOutputStream;
 import io.litterat.xpl.TypeReader;
-import io.litterat.xpl.TypeResolver;
 import io.litterat.xpl.TypeStream;
 import io.litterat.xpl.TypeWriter;
-import io.litterat.xpl.lang.Block;
-import io.litterat.xpl.lang.ConstructInstance;
-import io.litterat.xpl.lang.Expression;
-import io.litterat.xpl.lang.FieldRead;
-import io.litterat.xpl.lang.FieldSet;
-import io.litterat.xpl.lang.Lambda;
-import io.litterat.xpl.lang.LambdaFunction;
-import io.litterat.xpl.lang.ReadArray;
-import io.litterat.xpl.lang.ReadValue;
-import io.litterat.xpl.lang.ReturnNode;
-import io.litterat.xpl.lang.SlotAssigner;
-import io.litterat.xpl.lang.SlotReference;
-import io.litterat.xpl.lang.SlotSet;
-import io.litterat.xpl.lang.Statement;
-import io.litterat.xpl.lang.WriteArray;
-import io.litterat.xpl.lang.WriteValue;
+import io.litterat.xpl.lang.*;
 import io.litterat.xpl.lang.interpret.LitteratInterpreter;
 
-public class SchemaResolver implements TypeResolver {
+public class SchemaResolver {
 
 	private TypeMap typeMap;
-	private TypeLibrary library;
+	private TypeContext context;
 
 	public SchemaResolver(TypeMap map) {
 		this.typeMap = map;
-		this.library = map.library();
+		this.context = map.context();
 	}
 
-	@Override
-	public TypeMapEntry map(TypeName name) throws TypeException {
+	public TypeMapEntry register(Typename typename, Class<?> targetClass) throws TypeException {
+
+		DataClass dataClass = context.register(typename, targetClass, targetClass);
+		Definition definition = context.library().getDefinition(typename);
+
+		return map(typename, definition, dataClass);
+	}
+
+	public TypeMapEntry map(Typename name) throws TypeException {
+
+		DataClass descriptor = context.getDescriptor(name);
+		Definition definition = context.library().getDefinition(name);
+
+		return map(name, definition, descriptor);
+	}
+
+	public TypeMapEntry map(Typename name, Definition definition, DataClass descriptor) throws TypeException {
 
 		TypeMapEntry result = null;
 
-		Definition definition = library.getDefinition(name);
-		if (definition instanceof Record) {
-			Record sequence = (Record) definition;
-			DataClassRecord dataClass = (DataClassRecord) library.getTypeClass(name);
-
-			result = new TypeMapEntry(0, name, definition,
-					generateSequenceReaderConstructor(typeMap, sequence, name, dataClass),
-					generateSequenceWriter(typeMap, sequence, name, dataClass));
-		} else if (definition instanceof Union) {
-			UnionReaderWriter union = new UnionReaderWriter(name);
-			result = new TypeMapEntry(0, name, definition, union, union);
-		} else if (definition instanceof Atom) {
-			if (name.equals(TypeLibrary.STRING)) {
-				new TypeMapEntry(0, name, definition, new StringReaderWriter.StringReader(),
-						new StringReaderWriter.StringWriter());
-			} else {
-				new TypeMapEntry(0, name, definition, TransportHandles.getReader(name),
-						TransportHandles.getWriter(name));
-			}
-		} else if (definition instanceof TypeName) {
-			TypeName type = (TypeName) definition;
-			TypeReader refReader = typeMap.getEntry(type).reader();
-			TypeWriter refWriter = typeMap.getEntry(type).writer();
-			result = new TypeMapEntry(0, name, definition, refReader, refWriter);
-		} else if (definition instanceof StringAtom) {
-
-			result = new TypeMapEntry(0, name, definition, new StringReaderWriter.StringReader(),
-					new StringReaderWriter.StringWriter());
-
-		} else {
-			throw new TypeException(
-					"failed to map " + name.toString() + " with definition " + definition.getClass().getName());
-		}
+        switch (descriptor) {
+            case DataClassRecord dataClass ->
+                    result = new TypeMapEntry(0, name, definition, descriptor, generateSequenceReaderConstructor(typeMap, name, (Record) definition, dataClass),
+                            generateSequenceWriter(typeMap, name, (Record) definition, dataClass));
+            case DataClassUnion dataClassUnion -> {
+                UnionReaderWriter union = new UnionReaderWriter(name);
+                result = new TypeMapEntry(0, name, definition, descriptor, union, union);
+            }
+            case DataClassAtom dataClassAtom -> {
+                if (name.equals(Meta.STRING)) {
+                    result = new TypeMapEntry(0, name, definition, descriptor, new StringReaderWriter.StringReader(),
+                            new StringReaderWriter.StringWriter());
+                } else {
+                    result = new TypeMapEntry(0, name, definition, descriptor, TransportHandles.getReader(name),
+                            TransportHandles.getWriter(name));
+                }
+            }
+            case null, default -> throw new TypeException("failed to map " + name.toString());
+        }
 
 		return result;
 	}
 
-	@Override
-	public TypeName mapReverse(int streamId) throws TypeException {
-		throw new TypeException("unable to map reverse");
-	}
-
 	// TODO this needs more work. Should start as DataClass and look at each type.
-	private static TypeWriter generateSequenceWriter(TypeMap typeMap, Record sequence, TypeName typeName,
-			DataClassRecord dataClass) throws TypeException {
+	private static TypeWriter generateSequenceWriter(TypeMap typeMap, Typename typeName, Record sequence, DataClassRecord dataClass)
+			throws TypeException {
 		try {
-
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
 
 			int varObject = slots.getSlot(dataClass.typeClass());
@@ -136,8 +104,8 @@ public class SchemaResolver implements TypeResolver {
 				Field field = sequenceFields[x];
 				DataClassField dataClassField = dataClassFields[x];
 
-				if (field.type() instanceof TypeName) {
-					TypeName type = (TypeName) field.type();
+				if (field.type() instanceof Typename) {
+					Typename type = (Typename) field.type();
 					Statement writeField = new WriteValue(type,
 							new FieldRead(new SlotReference(varObject), typeName, field.name()));
 					statements.add(writeField);
@@ -146,13 +114,15 @@ public class SchemaResolver implements TypeResolver {
 					Array array = (Array) field.type();
 					DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
 
-					Class<?> arrayClss = typeMap.library().getTypeClass(array.type()).typeClass();
+					Class<?> arrayClss = dataArray.arrayDataClass().typeClass();
 					int loopSlot = slots.getSlot(arrayClss);
 					Expression readField = new FieldRead(new SlotReference(varObject), typeName, field.name());
 					Statement writeElement = new WriteValue(array.type(), new SlotReference(loopSlot));
 
 					Statement loop = new WriteArray(dataArray, loopSlot, readField, writeElement);
 					statements.add(loop);
+
+
 				} else {
 					throw new TypeException("Not recognised field element");
 				}
@@ -161,7 +131,7 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new FunctionSignature(TypeLibrary.VOID, new TypeName("vm", "output"), typeName),
+			Lambda lambda = new Lambda(new FunctionSignature(Meta.VOID, new Typename("vm", "output"), typeName),
 					slots.getSlots(), blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
@@ -169,7 +139,7 @@ public class SchemaResolver implements TypeResolver {
 
 			LambdaFunction lambdaFunction = compiler.compile(typeMap, lambda);
 
-			return new LambdaTypeWriter(lambdaFunction, dataClass);
+			return new LambdaTypeWriter(lambdaFunction);
 
 		} catch (NoSuchMethodException | IllegalAccessException | TypeException | DataBindException e) {
 			throw new TypeException(e);
@@ -177,13 +147,13 @@ public class SchemaResolver implements TypeResolver {
 	}
 
 	@SuppressWarnings("unused")
-	private static TypeReader generateSequenceReader(TypeMap typeMap, Record sequence, TypeName typeName,
-			DataClassRecord dataClass) throws TypeException {
+	private static TypeReader generateSequenceReader(TypeMap typeMap, Typename typeName, Record sequence, DataClassRecord dataClass)
+			throws TypeException {
 
 		try {
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
 
-			int varName = slots.getSlot(dataClass.dataClass());
+			int varName = slots.getSlot(dataClass.typeClass());
 
 			List<Statement> statements = new ArrayList<>();
 			statements.add(new SlotSet(varName, new ConstructInstance(typeName, new Expression[0])));
@@ -193,8 +163,8 @@ public class SchemaResolver implements TypeResolver {
 
 			for (int x = 0; x < sequenceFields.length; x++) {
 				Field field = sequenceFields[x];
-				if (field.type() instanceof TypeName) {
-					TypeName type = (TypeName) field.type();
+				if (field.type() instanceof Typename) {
+					Typename type = (Typename) field.type();
 					statements
 							.add(new FieldSet(new SlotReference(varName), new ReadValue(type), typeName, field.name()));
 				}
@@ -204,14 +174,14 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new FunctionSignature(typeName, new TypeName("vm", "input")), slots.getSlots(),
+			Lambda lambda = new Lambda(new FunctionSignature(typeName, new Typename("vm", "input")), slots.getSlots(),
 					blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
 			// LitteratGenerator compiler = new LitteratGenerator();
 			LambdaFunction lambdaFunction = compiler.compile(typeMap, lambda);
 
-			return new LambdaTypeReader(lambdaFunction, dataClass);
+			return new LambdaTypeReader(lambdaFunction);
 
 		} catch (NoSuchMethodException | IllegalAccessException | TypeException | DataBindException e) {
 			throw new TypeException(e);
@@ -219,10 +189,12 @@ public class SchemaResolver implements TypeResolver {
 
 	}
 
-	private static TypeReader generateSequenceReaderConstructor(TypeMap typeMap, Record sequence, TypeName typeName,
-			DataClassRecord dataClass) throws TypeException {
+	private static TypeReader generateSequenceReaderConstructor(TypeMap typeMap, Typename typeName, Record sequence, DataClassRecord dataClass
+			) throws TypeException {
 
 		try {
+
+
 			SlotAssigner slots = new SlotAssigner(TypeStream.class);
 
 			// int varName = slots.getSlot(clss);
@@ -238,8 +210,8 @@ public class SchemaResolver implements TypeResolver {
 				Field field = sequenceFields[x];
 				DataClassField dataClassField = dataClassFields[x];
 
-				if (field.type() instanceof TypeName) {
-					TypeName type = (TypeName) field.type();
+				if (field.type() instanceof Typename) {
+					Typename type = (Typename) field.type();
 					// int varReadSlot = slots.getSlot(clss);
 					// statements.add(new SlotSet(varReadSlot, new
 					// ReadType(field.type().toString())));
@@ -249,6 +221,7 @@ public class SchemaResolver implements TypeResolver {
 					DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
 
 					constructorBlock[x] = new ReadArray(dataArray, array, new ReadValue(array.type()));
+
 				} else {
 					throw new TypeException("not recognised type: " + field.type().getClass().getName());
 				}
@@ -264,7 +237,7 @@ public class SchemaResolver implements TypeResolver {
 			Statement[] statementArray = new Statement[statements.size()];
 			Block blockNode = new Block(statements.toArray(statementArray));
 
-			Lambda lambda = new Lambda(new FunctionSignature(typeName, new TypeName("vm", "input")), slots.getSlots(),
+			Lambda lambda = new Lambda(new FunctionSignature(typeName, new Typename("vm", "input")), slots.getSlots(),
 					blockNode);
 
 			LitteratInterpreter compiler = new LitteratInterpreter();
@@ -272,7 +245,7 @@ public class SchemaResolver implements TypeResolver {
 
 			LambdaFunction lambdaFunction = compiler.compile(typeMap, lambda);
 
-			return new LambdaTypeReader(lambdaFunction, dataClass);
+			return new LambdaTypeReader(lambdaFunction);
 
 		} catch (NoSuchMethodException | IllegalAccessException | DataBindException e) {
 			throw new TypeException(e);
@@ -283,18 +256,15 @@ public class SchemaResolver implements TypeResolver {
 	private static class LambdaTypeReader implements TypeReader {
 
 		private final LambdaFunction readerLambda;
-		private final MethodHandle toObject;
 
-		public LambdaTypeReader(LambdaFunction reader, DataClassRecord dataClass) {
+		public LambdaTypeReader(LambdaFunction reader) {
 			this.readerLambda = reader;
-			this.toObject = dataClass.toObject();
-
 		}
 
 		@Override
 		public Object read(TypeInputStream reader) throws IOException {
 			try {
-				return toObject.invoke(readerLambda.execute(reader));
+				return readerLambda.execute(reader);
 			} catch (Throwable e) {
 				throw new IOException("Failed to read", e);
 			}
@@ -304,17 +274,15 @@ public class SchemaResolver implements TypeResolver {
 	private static class LambdaTypeWriter implements TypeWriter {
 
 		private final LambdaFunction writerLambda;
-		private final MethodHandle toData;
 
-		public LambdaTypeWriter(LambdaFunction writer, DataClassRecord dataClass) {
+		public LambdaTypeWriter(LambdaFunction writer) {
 			this.writerLambda = writer;
-			this.toData = dataClass.toData();
 		}
 
 		@Override
 		public void write(TypeOutputStream writer, Object o) throws IOException {
 			try {
-				writerLambda.execute(writer, toData.invoke(o));
+				writerLambda.execute(writer, o);
 			} catch (Throwable e) {
 				throw new IOException("Failed to write", e);
 			}

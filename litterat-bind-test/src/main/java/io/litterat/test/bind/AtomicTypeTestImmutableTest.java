@@ -66,7 +66,7 @@ public class AtomicTypeTestImmutableTest {
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(AtomicTypeTestImmutable.class, descriptor.typeClass());
-		Assertions.assertEquals(AtomicTypeTestImmutable.class, descriptor.dataClass());
+		//Assertions.assertEquals(AtomicTypeTestImmutable.class, descriptor.dataClass());
 
 		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);

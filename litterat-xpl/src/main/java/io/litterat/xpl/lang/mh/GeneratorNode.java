@@ -17,7 +17,7 @@ package io.litterat.xpl.lang.mh;
 
 import java.lang.invoke.MethodHandle;
 
-import io.litterat.model.library.TypeException;
+import io.litterat.core.TypeException;
 import io.litterat.xpl.lang.LitteratMachine;
 
 public interface GeneratorNode {

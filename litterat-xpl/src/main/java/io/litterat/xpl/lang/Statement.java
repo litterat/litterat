@@ -15,11 +15,10 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "statement")
+@io.litterat.bind.annotation.Typename(namespace = "xpl", name = "statement")
 public abstract class Statement {
 
 }

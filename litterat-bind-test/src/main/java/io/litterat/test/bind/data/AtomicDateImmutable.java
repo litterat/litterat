@@ -17,7 +17,7 @@ package io.litterat.test.bind.data;
 
 import java.util.Date;
 
-import io.litterat.bind.Record;
+import io.litterat.bind.annotation.Record;
 
 public class AtomicDateImmutable {
 

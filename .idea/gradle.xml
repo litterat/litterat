@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
+                <projects>
+                  <project path="$PROJECT_DIR$/buildSrc" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="23" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/litterat-bind" />
+            <option value="$PROJECT_DIR$/litterat-bind-test" />
+            <option value="$PROJECT_DIR$/litterat-core" />
+            <option value="$PROJECT_DIR$/litterat-core-test" />
+            <option value="$PROJECT_DIR$/litterat-json" />
+            <option value="$PROJECT_DIR$/litterat-json-test" />
+            <option value="$PROJECT_DIR$/litterat-xpl" />
+            <option value="$PROJECT_DIR$/litterat-xpl-test" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

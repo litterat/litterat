@@ -18,6 +18,7 @@
 plugins {
     id 'java'
     id 'eclipse'
+    id 'idea'
 }
 
 
@@ -27,8 +28,9 @@ repositories {
 
 dependencies {
    //implementation group: 'io.litterat', name: 'litterat-bind', version: '0.5.0'
-   
-   implementation project(":litterat-bind")
+
+    implementation project(":litterat-bind")
+    implementation project(":litterat-core")
    
    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
@@ -37,12 +39,12 @@ dependencies {
    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 }
 
-java {
-   modularity.inferModulePath = true
-   
-   sourceCompatibility = JavaVersion.VERSION_11
-   targetCompatibility = JavaVersion.VERSION_11
-}
+//java {
+//   modularity.inferModulePath = true
+//
+//   sourceCompatibility = JavaVersion.VERSION_17
+//   targetCompatibility = JavaVersion.VERSION_17
+//}
 
 // Annoying hack because Gradle and Eclipse won't play nicely together.
 // https://github.com/eclipse/buildship/issues/658

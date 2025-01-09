@@ -15,62 +15,82 @@
  */
 package io.litterat.xpl;
 
+import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.litterat.model.TypeName;
-import io.litterat.model.library.TypeException;
-import io.litterat.model.library.TypeLibrary;
-import io.litterat.model.meta.SchemaTypes;
+import io.litterat.core.TypeContext;
+import io.litterat.core.TypeException;
+import io.litterat.core.meta.Array;
+import io.litterat.core.meta.Definition;
+import io.litterat.core.meta.Element;
+import io.litterat.core.meta.Entry;
+import io.litterat.core.meta.Field;
+import io.litterat.core.meta.Meta;
+import io.litterat.core.meta.Record;
+import io.litterat.core.meta.Typename;
+import io.litterat.xpl.resolve.SchemaResolver;
 import io.litterat.xpl.util.IntObjectHashMap;
 
 public class TypeMap {
 
-	private final TypeLibrary library;
+	private final TypeContext context;
 	private final IntObjectHashMap<TypeMapEntry> types;
-	private final ConcurrentHashMap<Class<?>, TypeMapEntry> classes;
-	private final ConcurrentHashMap<TypeName, TypeMapEntry> typeNames;
+	private final ConcurrentHashMap<Type, TypeMapEntry> classes;
+	private final ConcurrentHashMap<Typename, TypeMapEntry> typeNames;
+
+	private final SchemaResolver resolver;
 
 	private final AtomicInteger lastIdentifier;
 
-	public TypeMap(TypeLibrary library) {
-		Objects.requireNonNull(library, "TypeLibrary is required");
+	public TypeMap(TypeContext context) {
+		Objects.requireNonNull(context, "TypeContext is required");
 
-		this.library = library;
+		this.context = context;
 
 		this.types = new IntObjectHashMap<>();
 		this.classes = new ConcurrentHashMap<>();
 		this.typeNames = new ConcurrentHashMap<>();
 		this.lastIdentifier = new AtomicInteger(0);
+
+		this.resolver = new SchemaResolver(this);
+
+		// Register the base types to communicate schema definitions.
+		registerMetaData(resolver);
 	}
 
-	public void registerMetaData(TypeResolver resolver) {
+	private void registerMetaData(SchemaResolver resolver) {
 		try {
-			register(1, resolver.map(SchemaTypes.TYPE_NAME_DEFINITION));
-			register(2, resolver.map(SchemaTypes.TYPE_NAME));
-			register(3, resolver.map(TypeLibrary.STRING));
-			register(4, resolver.map(SchemaTypes.DEFINITION));
-			register(5, resolver.map(SchemaTypes.SEQUENCE));
-			register(6, resolver.map(SchemaTypes.FIELD));
-			register(7, resolver.map(SchemaTypes.ELEMENT));
-			register(8, resolver.map(SchemaTypes.ARRAY));
+			register(1, resolver.register(Meta.STRING, String.class));
+			register(2, resolver.register(Meta.ENTRY, Entry.class));
+			register(3, resolver.register(Meta.TYPENAME, Typename.class));
+			register(4, resolver.register(Meta.DEFINITION, Definition.class));
+			register(5, resolver.register(Meta.RECORD, Record.class));
+			register(6, resolver.register(Meta.FIELD, Field.class));
+			register(7, resolver.register(Meta.ELEMENT, Element.class));
+			register(8, resolver.register(Meta.ARRAY, Array.class));
+			register(9, resolver.register(TypeStreamEntry.STREAM_ENTRY, TypeStreamEntry.class));
 		} catch (TypeException e) {
 			throw new RuntimeException("Initialization error", e);
 		}
 	}
 
-	public TypeLibrary library() {
-		return library;
+	public TypeContext context() {
+		return context;
 	}
 
-	public TypeMapEntry register(int streamId, TypeMapEntry newEntry) throws TypeException {
+	private TypeMapEntry register(int streamId, TypeMapEntry newEntry) throws TypeException {
 
 		// Very simplistic lock strategy. Revisit sometime.
 		synchronized (lastIdentifier) {
 
+			if (lastIdentifier.get() < streamId ) {
+				lastIdentifier.set(streamId);
+			}
+
 			// Check it isn't already registered.
-			TypeMapEntry entry = typeNames.get(newEntry.typeName());
+			TypeMapEntry entry = typeNames.get(newEntry.typename());
 			if (entry != null) {
 				// just return what was there.
 				return entry;
@@ -88,28 +108,60 @@ public class TypeMap {
 			}
 
 			// Crate new entry.
-			entry = new TypeMapEntry(streamId, newEntry.typeName(), newEntry.definition(), newEntry.reader(),
+			entry = new TypeMapEntry(streamId, newEntry.typename(), newEntry.definition(), newEntry.dataClass(), newEntry.reader(),
 					newEntry.writer());
 			types.put(streamId, entry);
-			typeNames.put(entry.typeName(), entry);
+			typeNames.put(entry.typename(), entry);
 
 			// Atomic types will duplicate entries. First one wins.
-			classes.putIfAbsent(library.getTypeClass(entry.typeName()).typeClass(), entry);
+			classes.putIfAbsent(entry.dataClass().typeClass(), entry);
 
 			return entry;
 		}
 	}
 
-	public TypeMapEntry getEntry(TypeName typeName) {
-		return typeNames.get(typeName);
+	public TypeMapEntry getEntry(Typename typeName) {
+		TypeMapEntry entry = typeNames.get(typeName);
+
+		return entry;
 	}
 
-	public TypeMapEntry getEntry(Class<?> clzz) {
-		return classes.get(clzz);
+	public TypeMapEntry getEntry(Class<?> clzz) throws TypeException {
+		TypeMapEntry entry = classes.get(clzz);
+
+		return entry;
 	}
 
 	public TypeMapEntry getEntry(int streamId) {
-		return types.get(streamId);
+		TypeMapEntry entry = types.get(streamId);
+
+		return entry;
+	}
+
+	public TypeMapEntry registerStreamEntry(Typename typename) throws TypeException {
+		TypeMapEntry entry = resolver.map(typename);
+		if (entry == null) {
+			throw new TypeException("Class not registered or defined in stream: " + typename.toString());
+		}
+
+		// Register in the typeMap. update entry value with registered value.
+		return register(entry.streamId(), entry);
+	}
+
+	public void registerEntry(TypeStreamEntry def) throws TypeException {
+		TypeMapEntry entry = getEntry(def.streamId());
+		if (entry == null) {
+
+			// Generate the reader/writer.
+			entry = resolver.map(def.typename());
+
+			register(def.streamId(), entry);
+		} else {
+			if (!def.typename().equals(entry.typename())) {
+				throw new TypeException("No match for type on stream");
+			}
+		}
+
 	}
 
 }

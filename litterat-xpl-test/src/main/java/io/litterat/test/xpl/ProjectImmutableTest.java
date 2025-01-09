@@ -20,8 +20,8 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.ProjectImmutable;
+import io.litterat.core.TypeException;
+import io.litterat.test.core.data.ProjectImmutable;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 

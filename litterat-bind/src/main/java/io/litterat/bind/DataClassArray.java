@@ -89,8 +89,8 @@ public class DataClassArray extends DataClass {
 	// <value> get( <array>, <iter> );
 	private final MethodHandle get;
 
-	public DataClassArray(Class<?> targetType, DataClass arrayDataClass, MethodHandle constructor, MethodHandle size,
-			MethodHandle iterator, MethodHandle get, MethodHandle put)
+	public DataClassArray(Class<?> targetType, DataClass arrayDataClass,
+			MethodHandle constructor, MethodHandle size, MethodHandle iterator, MethodHandle get, MethodHandle put)
 			throws NoSuchMethodException, IllegalAccessException {
 		super(targetType, DataClassType.ARRAY);
 

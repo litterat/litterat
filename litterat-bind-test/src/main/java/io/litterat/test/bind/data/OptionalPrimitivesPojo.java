@@ -17,7 +17,7 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
-import io.litterat.bind.Record;
+import io.litterat.bind.annotation.Record;
 
 public class OptionalPrimitivesPojo {
 

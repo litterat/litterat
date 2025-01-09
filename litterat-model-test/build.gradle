@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-
+   implementation project(":litterat-bind")
    implementation project(":litterat-bind")
    implementation project(":litterat-bind-test")
    implementation project(":litterat-model")

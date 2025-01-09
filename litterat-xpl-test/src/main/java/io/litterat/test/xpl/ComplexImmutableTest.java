@@ -20,8 +20,8 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.ComplexImmutable;
+import io.litterat.core.TypeException;
+import io.litterat.test.core.data.ComplexImmutable;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 
@@ -36,7 +36,7 @@ public class ComplexImmutableTest {
 	public void testWriteAndReadSimpleImmutable() throws IOException, TypeException {
 
 		// Test writing out a Point.
-		byte[] buffer = new byte[150];
+		byte[] buffer = new byte[500];
 		TypeOutputStream out = new TypeOutputStream(buffer);
 		out.writeObject(test);
 		out.close();

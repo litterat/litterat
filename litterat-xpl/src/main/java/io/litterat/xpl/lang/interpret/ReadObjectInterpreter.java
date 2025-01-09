@@ -17,25 +17,25 @@ package io.litterat.xpl.lang.interpret;
 
 import java.io.IOException;
 
-import io.litterat.model.TypeName;
+import io.litterat.core.meta.Typename;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.lang.LitteratMachine;
 import io.litterat.xpl.lang.ReadValue;
 
 public class ReadObjectInterpreter implements ExpressionInterpreter {
 
-	private final TypeName typeName;
+	private final Typename typename;
 
 	public ReadObjectInterpreter(ReadValue readType) {
 
-		typeName = readType.type();
+		typename = readType.type();
 	}
 
 	@Override
 	public Object execute(LitteratMachine m) throws Throwable {
 		try {
 
-			return ((TypeInputStream) m.getVariable(LitteratMachine.VAR_TRANSPORT)).readObject(typeName);
+			return ((TypeInputStream) m.getVariable(LitteratMachine.VAR_TRANSPORT)).readObject(typename);
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}

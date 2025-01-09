@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.Atom;
+import io.litterat.bind.annotation.Atom;
 
 /**
  * 

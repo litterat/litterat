@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.TypeName;
-import io.litterat.model.library.TypeLibrary;
+import io.litterat.core.TypeContext;
+import io.litterat.core.meta.Typename;
 import io.litterat.xpl.Point;
 import io.litterat.xpl.TypeBaseInput;
 import io.litterat.xpl.TypeMap;
@@ -46,7 +46,7 @@ public class FieldSetGeneratorTest {
 		// class field so bypasses private/final.
 		Value pointRef = new Value(Point.class, p);
 		Value valueRef = new Value(float.class, newValue);
-		FieldSet setNode = new FieldSet(pointRef, valueRef, new TypeName("io.litterat.xpl", "point"), "latitude");
+		FieldSet setNode = new FieldSet(pointRef, valueRef, new Typename("io.litterat.xpl", "point"), "latitude");
 		ValueGenerator pointGen = new ValueGenerator(pointRef);
 		ValueGenerator valueGen = new ValueGenerator(valueRef);
 
@@ -54,8 +54,8 @@ public class FieldSetGeneratorTest {
 		FieldSetGenerator gen = new FieldSetGenerator(setNode, pointGen, valueGen);
 
 		// Setup a context and machine to execute.
-		TypeLibrary library = new TypeLibrary();
-		TypeMap typeMap = new TypeMap(library);
+		TypeContext context = TypeContext.builder().build();
+		TypeMap typeMap = new TypeMap(context);
 		LitteratMachine am = new LitteratMachine(typeMap, slots);
 
 		// bind and execture.

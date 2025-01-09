@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="io.litterat.test.core.ImmutableAtomTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-01-02T01:06:28" hostname="Davids-MacBook-Air-2.local" time="0.01">
+  <properties/>
+  <testcase name="testToArray()" classname="io.litterat.test.core.ImmutableAtomTest" time="0.007"/>
+  <testcase name="testToMap()" classname="io.litterat.test.core.ImmutableAtomTest" time="0.002"/>
+  <testcase name="checkDescriptor()" classname="io.litterat.test.core.ImmutableAtomTest" time="0.001"/>
+  <system-out><![CDATA[[THREE, test, true, foo]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

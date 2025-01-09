@@ -27,6 +27,7 @@ buildscript {
 plugins {
     id 'java'
     id 'eclipse'
+    id 'idea'
 }
 
 repositories {
@@ -35,17 +36,18 @@ repositories {
 
 dependencies {
 	// https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
-	implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.1'
+	implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.7.1'
 	
 }
 
+/*
 java {
    modularity.inferModulePath = true
    
    sourceCompatibility = JavaVersion.VERSION_11
    targetCompatibility = JavaVersion.VERSION_11
 }
-
+*/
 // Annoying hack because Gradle and Eclipse won't play nicely together.
 // https://github.com/eclipse/buildship/issues/658
 /*

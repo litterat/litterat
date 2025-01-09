@@ -14,6 +14,7 @@
 module io.litterat.bind {
 
 	exports io.litterat.bind;
+	exports io.litterat.bind.annotation;
 	exports io.litterat.bind.mapper;
 
 	requires org.objectweb.asm;

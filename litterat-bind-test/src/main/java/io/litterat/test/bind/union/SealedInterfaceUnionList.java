@@ -17,7 +17,7 @@ package io.litterat.test.bind.union;
 
 import java.util.List;
 
-import io.litterat.bind.Record;
+import io.litterat.bind.annotation.Record;
 
 @Record
 public class SealedInterfaceUnionList {

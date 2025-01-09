@@ -19,10 +19,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
+import io.litterat.core.TypeContext;
 import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.SimpleArray;
-import io.litterat.test.bind.data.SimpleImmutable;
+import io.litterat.test.core.data.SimpleArray;
+import io.litterat.test.core.data.SimpleImmutable;
 
 public class SimpleArrayTest {
 
@@ -34,11 +34,11 @@ public class SimpleArrayTest {
 
 	SimpleArray test = new SimpleArray(array);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test

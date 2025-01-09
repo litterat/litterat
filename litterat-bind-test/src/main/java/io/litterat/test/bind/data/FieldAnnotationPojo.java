@@ -15,8 +15,8 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.Record;
-import io.litterat.bind.Field;
+import io.litterat.bind.annotation.Record;
+import io.litterat.bind.annotation.Field;
 
 @Record
 public class FieldAnnotationPojo {

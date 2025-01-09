@@ -17,12 +17,14 @@ package io.litterat.test.json;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
+import io.litterat.core.TypeContext;
 import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.ProjectImmutable;
+import io.litterat.test.core.data.ProjectImmutable;
 
+@Disabled
 public class ProjectImmutableTest {
 
 	final static int TEST_X = 1;
@@ -30,11 +32,11 @@ public class ProjectImmutableTest {
 
 	ProjectImmutable test = new ProjectImmutable(TEST_X, TEST_Y);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test

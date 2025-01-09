@@ -19,10 +19,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.IntAtom;
-import io.litterat.test.bind.data.IntAtomData;
+import io.litterat.core.TypeContext;
+import io.litterat.core.TypeException;
+import io.litterat.test.core.data.IntAtom;
+import io.litterat.test.core.data.IntAtomData;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 
@@ -32,7 +32,7 @@ public class IntAtomTest {
 
 	IntAtomData test = new IntAtomData(INT_ATOM_TEST);
 
-	DataBindContext context;
+	TypeContext context;
 
 	// Disabled until after refactor
 	@Disabled

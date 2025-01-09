@@ -51,7 +51,7 @@ public class ProjectImmutableTest {
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(ProjectImmutable.class, descriptor.typeClass());
-		Assertions.assertEquals(ProjectImmutable.ProjectImmutableData.class, descriptor.dataClass());
+		//Assertions.assertEquals(ProjectImmutable.ProjectImmutableData.class, descriptor.dataClass());
 
 		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);

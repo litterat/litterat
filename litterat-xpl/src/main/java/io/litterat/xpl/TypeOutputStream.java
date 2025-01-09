@@ -15,36 +15,32 @@
  */
 package io.litterat.xpl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
-import io.litterat.model.TypeName;
-import io.litterat.model.library.TypeException;
-import io.litterat.model.library.TypeLibrary;
-import io.litterat.model.meta.SchemaTypes;
+import io.litterat.core.TypeContext;
+import io.litterat.core.TypeException;
+import io.litterat.core.meta.Entry;
+import io.litterat.core.meta.Typename;
 import io.litterat.xpl.io.ByteArrayBaseOutput;
 import io.litterat.xpl.io.ByteBufferBaseOutput;
 import io.litterat.xpl.io.StreamBaseOutput;
-import io.litterat.xpl.resolve.SchemaResolver;
 
 public class TypeOutputStream implements TypeStream {
 
 	private final TypeBaseOutput output;
 	private final TypeMap typeMap;
-	private final TypeResolver resolver;
 
 	public TypeOutputStream(TypeMap map, TypeBaseOutput output) {
 		this.output = output;
 		this.typeMap = map;
-		this.resolver = new SchemaResolver(map);
-
-		// Register the base types to communicate schema definitions.
-		typeMap.registerMetaData(resolver);
 	}
 
 	public TypeOutputStream(TypeBaseOutput output) {
-		this(new TypeMap(new TypeLibrary()), output);
+		this(new TypeMap(TypeContext.builder().build()), output);
 	}
 
 	public TypeOutputStream(TypeMap map, byte[] buffer) {
@@ -80,56 +76,85 @@ public class TypeOutputStream implements TypeStream {
 		return output;
 	}
 
-	private TypeMapEntry getEntry(TypeName typeName) throws TypeException, IOException {
-		TypeMapEntry entry = typeMap.getEntry(typeName);
-		if (entry == null) {
-			entry = resolver.map(typeName);
-			if (entry == null) {
-				throw new TypeException("Class not registered or defined in stream: " + typeName.toString());
-			}
+	private TypeMapEntry register(Typename typeName) throws TypeException, IOException {
+		TypeMapEntry entry = typeMap.registerStreamEntry(typeName);
 
-			// Register in the typeMap. update entry value with registered value.
-			entry = typeMap.register(entry.streamId(), entry);
-
-			// Write the definition before returning.
-			this.output().writeUVarInt32(DEFINE_TYPE);
-			this.writeObject(SchemaTypes.TYPE_NAME_DEFINITION, entry.nameDefinition());
-		}
+		// Write the definition before returning.
+		logOutput("writing TypeStreamEntry " + entry.streamId() + " " + entry.typename());
+		this.output().writeUVarInt32(DEFINE_TYPE);
+		this.writeObject(
+				new TypeStreamEntry(entry.streamId(), new Entry(entry.typename(), entry.definition())));
+		logOutput("finished writing TypeStreamEntry " + entry.streamId() + " " + entry.typename() );
 		return typeMap.getEntry(typeName);
 	}
 
 	public void writeObject(Object object) throws IOException {
 		try {
-			TypeMapEntry entry = getEntry(typeMap.library().getTypeName(object.getClass()));
+			Objects.requireNonNull(object, "writeObject(Object) requires non null value");
+
+			TypeMapEntry entry = typeMap.getEntry(object.getClass());
+			if (entry == null) {
+				entry = register(typeMap.context().getTypename(object.getClass()));
+			}
+
+			logOutput("writing streamId " + entry.streamId());
 			output().writeUVarInt32(entry.streamId());
+
+			logOutput( "writing object");
 			entry.writer().write(this, object);
+
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
 	}
 
-	public void writeObject(TypeName typeName, Object object) throws IOException {
+	public void writeObject(Typename typename, Object object) throws IOException {
 		try {
-			TypeMapEntry entry = getEntry(typeName);
+			Objects.requireNonNull(typename, "writeObject(Typename, Object) requires non null value");
+
+			TypeMapEntry entry = typeMap.getEntry(typename);
+			if (entry == null) {
+				entry = register(typename);
+			}
+
+			logOutput("writing streamId " + entry.streamId());
 			output().writeUVarInt32(entry.streamId());
+
+			logOutput( "writing object");
 			entry.writer().write(this, object);
+
 		} catch (Throwable e) {
 			throw new IOException(e);
+		}
+	}
+
+	public void logOutput(String msg) {
+		if (output instanceof ByteArrayBaseOutput out) {
+			System.err.println("Output pos: " + out.getBytesWritten() + " " + msg);
 		}
 	}
 
 	public int getStreamIdentifier(Class<?> clazz) throws IOException {
 		try {
-			TypeMapEntry entry = getEntry(typeMap.library().getTypeName(clazz));
+			TypeMapEntry entry = typeMap.getEntry(clazz);
+			if (entry == null) {
+				entry = register(typeMap.context().getTypename(clazz));
+			}
+
 			return entry.streamId();
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
 	}
 
-	public int getStreamIdentifier(TypeName typeName) throws IOException {
+	public int getStreamIdentifier(Typename typename) throws IOException {
 		try {
-			TypeMapEntry entry = getEntry(typeName);
+			TypeMapEntry entry = typeMap.getEntry(typename);
+
+			if (entry == null) {
+				entry = register(typename);
+			}
+
 			return entry.streamId();
 		} catch (Throwable e) {
 			throw new IOException(e);

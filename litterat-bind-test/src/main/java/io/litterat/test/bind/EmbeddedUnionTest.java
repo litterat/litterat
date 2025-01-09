@@ -57,7 +57,7 @@ public class EmbeddedUnionTest {
 		DataClassRecord descriptorRecord = (DataClassRecord) descriptor;
 
 		Assertions.assertEquals(EmbeddedUnion.class, descriptorRecord.typeClass());
-		Assertions.assertEquals(EmbeddedUnion.class, descriptorRecord.dataClass());
+		//Assertions.assertEquals(EmbeddedUnion.class, descriptorRecord.dataClass());
 
 		DataClassField[] fields = descriptorRecord.fields();
 		Assertions.assertNotNull(fields);

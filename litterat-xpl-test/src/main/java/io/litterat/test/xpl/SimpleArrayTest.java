@@ -21,9 +21,9 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.SimpleArray;
-import io.litterat.test.bind.data.SimpleImmutable;
+import io.litterat.core.TypeException;
+import io.litterat.test.core.data.SimpleArray;
+import io.litterat.test.core.data.SimpleImmutable;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 

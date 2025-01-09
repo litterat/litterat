@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
+import io.litterat.core.TypeContext;
 import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.SimplePojo;
+import io.litterat.test.core.data.SimplePojo;
 
 public class SimplePojoTest {
 
@@ -30,11 +30,11 @@ public class SimplePojoTest {
 
 	SimplePojo test;
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 
 		test = new SimplePojo();
 		test.setX(TEST_X);

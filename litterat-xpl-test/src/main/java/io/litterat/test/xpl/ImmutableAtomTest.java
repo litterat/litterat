@@ -20,9 +20,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.ImmutableAtom;
-import io.litterat.test.bind.data.SimpleEnum;
+import io.litterat.core.TypeException;
+import io.litterat.test.core.data.ImmutableAtom;
+import io.litterat.test.core.data.SimpleEnum;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 

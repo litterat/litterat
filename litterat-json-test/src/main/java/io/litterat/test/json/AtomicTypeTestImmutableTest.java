@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
+import io.litterat.core.TypeContext;
 import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.AtomicTypeTestImmutable;
+import io.litterat.test.core.data.AtomicTypeTestImmutable;
 
 public class AtomicTypeTestImmutableTest {
 
@@ -46,11 +46,11 @@ public class AtomicTypeTestImmutableTest {
 	AtomicTypeTestImmutable test = new AtomicTypeTestImmutable(pBoolean, oBoolean, pByte, oByte, pChar, oChar, pShort,
 			oShort, pInteger, oInteger, pLong, oLong, pFloat, oFloat, pDouble, oDouble, string);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test

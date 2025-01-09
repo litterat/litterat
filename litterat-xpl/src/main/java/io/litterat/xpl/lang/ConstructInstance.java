@@ -15,23 +15,22 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
+import io.litterat.core.meta.Typename;
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "construct_instance")
+@io.litterat.bind.annotation.Typename(namespace = "xpl", name = "construct_instance")
 public class ConstructInstance implements Expression {
 
-	private final TypeName type;
+	private final Typename type;
 	private final Expression[] params;
 
-	public ConstructInstance(TypeName type, Expression[] params) {
+	public ConstructInstance(Typename type, Expression[] params) {
 		this.type = type;
 		this.params = params;
 	}
 
-	public TypeName type() {
+	public Typename type() {
 		return type;
 	}
 

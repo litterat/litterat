@@ -15,7 +15,7 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.model.library.TypeException;
+import io.litterat.core.TypeException;
 
 public interface LambdaFunction {
 

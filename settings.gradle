@@ -1,10 +1,10 @@
 rootProject.name = 'litterat'
 
-include ':litterat-bind', 
-        ':litterat-bind-test',
-        ':litterat-model',
-	':litterat-model-test',
-        ':litterat-json',
-        ':litterat-json-test',
-        ':litterat-xpl',
-        ':litterat-xpl-test'
+include('litterat-bind',
+		'litterat-bind-test',
+		'litterat-core',
+		'litterat-core-test',
+        'litterat-json',
+        'litterat-json-test',
+        'litterat-xpl',
+        'litterat-xpl-test')

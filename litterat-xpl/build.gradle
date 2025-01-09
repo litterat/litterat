@@ -30,9 +30,8 @@ repositories {
 }
 
 dependencies {
-
     implementation project(":litterat-bind")
-    implementation project(":litterat-model")
+    implementation project(":litterat-core")
 
 	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
 	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
@@ -42,12 +41,12 @@ dependencies {
 	
 }
 
-java {
-   modularity.inferModulePath = true
-   
-   sourceCompatibility = JavaVersion.VERSION_11
-   targetCompatibility = JavaVersion.VERSION_11
-}
+//java {
+//   modularity.inferModulePath = true
+//
+//   sourceCompatibility = JavaVersion.VERSION_17
+//   targetCompatibility = JavaVersion.VERSION_17
+//}
 
 test {
 	useJUnitPlatform()

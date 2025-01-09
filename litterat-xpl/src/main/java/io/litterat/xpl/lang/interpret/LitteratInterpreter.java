@@ -18,14 +18,11 @@ package io.litterat.xpl.lang.interpret;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.litterat.core.TypeException;
 import io.litterat.bind.DataBindException;
-import io.litterat.model.Atom;
-import io.litterat.model.Definition;
-import io.litterat.model.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.Union;
-import io.litterat.model.atom.StringAtom;
-import io.litterat.model.library.TypeException;
+import io.litterat.core.meta.*;
+import io.litterat.core.meta.Record;
+import io.litterat.core.meta.atom.StringAtom;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.Block;
 import io.litterat.xpl.lang.BlockArray;
@@ -85,22 +82,23 @@ public class LitteratInterpreter {
 		} else if (statement instanceof WriteValue) {
 			WriteValue writeType = (WriteValue) statement;
 
-			Definition def = typeMap.library().getDefinition(writeType.type());
-			if (def instanceof Atom) {
-
-				compiledStatement = new WriteAtomInterpreter(writeType,
-						compileExpression(typeMap, writeType.expression()));
-			} else if (def instanceof Record) {
+			Definition def = typeMap.context().library().getDefinition(writeType.type());
+			if (def instanceof Record) {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
-
-			} else if (def instanceof TypeName) {
+			} else if (def instanceof Typename) {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
 			} else if (def instanceof Union) {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
 			} else if (def instanceof StringAtom) {
+				compiledStatement = new WriteObjectInterpreter(writeType,
+						compileExpression(typeMap, writeType.expression()));
+			} else if (def instanceof Atom) {
+				compiledStatement = new WriteAtomInterpreter(writeType,
+						compileExpression(typeMap, writeType.expression()));
+			} else if (def instanceof Array) {
 				compiledStatement = new WriteObjectInterpreter(writeType,
 						compileExpression(typeMap, writeType.expression()));
 			} else {
@@ -149,18 +147,19 @@ public class LitteratInterpreter {
 		} else if (expression instanceof ReadValue) {
 			ReadValue readType = (ReadValue) expression;
 
-			Definition def = typeMap.library().getDefinition(readType.type());
-			if (def instanceof Atom) {
-
-				compiledExpression = new ReadAtomInterpreter(readType);
-			} else if (def instanceof Record) {
+			Definition def = typeMap.context().library().getDefinition(readType.type());
+			if (def instanceof Record) {
 				compiledExpression = new ReadObjectInterpreter(readType);
-			} else if (def instanceof TypeName) {
+			} else if (def instanceof Typename) {
 				compiledExpression = new ReadObjectInterpreter(readType);
 			} else if (def instanceof Union) {
 				compiledExpression = new ReadObjectInterpreter(readType);
 			} else if (def instanceof StringAtom) {
 				compiledExpression = new ReadObjectInterpreter(readType);
+			} else if (def instanceof Atom) {
+				compiledExpression = new ReadAtomInterpreter(readType);
+			} else if (def instanceof Array) {
+				compiledExpression =  new ReadObjectInterpreter(readType);
 			} else {
 				throw new IllegalArgumentException("Write type not recognised: " + def.getClass().getName());
 			}

@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataBindException;
-import io.litterat.model.library.TypeException;
-import io.litterat.model.library.TypeLibrary;
-import io.litterat.test.bind.data.SimpleUUIDImmutable;
-import io.litterat.test.bind.data.UUIDBridge;
+import io.litterat.core.TypeContext;
+import io.litterat.core.TypeException;
+import io.litterat.core.TypeLibrary;
+import io.litterat.core.meta.Meta;
+import io.litterat.test.core.data.SimpleUUIDImmutable;
+import io.litterat.test.core.data.UUIDBridge;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.TypeOutputStream;
@@ -44,14 +44,14 @@ public class UUIDBridgeTest {
 	// The TypeMap/library/context combination must be passed in to allow access to
 	// the bridge.
 
-	DataBindContext context;
-	TypeLibrary library;
+	TypeContext context;
+	//TypeLibrary library;
 
 	@BeforeEach
-	public void setup() throws DataBindException {
-		context = DataBindContext.builder().build();
-		context.registerAtom(UUID.class, new UUIDBridge());
-		library = new TypeLibrary(context);
+	public void setup() throws TypeException {
+		context = TypeContext.builder().build();
+		context.registerAtom(Meta.UUID, UUID.class, new UUIDBridge());
+		//library = context.library();
 	}
 
 	@Test
@@ -59,11 +59,11 @@ public class UUIDBridgeTest {
 
 		// Test writing out a Point.
 		byte[] buffer = new byte[500];
-		TypeOutputStream out = new TypeOutputStream(new TypeMap(library), buffer);
+		TypeOutputStream out = new TypeOutputStream(new TypeMap(TypeContext.builder().build()), buffer);
 		out.writeObject(test);
 		out.close();
 
-		TypeInputStream in = new TypeInputStream(new TypeMap(library), buffer);
+		TypeInputStream in = new TypeInputStream(new TypeMap(context), buffer);
 		SimpleUUIDImmutable p2 = in.readObject();
 
 		Assertions.assertNotNull(p2);
