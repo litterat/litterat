@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.bind;
+package io.litterat.schema.bind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +24,16 @@ import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
-import io.litterat.model.Array;
-import io.litterat.model.Definition;
-import io.litterat.model.Element;
-import io.litterat.model.Field;
-import io.litterat.model.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.Union;
-import io.litterat.model.library.TypeException;
-import io.litterat.model.library.TypeLibrary;
-import io.litterat.model.meta.TypeDefinitions;
+import io.litterat.schema.meta.Array;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Element;
+import io.litterat.schema.meta.Field;
+import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.TypeName;
+import io.litterat.schema.meta.Union;
+import io.litterat.schema.library.TypeException;
+import io.litterat.schema.library.TypeLibrary;
+import io.litterat.schema.meta.TypeDefinitions;
 
 /**
  *

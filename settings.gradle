@@ -2,6 +2,8 @@ rootProject.name = 'litterat'
 
 include('litterat-bind',
 		'litterat-bind-test',
+		'litterat-schema',
+		'litterat-schema-test',
 		'litterat-core',
 		'litterat-core-test',
         'litterat-json',

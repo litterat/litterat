@@ -21,11 +21,11 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClass;
-import io.litterat.model.Definition;
-import io.litterat.model.Field;
-import io.litterat.model.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.library.TypeLibrary;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Field;
+import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.TypeName;
+import io.litterat.schema.library.TypeLibrary;
 import io.litterat.test.bind.data.SimpleImmutable;
 
 public class SimpleImmutableTest {

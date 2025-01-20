@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.atom;
+package io.litterat.schema.atom;
 
 import io.litterat.bind.Record;
-import io.litterat.model.Definition;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.annotation.SchemaType;
 
 /**
  * 

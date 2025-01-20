@@ -1,6 +1,6 @@
-package io.litterat.model.atom;
+package io.litterat.schema.atom;
 
-import io.litterat.model.Atom;
+import io.litterat.schema.meta.Atom;
 
 public class BooleanAtom extends Atom {
 

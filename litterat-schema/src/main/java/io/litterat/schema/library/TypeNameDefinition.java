@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.library;
+package io.litterat.schema.library;
 
 import io.litterat.bind.Record;
-import io.litterat.model.Definition;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.TypeName;
+import io.litterat.schema.annotation.SchemaType;
 
 /**
  * This is used as part of creating an entry in a TypeMap and part of an encoding to map an

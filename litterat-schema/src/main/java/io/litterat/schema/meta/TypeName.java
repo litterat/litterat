@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model;
+package io.litterat.schema.meta;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import io.litterat.bind.Record;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.schema.annotation.SchemaType;
 
 /**
  * 

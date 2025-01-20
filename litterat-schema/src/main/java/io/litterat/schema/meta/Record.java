@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model;
+package io.litterat.schema.meta;
 
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.schema.annotation.SchemaType;
 
 /**
  * 

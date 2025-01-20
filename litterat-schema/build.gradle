@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(":litterat-bind")
+
 }
 
 java {

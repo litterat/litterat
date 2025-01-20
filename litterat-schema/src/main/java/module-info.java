@@ -13,13 +13,13 @@
  */
 module io.litterat.model {
 
-	exports io.litterat.model;
-	exports io.litterat.model.annotation;
-	exports io.litterat.model.atom;
-	exports io.litterat.model.bind;
-	exports io.litterat.model.function;
-	exports io.litterat.model.meta;
-	exports io.litterat.model.library;
+	exports io.litterat.schema;
+	exports io.litterat.schema.annotation;
+	exports io.litterat.schema.atom;
+	exports io.litterat.schema.bind;
+	exports io.litterat.schema.function;
+	exports io.litterat.schema.meta;
+	exports io.litterat.schema.library;
 
 	requires transitive io.litterat.bind;
 

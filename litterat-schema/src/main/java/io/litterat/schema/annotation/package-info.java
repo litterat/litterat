@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.annotation;
+package io.litterat.schema.annotation;
 /**
  *
  * Annotations for the type library add additional meta data to a class to

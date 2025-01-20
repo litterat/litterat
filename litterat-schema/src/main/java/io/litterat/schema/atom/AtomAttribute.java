@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.atom;
+package io.litterat.schema.atom;
 
 import io.litterat.bind.Record;
 import io.litterat.bind.Union;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.schema.annotation.SchemaType;
 
 @Union
 @SchemaType(namespace = "schema", name = "atom_attribute")

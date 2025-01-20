@@ -1,8 +1,8 @@
-package io.litterat.model.atom;
+package io.litterat.schema.atom;
 
 import io.litterat.bind.Record;
-import io.litterat.model.Atom;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.schema.meta.Atom;
+import io.litterat.schema.annotation.SchemaType;
 
 /**
  * 

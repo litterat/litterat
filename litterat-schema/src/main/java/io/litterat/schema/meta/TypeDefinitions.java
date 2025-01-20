@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.meta;
+package io.litterat.schema.meta;
 
-import io.litterat.model.Atom;
-import io.litterat.model.Definition;
-import io.litterat.model.atom.AtomAttribute;
-import io.litterat.model.atom.AtomAttribute.AtomFixedLength;
-import io.litterat.model.atom.AtomAttribute.AtomVariableLength;
-import io.litterat.model.atom.StringAtom;
-import io.litterat.model.atom.IntegerAtom.AtomBigEndian;
-import io.litterat.model.atom.IntegerAtom.AtomInteger;
-import io.litterat.model.atom.IntegerAtom.AtomLittleEndian;
-import io.litterat.model.atom.IntegerAtom.AtomSigned;
-import io.litterat.model.atom.IntegerAtom.AtomUnsigned;
-import io.litterat.model.atom.RealAtom.AtomIEEE756;
+import io.litterat.schema.atom.AtomAttribute;
+import io.litterat.schema.atom.AtomAttribute.AtomFixedLength;
+import io.litterat.schema.atom.AtomAttribute.AtomVariableLength;
+import io.litterat.schema.atom.StringAtom;
+import io.litterat.schema.atom.IntegerAtom.AtomBigEndian;
+import io.litterat.schema.atom.IntegerAtom.AtomInteger;
+import io.litterat.schema.atom.IntegerAtom.AtomLittleEndian;
+import io.litterat.schema.atom.IntegerAtom.AtomSigned;
+import io.litterat.schema.atom.IntegerAtom.AtomUnsigned;
+import io.litterat.schema.atom.RealAtom.AtomIEEE756;
 
 public class TypeDefinitions {
 

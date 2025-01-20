@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.meta;
+package io.litterat.schema.meta;
 
-import io.litterat.model.Array;
-import io.litterat.model.Element;
-import io.litterat.model.Field;
-import io.litterat.model.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.Union;
-import io.litterat.model.library.TypeLibrary;
+import io.litterat.schema.library.TypeLibrary;
 
 public class SchemaTypes {
 

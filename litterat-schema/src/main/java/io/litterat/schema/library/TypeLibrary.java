@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.library;
+package io.litterat.schema.library;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,16 +22,16 @@ import java.util.concurrent.ConcurrentMap;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
-import io.litterat.model.Array;
-import io.litterat.model.Definition;
-import io.litterat.model.Element;
-import io.litterat.model.Field;
-import io.litterat.model.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
-import io.litterat.model.bind.ModelBinder;
-import io.litterat.model.meta.SchemaTypes;
-import io.litterat.model.meta.TypeDefinitions;
+import io.litterat.schema.meta.Array;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Element;
+import io.litterat.schema.meta.Field;
+import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.TypeName;
+import io.litterat.schema.annotation.SchemaType;
+import io.litterat.schema.bind.ModelBinder;
+import io.litterat.schema.meta.SchemaTypes;
+import io.litterat.schema.meta.TypeDefinitions;
 
 public class TypeLibrary {
 

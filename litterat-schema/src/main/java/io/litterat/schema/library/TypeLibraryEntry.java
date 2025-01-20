@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.model.library;
+package io.litterat.schema.library;
 
 import io.litterat.bind.DataClass;
-import io.litterat.model.Definition;
-import io.litterat.model.TypeName;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.TypeName;
 
 public class TypeLibraryEntry {
 

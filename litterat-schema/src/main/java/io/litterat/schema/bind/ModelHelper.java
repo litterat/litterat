@@ -1,4 +1,4 @@
-package io.litterat.model.bind;
+package io.litterat.schema.bind;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
