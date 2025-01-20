@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import io.litterat.bind.DataBindException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,7 +139,7 @@ public class SealedInterfaceUnionTest {
 		MapMapper mapMapper = new MapMapper(context.dataBindContext());
 
 		// Fails because Rectangle is not a member of the union.
-		Assertions.assertThrows(TypeException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toMap(errorTest);
 		});
 
@@ -150,7 +151,7 @@ public class SealedInterfaceUnionTest {
 		point.put("type", "io.litterat.test.bind.union.SealedInterfaceUnionRectangle");
 
 		// Fails because Rectangle is not part of the SealedInterfaceUnion union list.
-		Assertions.assertThrows(TypeException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(SealedInterfaceUnionList.class, map);
 		});
 

@@ -17,6 +17,7 @@ package io.litterat.test.core;
 
 import java.util.Map;
 
+import io.litterat.bind.DataBindException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,7 +104,7 @@ public class PrimitiveArrayTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("intArray", "error");
 
-		Assertions.assertThrows(TypeException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(PrimitiveArray.class, map);
 		});
 

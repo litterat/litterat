@@ -16,7 +16,9 @@
 package io.litterat.test.core.data;
 
 import io.litterat.bind.annotation.Field;
+import io.litterat.bind.annotation.Namespace;
 import io.litterat.bind.annotation.Record;
+import io.litterat.bind.annotation.Typename;
 
 /**
  * 
@@ -26,6 +28,7 @@ import io.litterat.bind.annotation.Record;
  * can be checked by the invariance verifier for first param and the getter matches the field.
  *
  */
+@Typename(namespace = "test", name="ComplexImmutable")
 public class ComplexImmutable {
 
 	public static int multiplier = 2;

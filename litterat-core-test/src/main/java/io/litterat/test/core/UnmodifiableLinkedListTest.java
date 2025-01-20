@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import io.litterat.bind.DataBindException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,7 +112,7 @@ public class UnmodifiableLinkedListTest {
 		// corrupting the map by putting an invalid value for x.
 		map.put("list", "error");
 
-		Assertions.assertThrows(TypeException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(UnmodifiableLinkedList.class, map);
 		});
 
