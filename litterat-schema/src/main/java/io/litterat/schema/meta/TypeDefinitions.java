@@ -15,16 +15,16 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.schema.atom.AtomAttribute;
-import io.litterat.schema.atom.AtomAttribute.AtomFixedLength;
-import io.litterat.schema.atom.AtomAttribute.AtomVariableLength;
-import io.litterat.schema.atom.StringAtom;
-import io.litterat.schema.atom.IntegerAtom.AtomBigEndian;
-import io.litterat.schema.atom.IntegerAtom.AtomInteger;
-import io.litterat.schema.atom.IntegerAtom.AtomLittleEndian;
-import io.litterat.schema.atom.IntegerAtom.AtomSigned;
-import io.litterat.schema.atom.IntegerAtom.AtomUnsigned;
-import io.litterat.schema.atom.RealAtom.AtomIEEE756;
+import io.litterat.schema.meta.atom.AtomAttribute;
+import io.litterat.schema.meta.atom.AtomAttribute.AtomFixedLength;
+import io.litterat.schema.meta.atom.AtomAttribute.AtomVariableLength;
+import io.litterat.schema.meta.atom.StringAtom;
+import io.litterat.schema.meta.atom.IntegerAtom.AtomBigEndian;
+import io.litterat.schema.meta.atom.IntegerAtom.AtomInteger;
+import io.litterat.schema.meta.atom.IntegerAtom.AtomLittleEndian;
+import io.litterat.schema.meta.atom.IntegerAtom.AtomSigned;
+import io.litterat.schema.meta.atom.IntegerAtom.AtomUnsigned;
+import io.litterat.schema.meta.atom.RealAtom.AtomIEEE756;
 
 public class TypeDefinitions {
 

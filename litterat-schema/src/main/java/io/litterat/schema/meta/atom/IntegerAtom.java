@@ -1,4 +1,4 @@
-package io.litterat.schema.atom;
+package io.litterat.schema.meta.atom;
 
 import io.litterat.bind.Record;
 import io.litterat.schema.meta.Atom;

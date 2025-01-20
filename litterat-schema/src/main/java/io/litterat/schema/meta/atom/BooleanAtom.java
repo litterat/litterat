@@ -1,4 +1,4 @@
-package io.litterat.schema.atom;
+package io.litterat.schema.meta.atom;
 
 import io.litterat.schema.meta.Atom;
 

@@ -17,7 +17,7 @@ package io.litterat.schema.meta;
 
 import io.litterat.bind.Union;
 import io.litterat.schema.annotation.SchemaType;
-import io.litterat.schema.atom.AtomAttribute;
+import io.litterat.schema.meta.atom.AtomAttribute;
 
 /**
  * 

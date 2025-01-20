@@ -15,7 +15,7 @@ module io.litterat.model {
 
 	exports io.litterat.schema;
 	exports io.litterat.schema.annotation;
-	exports io.litterat.schema.atom;
+	exports io.litterat.schema.meta.atom;
 	exports io.litterat.schema.bind;
 	exports io.litterat.schema.function;
 	exports io.litterat.schema.meta;
