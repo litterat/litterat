@@ -13,29 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.schema.function;
+package io.litterat.schema;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.DataClass;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.TypeName;
 
-@Record
-@SchemaType(namespace = "schema", name = "method")
-public class Function {
+public class TypeLibraryEntry {
 
-	private final String name;
-	private final FunctionSignature signature;
+	final TypeLibraryState state;
+	final TypeName name;
+	final Definition definition;
+	final DataClass clss;
 
-	public Function(final String name, final FunctionSignature signature) {
+	public TypeLibraryEntry(TypeLibraryState state, TypeName name, Definition definition, DataClass clss) {
+		this.state = state;
 		this.name = name;
-		this.signature = signature;
+		this.definition = definition;
+		this.clss = clss;
 	}
 
-	public String name() {
+	public TypeLibraryState state() {
+		return state;
+	}
+
+	public TypeName typeName() {
 		return name;
 	}
 
-	public FunctionSignature signature() {
-		return signature;
+	public DataClass typeClass() {
+		return clss;
+	}
+
+	public Definition definition() {
+		return definition;
 	}
 
 }

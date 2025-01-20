@@ -30,15 +30,9 @@ repositories {
 }
 
 dependencies {
-
+    implementation project(":litterat-bind")
 }
 
-java {
-   modularity.inferModulePath = true
-   
-   sourceCompatibility = JavaVersion.VERSION_11
-   targetCompatibility = JavaVersion.VERSION_11
-}
 
 
 /*

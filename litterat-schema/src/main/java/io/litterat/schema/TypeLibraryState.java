@@ -13,25 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.schema.library;
+package io.litterat.schema;
 
-/**
- * 
- *
- */
-public class TypeException extends Exception {
-
-	private static final long serialVersionUID = 2048021451393901304L;
-
-	public TypeException(String message) {
-		super(message);
-	}
-
-	public TypeException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public TypeException(Throwable cause) {
-		super(cause);
-	}
+public enum TypeLibraryState {
+	RESERVED, REGISTERED, BOUND
 }

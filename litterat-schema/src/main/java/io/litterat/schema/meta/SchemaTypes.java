@@ -15,7 +15,7 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.schema.library.TypeLibrary;
+import io.litterat.schema.TypeLibrary;
 
 public class SchemaTypes {
 

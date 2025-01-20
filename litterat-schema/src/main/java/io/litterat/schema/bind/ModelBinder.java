@@ -31,8 +31,8 @@ import io.litterat.schema.meta.Field;
 import io.litterat.schema.meta.Record;
 import io.litterat.schema.meta.TypeName;
 import io.litterat.schema.meta.Union;
-import io.litterat.schema.library.TypeException;
-import io.litterat.schema.library.TypeLibrary;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.TypeLibrary;
 import io.litterat.schema.meta.TypeDefinitions;
 
 /**

@@ -13,19 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.schema.function;
+package io.litterat.schema.meta;
 
 import io.litterat.bind.Record;
-import io.litterat.schema.meta.Definition;
 import io.litterat.schema.annotation.SchemaType;
 
 @Record
-@SchemaType(namespace = "schema", name = "interface")
-public class Interface implements Definition {
+@SchemaType(namespace = "schema", name = "method")
+public class Function {
 
-	final Function[] methods;
+	private final String name;
+	private final FunctionSignature signature;
 
-	public Interface(Function[] methods) {
-		this.methods = methods;
+	public Function(final String name, final FunctionSignature signature) {
+		this.name = name;
+		this.signature = signature;
 	}
+
+	public String name() {
+		return name;
+	}
+
+	public FunctionSignature signature() {
+		return signature;
+	}
+
 }
