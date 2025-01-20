@@ -1,12 +1,0 @@
-ñ[{x=1, y=2, radius=3, type=io.litterat.test.core.union.AbstractUnionCircle}, {x=3, width=5, y=4, type=io.litterat.test.core.union.AbstractUnionRectangle, height=6}, {x=7, y=8, radius=9, type=io.litterat.test.core.union.AbstractUnionCircle}]
-.-[THREE, test, true, foo]
-68é[{x=1, y=2, type=io.litterat.test.core.union.InterfaceUnionPoint}, {x=3, y=4, radius=5, type=io.litterat.test.core.union.InterfaceUnionCircle}, {x=6, width=8, y=7, type=io.litterat.test.core.union.InterfaceUnionRectangle, height=9}]
-;=[one, two, three]
-@A[foo, 1, 2]
-EF[1, 2, foo]
-gi¨[{x=1, y=2, type=io.litterat.test.core.data.SealedAbstractRecord$RecordPoint}, {x=3, y=4, radius=5, type=io.litterat.test.core.data.SealedAbstractRecord$RecordCircle}]
-lnœ[{x=1, y=2, type=io.litterat.test.core.union.SealedInterfaceUnionPoint}, {x=3, y=4, radius=5, type=io.litterat.test.core.union.SealedInterfaceUnionCircle}]
-qs´[{x=1, y=2, type=io.litterat.test.core.data.SealedRecordInterface$RecordPoint}, {x=3, y=4, tag=test, radius=5, type=io.litterat.test.core.data.SealedRecordInterface$RecordCircle}]
-vx¬[{x=1, y=2, type=io.litterat.test.core.data.SealedUnionRecord$RecordPoint}, {x=3, y=4, tag=test, radius=5, type=io.litterat.test.core.data.SealedUnionRecord$RecordCircle}]
-š›'java.util.Collections$UnmodifiableList
-šœ[one, two, three]
