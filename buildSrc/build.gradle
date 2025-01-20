@@ -1,0 +1,10 @@
+
+apply plugin: 'java-library'
+//    java {
+//        modularity.inferModulePath = true
+//    }
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(23))
+    }
+}
