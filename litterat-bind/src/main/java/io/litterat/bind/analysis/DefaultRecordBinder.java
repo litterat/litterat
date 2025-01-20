@@ -450,7 +450,9 @@ public class DefaultRecordBinder {
 
 		MethodHandle accessor = accessor(info);
 		MethodHandle setter = setter(info);
-		boolean isRequired = isRequired(info);
+
+		// Optional values by definition are not required.
+		boolean isRequired = false;
 		String fieldName = fieldName(info);
 
 		// This will be one of OptionalInt, OptionalLong or OptionalDouble.
@@ -522,9 +524,6 @@ public class DefaultRecordBinder {
 			setter = MethodHandles.guardWithTest(checkNonNull, optionalIntOf, optionalIntEmpty);
 
 		}
-
-		// Optional values by definition are not required.
-		isRequired = false;
 
 		// (optional) -> optional.isPresent();
 		MethodHandle isPresent = lookup.findVirtual(optionalClass, "isPresent", MethodType.methodType(boolean.class));
