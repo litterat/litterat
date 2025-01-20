@@ -15,11 +15,8 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.annotation.SchemaType;
-
-@Record
-@SchemaType(namespace = "schema", name = "interface")
+@io.litterat.bind.annotation.Record
+@io.litterat.bind.annotation.Typename(namespace = "schema", name = "interface")
 public class Interface implements Definition {
 
 	final Function[] methods;

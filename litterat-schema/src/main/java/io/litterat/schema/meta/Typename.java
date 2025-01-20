@@ -18,32 +18,29 @@ package io.litterat.schema.meta;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
 
 /**
- * 
  * @formatter:off
  *
  * A type name provides a unique identifier into the type library. A type name
  * is uniquely identified using the namespace, name, optional attribute and
  * version.
- *
+ * <p>
  * For example:
- *
+ * <p>
  *    schema.sequence#1 : Identifies version 1 of the schema.sequence definition.
  *    schema.atom:atom_size : Identifies the abstract mapping from atom to atom_size s
  *    foo.example:bar#1 : Identifies the bar field in the record definition foo.example.
- *
+ * <p>
  * A type version must be specified for any type in the type library. A TypeName used for a
  * reference can specify a version of 0 to specify an unknown version.
- * 
+ *
  * @formatter:on
- * 
  */
 
-@SchemaType(namespace = "schema", name = "type_name")
-public class TypeName implements Element {
+@io.litterat.bind.annotation.Typename(namespace = "meta", name = "type_name")
+public class Typename implements Element {
 
 	public static final String ROOT_NAMESPACE = "";
 
@@ -55,7 +52,7 @@ public class TypeName implements Element {
 	private final String name;
 
 	@Record
-	public TypeName(String namespace, String name) {
+	public Typename(String namespace, String name) {
 		Objects.requireNonNull(namespace, "Namespace can not be null");
 		Objects.requireNonNull(name, "Name can not be null");
 
@@ -72,7 +69,7 @@ public class TypeName implements Element {
 
 	}
 
-	public TypeName(String name) {
+	public Typename(String name) {
 		this(ROOT_NAMESPACE, name);
 	}
 
@@ -106,7 +103,7 @@ public class TypeName implements Element {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TypeName other = (TypeName) obj;
+		Typename other = (Typename) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;

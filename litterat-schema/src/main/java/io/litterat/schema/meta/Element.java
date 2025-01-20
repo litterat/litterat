@@ -15,15 +15,13 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.schema.annotation.SchemaType;
-
 /**
  * An element is the union of all structural definition types. Probably not the best name, but
  * haven't found anything better yet.
  */
 
-@io.litterat.bind.Union(value = { Record.class, Union.class, Array.class, TypeName.class }, sealed = true)
-@SchemaType(namespace = "schema", name = "element")
+@io.litterat.bind.annotation.Typename(namespace = "meta", name = "element")
+@io.litterat.bind.annotation.Union(value = { Record.class, Union.class, Array.class, Typename.class }, sealed = true)
 public interface Element extends Definition {
 
 }

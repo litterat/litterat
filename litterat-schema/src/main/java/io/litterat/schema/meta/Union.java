@@ -15,27 +15,54 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
- * 
+ *
  * A Union is a record that represents a choice between a list of rules. The list of rules are
  * included as a Reference using TypeNames.
  *
  */
 
 @Record
-@SchemaType(namespace = "schema", name = "union")
+@io.litterat.bind.annotation.Typename(namespace = "meta", name = "union")
 public class Union implements Element {
 
-	private final TypeName[] map;
 
-	public Union(TypeName[] map) {
+	private final Typename[] map;
+
+	private final boolean isSealed;
+
+	@Record
+	public Union(Typename[] map, boolean isSealed) {
 		this.map = map;
+		this.isSealed = isSealed;
 	}
 
-	public TypeName[] map() {
+	public Union(Typename[] map) {
+		this(map, true);
+	}
+
+	public Typename[] map() {
 		return map;
+	}
+
+	public boolean isSealed() {
+		return isSealed;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Union union = (Union) o;
+		return isSealed == union.isSealed && Objects.deepEquals(map, union.map);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(Arrays.hashCode(map), isSealed);
 	}
 }

@@ -1,8 +1,7 @@
 package io.litterat.schema.meta.atom;
 
-import io.litterat.bind.Record;
+import io.litterat.bind.annotation.Record;
 import io.litterat.schema.meta.Atom;
-import io.litterat.schema.annotation.SchemaType;
 
 public class IntegerAtom extends Atom {
 
@@ -10,28 +9,24 @@ public class IntegerAtom extends Atom {
 		super(attributes);
 	}
 
-	public IntegerAtom() {
-		super(new AtomAttribute[] { new AtomInteger() });
-	}
-
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_integer")
+	@io.litterat.bind.annotation.Typename(namespace = "schema", name = "atom_integer")
 	public static class AtomInteger extends AtomAttribute {}
 
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_unsigned")
+	@io.litterat.bind.annotation.Typename(namespace = "schema", name = "atom_unsigned")
 	public static class AtomUnsigned extends AtomAttribute {}
 
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_signed")
+	@io.litterat.bind.annotation.Typename(namespace = "schema", name = "atom_signed")
 	public static class AtomSigned extends AtomAttribute {}
 
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_big_endian")
+	@io.litterat.bind.annotation.Typename(namespace = "schema", name = "atom_big_endian")
 	public static class AtomBigEndian extends AtomAttribute {}
 
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_little_endian")
+	@io.litterat.bind.annotation.Typename(namespace = "schema", name = "atom_little_endian")
 	public static class AtomLittleEndian extends AtomAttribute {}
 
 }

@@ -15,26 +15,23 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.annotation.SchemaType;
-
-@Record
-@SchemaType(namespace = "schema", name = "signature")
+@io.litterat.bind.annotation.Record
+@io.litterat.bind.annotation.Typename(namespace = "meta", name = "signature")
 public class FunctionSignature {
 
-	private final TypeName[] arguments;
-	private final TypeName returnType;
+	private final Typename[] arguments;
+	private final Typename returnType;
 
-	public FunctionSignature(TypeName returnType, TypeName... arguments) {
+	public FunctionSignature(Typename returnType, Typename... arguments) {
 		this.arguments = arguments;
 		this.returnType = returnType;
 	}
 
-	public TypeName[] arguments() {
+	public Typename[] arguments() {
 		return arguments;
 	}
 
-	public TypeName returnType() {
+	public Typename returnType() {
 		return returnType;
 	}
 }

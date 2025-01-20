@@ -15,18 +15,18 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.Union;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Typename;
+import io.litterat.bind.annotation.Union;
 
 /**
- * 
+ *
  * A definition is how each rule is defined in the library. A definition is itself a union type of
  * either an Element or Atom.
  *
  */
 
+@Typename(namespace = "meta", name = "definition")
 @Union(value = { Element.class, Atom.class }, sealed = true)
-@SchemaType(namespace = "schema", name = "definition")
 public interface Definition {
 
 }

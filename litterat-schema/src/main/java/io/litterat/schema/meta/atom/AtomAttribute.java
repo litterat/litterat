@@ -15,19 +15,20 @@
  */
 package io.litterat.schema.meta.atom;
 
-import io.litterat.bind.Record;
-import io.litterat.bind.Union;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Field;
+import io.litterat.bind.annotation.Record;
+import io.litterat.bind.annotation.Typename;
+import io.litterat.bind.annotation.Union;
 
 @Union
-@SchemaType(namespace = "schema", name = "atom_attribute")
+@Typename(namespace = "schema", name = "atom_attribute")
 public abstract class AtomAttribute {
 
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_fixed_length")
+	@Typename(namespace = "schema", name = "atom_fixed_length")
 	public static class AtomFixedLength extends AtomAttribute {
 
-		@SchemaType(name = "uint8")
+		@Typename(name = "uint8")
 		private final int bytes;
 
 		public AtomFixedLength(int bytes) {
@@ -40,17 +41,16 @@ public abstract class AtomAttribute {
 	}
 
 	@Record
-	@SchemaType(namespace = "schema", name = "atom_variable_length")
+	@Typename(namespace = "schema", name = "atom_variable_length")
 	public static class AtomVariableLength extends AtomAttribute {
 
-		@SchemaType(name = "uint8")
+		@Typename(name = "uint8")
 		private final int minBytes;
 
-		@SchemaType(name = "uint8")
+		@Typename(name = "uint8")
 		private final int maxBytes;
 
-		public AtomVariableLength(@io.litterat.bind.Field(name = "min_bytes") int minBytes,
-				@io.litterat.bind.Field(name = "max_bytes") int maxBytes) {
+		public AtomVariableLength(@Field(name = "min_bytes") int minBytes, @Field(name = "max_bytes") int maxBytes) {
 			this.minBytes = minBytes;
 			this.maxBytes = maxBytes;
 		}

@@ -15,19 +15,21 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.Union;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Union;
 import io.litterat.schema.meta.atom.AtomAttribute;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
- * 
+ *
  * An atom is an unsealed union type. Various atom definitions can be bound to this type.
  *
  */
 
-@SchemaType(namespace = "schema", name = "atom")
+@io.litterat.bind.annotation.Typename(namespace = "meta", name = "atom")
 @Union(value = {}, sealed = false)
-public class Atom implements Definition {
+public abstract class Atom implements Definition {
 
 	private final AtomAttribute[] attributes;
 
@@ -39,4 +41,15 @@ public class Atom implements Definition {
 		return attributes;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Atom atom = (Atom) o;
+		return Objects.deepEquals(attributes, atom.attributes);
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(attributes);
+	}
 }

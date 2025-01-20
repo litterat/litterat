@@ -16,5 +16,5 @@
 package io.litterat.schema;
 
 public enum TypeLibraryState {
-	RESERVED, REGISTERED, BOUND
+	RESERVED, REGISTERED
 }

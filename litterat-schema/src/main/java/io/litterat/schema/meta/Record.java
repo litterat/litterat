@@ -15,16 +15,19 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Typename;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
- * 
+ *
  * A Record represents the
  *
  */
 
-@io.litterat.bind.Record
-@SchemaType(namespace = "schema", name = "sequence")
+@io.litterat.bind.annotation.Record
+@Typename(namespace = "meta", name = "record")
 public class Record implements Element {
 
 	private final Field[] fields;
@@ -35,5 +38,17 @@ public class Record implements Element {
 
 	public Field[] fields() {
 		return this.fields;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Record record = (Record) o;
+		return Objects.deepEquals(fields, record.fields);
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(fields);
 	}
 }

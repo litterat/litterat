@@ -15,29 +15,42 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
+
+import java.util.Objects;
 
 /**
- * 
+ *
  * An array is a structural element which defines a repeated element type.
- * 
+ *
  * In the future it might be useful to introduce restrictions on the array type to specify a min/max
  * elements.
  *
  */
 
 @Record
-@SchemaType(namespace = "schema", name = "array")
+@io.litterat.bind.annotation.Typename(namespace = "meta", name = "array")
 public class Array implements Element {
 
-	private final TypeName type;
+	private final Typename type;
 
-	public Array(TypeName type) {
+	public Array(Typename type) {
 		this.type = type;
 	}
 
-	public TypeName type() {
+	public Typename type() {
 		return this.type;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Array array = (Array) o;
+		return Objects.equals(type, array.type);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(type);
 	}
 }

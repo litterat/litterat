@@ -15,34 +15,27 @@
  */
 package io.litterat.schema;
 
-import io.litterat.bind.DataClass;
 import io.litterat.schema.meta.Definition;
-import io.litterat.schema.meta.TypeName;
+import io.litterat.schema.meta.Typename;
 
 public class TypeLibraryEntry {
 
 	final TypeLibraryState state;
-	final TypeName name;
+	final Typename name;
 	final Definition definition;
-	final DataClass clss;
 
-	public TypeLibraryEntry(TypeLibraryState state, TypeName name, Definition definition, DataClass clss) {
+	public TypeLibraryEntry(TypeLibraryState state, Typename name, Definition definition) {
 		this.state = state;
 		this.name = name;
 		this.definition = definition;
-		this.clss = clss;
 	}
 
 	public TypeLibraryState state() {
 		return state;
 	}
 
-	public TypeName typeName() {
+	public Typename typeName() {
 		return name;
-	}
-
-	public DataClass typeClass() {
-		return clss;
 	}
 
 	public Definition definition() {

@@ -15,32 +15,25 @@
  */
 package io.litterat.schema.meta.atom;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.meta.Definition;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
+import io.litterat.bind.annotation.Typename;
+import io.litterat.schema.meta.Atom;
 
 /**
- * 
  * Definition of a string atom.
- * 
+ *
  * @formatter:off
  * TODO This should extend or implement Atom.
- * TODO Common string restrictions such as min/max length required. 
+ * TODO Common string restrictions such as min/max length required.
  * TODO Should be able to base one string on a previous definition.
  * @formatter:on
- * 
  */
-@SchemaType(namespace = "schema", name = "encoding")
-public class StringAtom implements Definition {
-
-	private final String encoding;
+@Typename(namespace = "schema", name = "encoding")
+public class StringAtom extends Atom {
 
 	@Record
-	public StringAtom(String encoding) {
-		this.encoding = encoding;
+	public StringAtom(AtomAttribute[] attributes) {
+		super(attributes);
 	}
 
-	public String encoding() {
-		return encoding;
-	}
 }

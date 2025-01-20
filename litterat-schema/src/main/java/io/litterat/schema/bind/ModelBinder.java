@@ -29,7 +29,7 @@ import io.litterat.schema.meta.Definition;
 import io.litterat.schema.meta.Element;
 import io.litterat.schema.meta.Field;
 import io.litterat.schema.meta.Record;
-import io.litterat.schema.meta.TypeName;
+import io.litterat.schema.meta.Typename;
 import io.litterat.schema.meta.Union;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.TypeLibrary;
@@ -67,7 +67,7 @@ public class ModelBinder {
 				if (fieldDataClass instanceof DataClassArray) {
 					DataClassArray dataClassArray = (DataClassArray) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(dataClassArray.arrayDataClass());
+					Typename typeName = library.getTypeName(dataClassArray.arrayDataClass());
 
 					fields.add(new Field(name, new Array(typeName)));
 
@@ -75,7 +75,7 @@ public class ModelBinder {
 						|| fieldDataClass instanceof DataClassUnion) {
 					// This currently assumes that any atom,record,or union will have its own type name rather than
 					// be an embedded type.
-					TypeName typeName = library.getTypeName(fieldDataClass);
+					Typename typeName = library.getTypeName(fieldDataClass);
 
 					// TODO - What about required?
 
@@ -90,7 +90,7 @@ public class ModelBinder {
 		} else if (dataClass instanceof DataClassUnion) {
 			DataClassUnion dataClassUnion = (DataClassUnion) dataClass;
 
-			TypeName[] members = new TypeName[dataClassUnion.memberTypes().length];
+			Typename[] members = new Typename[dataClassUnion.memberTypes().length];
 			for (int x = 0; x < members.length; x++) {
 				members[x] = library.getTypeName(dataClassUnion.memberTypes()[x]);
 			}
@@ -101,7 +101,7 @@ public class ModelBinder {
 			DataClassArray dataClassArray = (DataClassArray) dataClass;
 			// TODO implement this.
 
-			TypeName arrayElementType = library.getTypeName(dataClassArray.arrayDataClass());
+			Typename arrayElementType = library.getTypeName(dataClassArray.arrayDataClass());
 
 			result = new Array(arrayElementType);
 
@@ -137,14 +137,14 @@ public class ModelBinder {
 				if (fieldDataClass instanceof DataClassArray) {
 					DataClassArray dataClassArray = (DataClassArray) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(dataClassArray.arrayDataClass());
+					Typename typeName = library.getTypeName(dataClassArray.arrayDataClass());
 
 					fields.add(new Field(name, new Array(typeName)));
 
 				} else if (fieldDataClass instanceof DataClassAtom) {
 					DataClassAtom fieldDataClassAtom = (DataClassAtom) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(fieldDataClassAtom);
+					Typename typeName = library.getTypeName(fieldDataClassAtom);
 
 					// TODO - What about required?
 
@@ -152,7 +152,7 @@ public class ModelBinder {
 				} else if (fieldDataClass instanceof DataClassRecord) {
 					DataClassRecord fieldDataClassRecord = (DataClassRecord) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(fieldDataClassRecord);
+					Typename typeName = library.getTypeName(fieldDataClassRecord);
 
 					// TODO - What about required?
 
@@ -160,7 +160,7 @@ public class ModelBinder {
 				} else if (fieldDataClass instanceof DataClassUnion) {
 					DataClassUnion fieldDataClassUnion = (DataClassUnion) fieldDataClass;
 
-					TypeName typeName = library.getTypeName(fieldDataClassUnion);
+					Typename typeName = library.getTypeName(fieldDataClassUnion);
 
 					// TODO - What about required?
 

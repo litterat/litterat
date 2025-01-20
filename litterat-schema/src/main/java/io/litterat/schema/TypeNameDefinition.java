@@ -17,7 +17,7 @@ package io.litterat.schema;
 
 import io.litterat.bind.Record;
 import io.litterat.schema.meta.Definition;
-import io.litterat.schema.meta.TypeName;
+import io.litterat.schema.meta.Typename;
 import io.litterat.schema.annotation.SchemaType;
 
 /**
@@ -29,11 +29,11 @@ import io.litterat.schema.annotation.SchemaType;
 @SchemaType(namespace = "schema", name = "type_name_definition")
 public class TypeNameDefinition {
 	private final int streamId;
-	private final TypeName typeName;
+	private final Typename typeName;
 	private final Definition definition;
 
 	@Record
-	public TypeNameDefinition(int streamId, TypeName typeName, Definition definition) {
+	public TypeNameDefinition(int streamId, Typename typeName, Definition definition) {
 		this.streamId = streamId;
 		this.typeName = typeName;
 		this.definition = definition;
@@ -43,7 +43,7 @@ public class TypeNameDefinition {
 		return streamId;
 	}
 
-	public TypeName typeName() {
+	public Typename typeName() {
 		return typeName;
 	}
 

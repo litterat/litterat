@@ -19,41 +19,41 @@ import io.litterat.schema.TypeLibrary;
 
 public class SchemaTypes {
 
-	public static final TypeName ANY = new TypeName("schema", "any");
-	public static final TypeName ARRAY = new TypeName("schema", "array");
-	public static final TypeName ATOM = new TypeName("schema", "atom");
-	public static final TypeName ATOM_ATTRIBUTE = new TypeName("schema", "atom_attribute");
-	public static final TypeName ATOM_BIG_ENDIAN = new TypeName("schema", "atom_big_endian");
-	public static final TypeName ATOM_LITTLE_ENDIAN = new TypeName("schema", "atom_little_endian");
-	public static final TypeName ATOM_SIGNED = new TypeName("schema", "atom_signed");
-	public static final TypeName ATOM_IEEE756 = new TypeName("schema", "atom_ieee756");
-	public static final TypeName ATOM_UNSIGNED = new TypeName("schema", "atom_big_unsigned");
-	public static final TypeName ATOM_FIXED_LENGTH = new TypeName("schema", "atom_fixed_length");
-	public static final TypeName ATOM_VARIABLE_LENGTH = new TypeName("schema", "atom_variable_length");
-	public static final TypeName DEFINITION = new TypeName("schema", "definition");
-	public static final TypeName DICTIONARY = new TypeName("schema", "dictionary");
-	public static final TypeName ELEMENT = new TypeName("schema", "element");
-	public static final TypeName ENCODING = new TypeName("schema", "encoding");
-	public static final TypeName ENUM = new TypeName("schema", "enum");
-	public static final TypeName ENVELOPE = new TypeName("schema", "envelope");
-	public static final TypeName EXPRESSION = new TypeName("schema", "expression");
-	public static final TypeName FIELD = new TypeName("schema", "field");
-	public static final TypeName INTERFACE = new TypeName("schema", "interface");
-	public static final TypeName METHOD = new TypeName("schema", "method");
-	public static final TypeName NAMESPACE = new TypeName("schema", "namespace");
-	public static final TypeName RECORD = new TypeName("schema", "record");
-	public static final TypeName SEQUENCE = new TypeName("schema", "sequence");
-	public static final TypeName SIGNATURE = new TypeName("schema", "signature");
-	public static final TypeName TYPE_NAME = new TypeName("schema", "type_name");
-	public static final TypeName TYPE_NAME_DEFINITION = new TypeName("schema", "type_name_definition");
-	public static final TypeName UNION = new TypeName("schema", "union");
+	public static final Typename ANY = new Typename("schema", "any");
+	public static final Typename ARRAY = new Typename("schema", "array");
+	public static final Typename ATOM = new Typename("schema", "atom");
+	public static final Typename ATOM_ATTRIBUTE = new Typename("schema", "atom_attribute");
+	public static final Typename ATOM_BIG_ENDIAN = new Typename("schema", "atom_big_endian");
+	public static final Typename ATOM_LITTLE_ENDIAN = new Typename("schema", "atom_little_endian");
+	public static final Typename ATOM_SIGNED = new Typename("schema", "atom_signed");
+	public static final Typename ATOM_IEEE756 = new Typename("schema", "atom_ieee756");
+	public static final Typename ATOM_UNSIGNED = new Typename("schema", "atom_big_unsigned");
+	public static final Typename ATOM_FIXED_LENGTH = new Typename("schema", "atom_fixed_length");
+	public static final Typename ATOM_VARIABLE_LENGTH = new Typename("schema", "atom_variable_length");
+	public static final Typename DEFINITION = new Typename("schema", "definition");
+	public static final Typename DICTIONARY = new Typename("schema", "dictionary");
+	public static final Typename ELEMENT = new Typename("schema", "element");
+	public static final Typename ENCODING = new Typename("schema", "encoding");
+	public static final Typename ENUM = new Typename("schema", "enum");
+	public static final Typename ENVELOPE = new Typename("schema", "envelope");
+	public static final Typename EXPRESSION = new Typename("schema", "expression");
+	public static final Typename FIELD = new Typename("schema", "field");
+	public static final Typename INTERFACE = new Typename("schema", "interface");
+	public static final Typename METHOD = new Typename("schema", "method");
+	public static final Typename NAMESPACE = new Typename("schema", "namespace");
+	public static final Typename RECORD = new Typename("schema", "record");
+	public static final Typename SEQUENCE = new Typename("schema", "sequence");
+	public static final Typename SIGNATURE = new Typename("schema", "signature");
+	public static final Typename TYPE_NAME = new Typename("schema", "type_name");
+	public static final Typename TYPE_NAME_DEFINITION = new Typename("schema", "type_name_definition");
+	public static final Typename UNION = new Typename("schema", "union");
 
 	// @formatter:off
 	public static final Element DEFINITION_DEF = new Union(
-			new TypeName[] { SEQUENCE, RECORD, UNION, ENCODING });
+			new Typename[] { SEQUENCE, RECORD, UNION, ENCODING });
 
 	public static final Element ELEMENT_DEF = new Union(
-			new TypeName[] { ANY, ARRAY });
+			new Typename[] { ANY, ARRAY });
 
 	// Any is really just an empty object with no fields.
 	public static final Element ANY_DEF = new Record(
@@ -71,7 +71,7 @@ public class SchemaTypes {
 			});
 
 	public static final Element ATOM_ATTRIBUTE_DEF = new Union(
-			new TypeName[] { ATOM_BIG_ENDIAN, ATOM_LITTLE_ENDIAN, ATOM_SIGNED, ATOM_UNSIGNED,
+			new Typename[] { ATOM_BIG_ENDIAN, ATOM_LITTLE_ENDIAN, ATOM_SIGNED, ATOM_UNSIGNED,
 							ATOM_IEEE756, ATOM_FIXED_LENGTH, ATOM_VARIABLE_LENGTH
 			});
 

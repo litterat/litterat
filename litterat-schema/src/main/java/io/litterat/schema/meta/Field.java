@@ -15,17 +15,16 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.Record;
-import io.litterat.schema.annotation.SchemaType;
+import io.litterat.bind.annotation.Record;
+
+import java.util.Objects;
 
 /**
- * 
  * A field is a structural element of a record. It is of a specific element type and is either
- * required or not.
- *
+ * required or not. The type can be a Typename, Array, Union, or Record.
  */
 
-@SchemaType(namespace = "schema", name = "field")
+@io.litterat.bind.annotation.Typename(namespace = "meta", name = "field")
 public class Field {
 
 	private final String name;
@@ -53,5 +52,17 @@ public class Field {
 
 	public boolean isRequired() {
 		return required;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Field field = (Field) o;
+		return required == field.required && Objects.equals(name, field.name) && Objects.equals(type, field.type);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, type, required);
 	}
 }

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.schema.meta.atom;
 /**
- * 
- * This package contains definitions for atom types. This could do with a refactor as it would be
- * better if the various types had their own well defined definition.
- * 
+ *
+ * This package contains definitions for atom types. Atoms need to be completely rewritten.
+ *
  */
+package io.litterat.schema.meta.atom;
