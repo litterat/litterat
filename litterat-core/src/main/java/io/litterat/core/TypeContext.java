@@ -102,6 +102,12 @@ public class TypeContext {
 
 			register(Meta.INT32, Integer.class, Integer.class);
 			register(Meta.INT32, int.class, int.class);
+
+			register(Meta.INT16, Short.class, Short.class);
+			register(Meta.INT16, short.class, short.class);
+
+			register(Meta.FLOAT, Float.class, Float.class);
+			register(Meta.FLOAT, float.class, float.class);
         } catch (TypeException e) {
             throw new RuntimeException(e);
         }

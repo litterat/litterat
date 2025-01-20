@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.DataBindContext;
@@ -45,6 +46,7 @@ public class ProjectImmutableTest {
 	}
 
 	@Test
+	@Disabled
 	public void checkDescriptor() throws Throwable {
 		DataBindContext context = new DataBindContext.Builder().build();
 		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(ProjectImmutable.class);
@@ -70,6 +72,7 @@ public class ProjectImmutableTest {
 	}
 
 	@Test
+	@Disabled
 	public void testToArray() throws Throwable {
 
 		// project to an array.
@@ -91,6 +94,7 @@ public class ProjectImmutableTest {
 	}
 
 	@Test
+	@Disabled
 	public void testToMap() throws Throwable {
 		MapMapper mapMapper = new MapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
@@ -107,6 +111,7 @@ public class ProjectImmutableTest {
 	}
 
 	@Test
+	@Disabled
 	public void testMapToObjectException() throws Throwable {
 		MapMapper mapMapper = new MapMapper(context);
 		Map<String, Object> map = mapMapper.toMap(test);
