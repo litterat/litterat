@@ -10,7 +10,8 @@ Next steps list. A general list of things that could be done next in no particul
  - Dates, timestamps and other atoms. To be completed as needed.
  - Create bind error examples and test edge cases. To be completed as issues found.
  - Review model arrays and look at multi-dimensional arrays as part of schema design.
- - Investigate how Annotations might work. 
+ - Investigate how Annotations might work.
+ - Registering packages
  
  litterat-xpl
  - Review the lang package and SchemaResolver to match more correctly to the model.

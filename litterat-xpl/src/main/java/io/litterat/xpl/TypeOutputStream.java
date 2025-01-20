@@ -97,7 +97,7 @@ public class TypeOutputStream implements TypeStream {
 				entry = register(typeMap.context().getTypename(object.getClass()));
 			}
 
-			logOutput("writing streamId " + entry.streamId());
+			logOutput("writing " + object.getClass() + " streamId " + entry.streamId());
 			output().writeUVarInt32(entry.streamId());
 
 			logOutput( "writing object");
@@ -117,7 +117,7 @@ public class TypeOutputStream implements TypeStream {
 				entry = register(typename);
 			}
 
-			logOutput("writing streamId " + entry.streamId());
+			logOutput("writing " + typename + " streamId " + entry.streamId());
 			output().writeUVarInt32(entry.streamId());
 
 			logOutput( "writing object");

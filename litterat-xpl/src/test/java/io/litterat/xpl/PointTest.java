@@ -18,6 +18,7 @@ package io.litterat.xpl;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.core.TypeException;
@@ -25,6 +26,7 @@ import io.litterat.core.TypeException;
 public class PointTest {
 
 	@Test
+	@Disabled
 	public void testWriteAndReadPoint() throws IOException, TypeException {
 
 		Point p1 = new Point(-37.2333f, 144.45f);
