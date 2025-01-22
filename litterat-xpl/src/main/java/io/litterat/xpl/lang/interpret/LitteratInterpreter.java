@@ -18,11 +18,11 @@ package io.litterat.xpl.lang.interpret;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.DataBindException;
-import io.litterat.core.meta.*;
-import io.litterat.core.meta.Record;
-import io.litterat.core.meta.atom.StringAtom;
+import io.litterat.schema.meta.*;
+import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.atom.StringAtom;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.Block;
 import io.litterat.xpl.lang.BlockArray;

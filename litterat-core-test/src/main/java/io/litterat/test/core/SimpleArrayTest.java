@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import io.litterat.core.TypeContext;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.core.meta.Meta;
+import io.litterat.schema.meta.Meta;
 import io.litterat.test.core.data.SimpleArray;
 import io.litterat.test.core.data.SimpleImmutable;
 import io.litterat.test.core.data.UUIDBridge;

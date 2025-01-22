@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;

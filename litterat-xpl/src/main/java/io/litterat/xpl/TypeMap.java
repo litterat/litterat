@@ -21,15 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.Array;
-import io.litterat.core.meta.Definition;
-import io.litterat.core.meta.Element;
-import io.litterat.core.meta.Entry;
-import io.litterat.core.meta.Field;
-import io.litterat.core.meta.Meta;
-import io.litterat.core.meta.Record;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Array;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Element;
+import io.litterat.schema.meta.Entry;
+import io.litterat.schema.meta.Field;
+import io.litterat.schema.meta.Meta;
+import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.resolve.SchemaResolver;
 import io.litterat.xpl.util.IntObjectHashMap;
 

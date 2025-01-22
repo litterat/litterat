@@ -33,8 +33,9 @@ repositories {
 }
 
 dependencies {
-
+    implementation project(":litterat-annotation")
     implementation project(":litterat-bind")
+    implementation project(":litterat-schema")
 
 	// https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
 	implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.7.1'

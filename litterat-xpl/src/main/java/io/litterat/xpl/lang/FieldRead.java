@@ -15,9 +15,9 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.annotation.Record;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.meta.Typename;
 
 /**
  * This reads a getter from an object.

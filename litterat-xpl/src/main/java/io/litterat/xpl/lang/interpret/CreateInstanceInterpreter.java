@@ -17,7 +17,7 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.xpl.TypeMap;

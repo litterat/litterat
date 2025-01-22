@@ -3,7 +3,7 @@ package io.litterat.xpl.resolve;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;

@@ -16,7 +16,7 @@
 package io.litterat.xpl.lang;
 
 import io.litterat.bind.annotation.Record;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.meta.Typename;
 
 @Record
 @io.litterat.bind.annotation.Typename(namespace = "xpl", name = "create_instance")

@@ -15,7 +15,7 @@
  */
 package io.litterat.xpl.lang.interpret;
 
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeStream;
 import io.litterat.xpl.lang.Lambda;
 import io.litterat.xpl.lang.LambdaFunction;

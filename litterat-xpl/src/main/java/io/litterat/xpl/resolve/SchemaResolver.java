@@ -21,9 +21,9 @@ import java.util.List;
 
 import io.litterat.bind.*;
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.*;
-import io.litterat.core.meta.Record;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.*;
+import io.litterat.schema.meta.Record;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.TypeMapEntry;

@@ -16,8 +16,8 @@
 package io.litterat.xpl;
 
 import io.litterat.bind.DataClass;
-import io.litterat.core.meta.Definition;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Typename;
 
 public class TypeMapEntry {
 

@@ -29,19 +29,20 @@ repositories {
 }
 
 dependencies {
-   implementation project(":litterat-bind")
-   implementation project(":litterat-core")
-   implementation project(":litterat-xpl")
+    implementation project(":litterat-annotation")
+    implementation project(":litterat-bind")
+    implementation project(":litterat-schema")
+    implementation project(":litterat-core")
+    implementation project(":litterat-xpl")
    
-   // test data
-   implementation project(":litterat-core-test")
+    // test data
+    implementation project(":litterat-core-test")
 
-   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-   implementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
 	
-   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-   implementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
-	
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 }
 
 // This is to enable sealed interfaces to be tested. To be removed when Java 17 is released.

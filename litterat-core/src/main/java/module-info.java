@@ -14,9 +14,9 @@
 module io.litterat.core {
 
 	exports io.litterat.core;
-	exports io.litterat.core.meta;
-	exports io.litterat.core.meta.atom;
 	exports io.litterat.core.resolve;
 
+	requires transitive io.litterat.annotation;
 	requires transitive io.litterat.bind;
+	requires transitive io.litterat.schema;
 }

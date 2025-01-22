@@ -30,6 +30,7 @@ dependencies {
    //implementation group: 'io.litterat', name: 'litterat-bind', version: '0.5.0'
 
     implementation project(":litterat-bind")
+    implementation project(":litterat-schema")
     implementation project(":litterat-core")
    
    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api

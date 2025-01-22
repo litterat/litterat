@@ -5,9 +5,13 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.litterat.bind.*;
-import io.litterat.core.meta.Definition;
-import io.litterat.core.meta.Meta;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.TypeLibrary;
+import io.litterat.schema.TypeLibraryState;
+import io.litterat.schema.TypeNotDefinedException;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Meta;
+import io.litterat.schema.meta.Typename;
 import io.litterat.core.resolve.*;
 
 /**
@@ -171,8 +175,6 @@ public class TypeContext {
 
 	public DataClass register(Typename typename, Class<?> targetClass, Type parameterizedType) throws TypeException {
 
-
-
         try {
             DataClass dataClass = dataBindContext().getDescriptor(targetClass, parameterizedType);
 
@@ -200,7 +202,7 @@ public class TypeContext {
 
 			registerStack.pop();
 			return dataClass;
-        } catch (DataBindException e) {
+        } catch (DataBindException | CodeAnalysisException e) {
             throw new TypeException(e);
         }
 
@@ -211,7 +213,7 @@ public class TypeContext {
 	 * Create a meta definition for the TypeLibrary from the in-built DataClass.
 	 */
 	private Definition createDefinition(DataClass dataClass, Type parameterizedType)
-			throws TypeException {
+            throws TypeException, CodeAnalysisException, DataBindException {
 
         return switch (dataClass) {
 			case DataClassUnion dataClassUnion ->

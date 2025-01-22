@@ -15,7 +15,7 @@
  */
 package io.litterat.core.resolve;
 
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 
 public class CodeAnalysisException extends TypeException {
 

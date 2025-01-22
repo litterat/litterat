@@ -2,10 +2,11 @@ package io.litterat.core.resolve;
 
 import io.litterat.bind.*;
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.TypeNotDefinedException;
-import io.litterat.core.meta.*;
-import io.litterat.core.meta.Record;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Array;
+import io.litterat.schema.meta.Element;
+import io.litterat.schema.meta.Field;
+import io.litterat.schema.meta.Record;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

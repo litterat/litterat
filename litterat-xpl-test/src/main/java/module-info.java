@@ -13,7 +13,10 @@
  */
 open module io.litterat.test.xpl {
 
-	requires io.litterat.core;
+	requires transitive io.litterat.annotation;
+	requires transitive io.litterat.bind;
+	requires transitive io.litterat.schema;
+
 	requires io.litterat.xpl;
 
 	// The test data.

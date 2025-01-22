@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.ArrayMapper;

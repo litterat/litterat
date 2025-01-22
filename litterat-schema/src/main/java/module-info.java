@@ -11,16 +11,11 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-module io.litterat.model {
-
+module io.litterat.schema {
 	exports io.litterat.schema;
-	exports io.litterat.schema.annotation;
-	exports io.litterat.schema.meta.atom;
-	exports io.litterat.schema.bind;
-	exports io.litterat.schema.function;
 	exports io.litterat.schema.meta;
-	exports io.litterat.schema.library;
+	exports io.litterat.schema.meta.atom;
 
+	requires transitive io.litterat.annotation;
 	requires transitive io.litterat.bind;
-
 }

@@ -14,7 +14,7 @@
 open module io.litterat.test.model {
 
 	requires io.litterat.bind;
-	requires io.litterat.model;
+	requires io.litterat.schema;
 
 	// The test data.
 	requires io.litterat.test.bind;

@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.Meta;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Meta;
+import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.TypeBaseInput;
 import io.litterat.xpl.TypeBaseOutput;
 import io.litterat.xpl.TypeInputStream;

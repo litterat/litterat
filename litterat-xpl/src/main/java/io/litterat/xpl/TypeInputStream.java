@@ -20,8 +20,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.io.ByteArrayBaseInput;
 import io.litterat.xpl.io.ByteBufferBaseInput;
 import io.litterat.xpl.io.StreamBaseInput;

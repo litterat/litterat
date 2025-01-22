@@ -17,7 +17,7 @@ package io.litterat.xpl.lang;
 
 import io.litterat.bind.annotation.Record;
 import io.litterat.bind.DataClassArray;
-import io.litterat.core.meta.Array;
+import io.litterat.schema.meta.Array;
 
 /**
  *

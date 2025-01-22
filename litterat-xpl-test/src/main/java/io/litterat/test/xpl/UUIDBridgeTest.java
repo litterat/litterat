@@ -23,9 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.TypeLibrary;
-import io.litterat.core.meta.Meta;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Meta;
 import io.litterat.test.core.data.SimpleUUIDImmutable;
 import io.litterat.test.core.data.UUIDBridge;
 import io.litterat.xpl.TypeInputStream;

@@ -1,10 +1,11 @@
 package io.litterat.core.resolve;
 
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassArray;
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.Array;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Array;
+import io.litterat.schema.meta.Typename;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -13,7 +14,7 @@ import java.util.Collection;
 public class ArrayResolver implements TypeResolver<Array, DataClassArray> {
 
     public Array resolveDefinition(TypeContext context, DataClassArray dataClass, Type parameterizedType)
-            throws TypeException {
+            throws TypeException, DataBindException {
 
         try {
 

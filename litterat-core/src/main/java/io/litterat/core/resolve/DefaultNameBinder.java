@@ -5,8 +5,8 @@ import java.lang.reflect.Type;
 import io.litterat.bind.annotation.Namespace;
 import io.litterat.core.TypeContext;
 import io.litterat.core.TypeContextNameBinder;
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Typename;
 
 /**
  * This is the default method of converting from a code first Class to a schema typename.

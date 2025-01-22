@@ -2,8 +2,8 @@ package io.litterat.core.resolve;
 
 import io.litterat.bind.DataClassAtom;
 import io.litterat.core.TypeContext;
-import io.litterat.core.meta.Atom;
-import io.litterat.core.meta.atom.*;
+import io.litterat.schema.meta.Atom;
+import io.litterat.schema.meta.atom.*;
 
 import java.lang.reflect.Type;
 

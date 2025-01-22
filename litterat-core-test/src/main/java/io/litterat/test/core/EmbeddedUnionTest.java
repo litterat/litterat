@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.core.union.EmbeddedUnion;

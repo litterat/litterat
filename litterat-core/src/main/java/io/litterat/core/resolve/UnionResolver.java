@@ -3,9 +3,9 @@ package io.litterat.core.resolve;
 
 import io.litterat.bind.DataClassUnion;
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.Typename;
-import io.litterat.core.meta.Union;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Typename;
+import io.litterat.schema.meta.Union;
 
 import java.lang.reflect.Type;
 

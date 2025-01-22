@@ -22,9 +22,9 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
-import io.litterat.core.meta.Entry;
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Entry;
+import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.io.ByteArrayBaseOutput;
 import io.litterat.xpl.io.ByteBufferBaseOutput;
 import io.litterat.xpl.io.StreamBaseOutput;

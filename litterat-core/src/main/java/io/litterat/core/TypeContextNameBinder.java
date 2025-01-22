@@ -2,7 +2,8 @@ package io.litterat.core;
 
 import java.lang.reflect.Type;
 
-import io.litterat.core.meta.Typename;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Typename;
 
 /**
  * 

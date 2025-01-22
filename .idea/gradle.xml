@@ -21,12 +21,15 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/litterat-annotation" />
             <option value="$PROJECT_DIR$/litterat-bind" />
             <option value="$PROJECT_DIR$/litterat-bind-test" />
             <option value="$PROJECT_DIR$/litterat-core" />
             <option value="$PROJECT_DIR$/litterat-core-test" />
             <option value="$PROJECT_DIR$/litterat-json" />
             <option value="$PROJECT_DIR$/litterat-json-test" />
+            <option value="$PROJECT_DIR$/litterat-schema" />
+            <option value="$PROJECT_DIR$/litterat-schema-test" />
             <option value="$PROJECT_DIR$/litterat-xpl" />
             <option value="$PROJECT_DIR$/litterat-xpl-test" />
           </set>

@@ -15,7 +15,7 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.annotation.Record;
 
 /**
