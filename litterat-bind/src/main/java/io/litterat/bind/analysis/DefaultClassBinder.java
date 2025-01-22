@@ -1,6 +1,7 @@
 package io.litterat.bind.analysis;
 
 
+import io.litterat.annotation.Atom;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
@@ -172,8 +173,8 @@ public class DefaultClassBinder {
 		}
 
 		// Check for class annoation
-		io.litterat.bind.annotation.Atom atomAnnotation = targetClass
-				.getAnnotation(io.litterat.bind.annotation.Atom.class);
+		Atom atomAnnotation = targetClass
+				.getAnnotation(Atom.class);
 		if (atomAnnotation != null) {
 			return true;
 		}
@@ -181,7 +182,7 @@ public class DefaultClassBinder {
 		// Check for annotation on constructor.
 		Constructor<?>[] constructors = targetClass.getConstructors();
 		for (Constructor<?> constructor : constructors) {
-			atomAnnotation = constructor.getAnnotation(io.litterat.bind.annotation.Atom.class);
+			atomAnnotation = constructor.getAnnotation(Atom.class);
 			if (atomAnnotation != null) {
 				return true;
 			}
@@ -191,7 +192,7 @@ public class DefaultClassBinder {
 		Method[] methods = targetClass.getDeclaredMethods();
 		for (Method method : methods) {
 
-			atomAnnotation = method.getAnnotation(io.litterat.bind.annotation.Atom.class);
+			atomAnnotation = method.getAnnotation(Atom.class);
 			if (Modifier.isStatic(method.getModifiers()) && atomAnnotation != null) {
 				return true;
 			}

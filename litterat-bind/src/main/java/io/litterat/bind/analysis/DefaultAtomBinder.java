@@ -1,5 +1,6 @@
 package io.litterat.bind.analysis;
 
+import io.litterat.annotation.Atom;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.EnumBridge;
@@ -47,8 +48,8 @@ public class DefaultAtomBinder {
 			// Check for annotation on constructor.
 			Constructor<?>[] constructors = targetClass.getConstructors();
 			for (Constructor<?> constructor : constructors) {
-				io.litterat.bind.annotation.Atom atomAnnotation = constructor
-						.getAnnotation(io.litterat.bind.annotation.Atom.class);
+				Atom atomAnnotation = constructor
+						.getAnnotation(Atom.class);
 				if (atomAnnotation != null) {
 					Parameter[] params = constructor.getParameters();
 					if (params.length != 1 || !isPrimitive(params[0].getType())) {
@@ -77,8 +78,8 @@ public class DefaultAtomBinder {
 			Method[] methods = targetClass.getDeclaredMethods();
 			for (Method method : methods) {
 
-				io.litterat.bind.annotation.Atom atomAnnotation = method
-						.getAnnotation(io.litterat.bind.annotation.Atom.class);
+				Atom atomAnnotation = method
+						.getAnnotation(Atom.class);
 				if (Modifier.isStatic(method.getModifiers()) && atomAnnotation != null) {
 					Parameter[] params = method.getParameters();
 					if (params.length != 1 || !isPrimitive(params[0].getType())) {
@@ -93,8 +94,8 @@ public class DefaultAtomBinder {
 					// Requires an accessor with the same type.
 					for (Method accessorMethod : methods) {
 
-						io.litterat.bind.annotation.Atom accessorAtom = accessorMethod
-								.getAnnotation(io.litterat.bind.annotation.Atom.class);
+						Atom accessorAtom = accessorMethod
+								.getAnnotation(Atom.class);
 						if (accessorAtom != null && !Modifier.isStatic(accessorMethod.getModifiers())) {
 							if (accessorMethod.getReturnType() != param) {
 								throw new CodeAnalysisException(
@@ -117,8 +118,8 @@ public class DefaultAtomBinder {
 
 			// Allow enums to be serialized to their String value if using default
 			// serialization.
-			io.litterat.bind.annotation.Atom enumAtom = targetClass
-					.getAnnotation(io.litterat.bind.annotation.Atom.class);
+			Atom enumAtom = targetClass
+					.getAnnotation(Atom.class);
 			if (targetClass.isEnum() && enumAtom != null) {
 
 				EnumBridge bridge = new EnumBridge(targetClass);
