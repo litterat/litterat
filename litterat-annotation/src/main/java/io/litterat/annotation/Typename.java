@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.bind.annotation;
+package io.litterat.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Allows specifying the name of a field. Either overriding the name or selecting the name for
- * parameters where the name cannot be detected.
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
-public @interface Union {
+public @interface Typename {
 
-	Class<?>[] value() default {};
+	String namespace() default "";
 
-	boolean sealed() default true;
+	// specify the model type.
+	String name();
+
 }

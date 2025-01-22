@@ -15,7 +15,8 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 import io.litterat.bind.DataClassArray;
 import io.litterat.schema.meta.Array;
 
@@ -26,7 +27,7 @@ import io.litterat.schema.meta.Array;
  */
 
 @Record
-@io.litterat.bind.annotation.Typename(namespace = "xpl", name = "read_array")
+@Typename(namespace = "xpl", name = "read_array")
 public class ReadArray implements Expression {
 
 	private final DataClassArray dataArray;

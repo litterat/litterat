@@ -15,8 +15,8 @@
  */
 package io.litterat.schema.meta.atom;
 
-import io.litterat.bind.annotation.Record;
-import io.litterat.bind.annotation.Typename;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 import io.litterat.schema.meta.Atom;
 
 /**

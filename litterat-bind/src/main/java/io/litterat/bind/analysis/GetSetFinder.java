@@ -15,7 +15,7 @@
  */
 package io.litterat.bind.analysis;
 
-import io.litterat.bind.annotation.Field;
+import io.litterat.annotation.Field;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;

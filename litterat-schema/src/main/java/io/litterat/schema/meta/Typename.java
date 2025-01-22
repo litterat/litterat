@@ -18,7 +18,7 @@ package io.litterat.schema.meta;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 /**
  * @formatter:off
@@ -39,7 +39,7 @@ import io.litterat.bind.annotation.Record;
  * @formatter:on
  */
 
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "type_name")
+@io.litterat.annotation.Typename(namespace = "meta", name = "type_name")
 public class Typename implements Element {
 
 	public static final String ROOT_NAMESPACE = "";

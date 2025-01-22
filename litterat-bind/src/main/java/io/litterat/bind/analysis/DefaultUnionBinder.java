@@ -1,9 +1,9 @@
 package io.litterat.bind.analysis;
 
+import io.litterat.annotation.Union;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassUnion;
-import io.litterat.bind.analysis.NewFeatures;
 
 
 import java.lang.reflect.Type;
@@ -30,8 +30,8 @@ public class DefaultUnionBinder {
 			return new DataClassUnion(targetClass, unionMembers, false);
 		}
 
-		io.litterat.bind.annotation.Union unionAnnotation = targetClass
-				.getAnnotation(io.litterat.bind.annotation.Union.class);
+		Union unionAnnotation = targetClass
+				.getAnnotation(Union.class);
 		if (unionAnnotation != null) {
 			if (unionAnnotation.value() != null && unionAnnotation.value().length > 0) {
 

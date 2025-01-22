@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.union;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 @Record
 public class AbstractUnionRectangle extends AbstractUnion {

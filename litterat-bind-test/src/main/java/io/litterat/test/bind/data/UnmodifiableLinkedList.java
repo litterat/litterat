@@ -17,8 +17,8 @@ package io.litterat.test.bind.data;
 
 import java.util.List;
 
-import io.litterat.bind.annotation.Field;
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Field;
+import io.litterat.annotation.Record;
 
 public class UnmodifiableLinkedList {
 

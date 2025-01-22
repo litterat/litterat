@@ -15,8 +15,11 @@
  */
 package io.litterat.schema.meta;
 
-@io.litterat.bind.annotation.Record
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "method")
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
+
+@Record
+@Typename(namespace = "meta", name = "method")
 public class Function {
 
 	private final String name;

@@ -17,12 +17,13 @@ package io.litterat.test.core.data;
 
 import java.util.List;
 
-import io.litterat.bind.annotation.Field;
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Field;
+import io.litterat.annotation.Record;
 
 public class UnmodifiableLinkedList {
 
-	@Field(name = "list", bridge = UnmodifiableLinkedListBridge.class)
+	//@Field(name = "list", bridge = UnmodifiableLinkedListBridge.class)
+	@Field(name ="list")
 	private final List<String> list;
 
 	@Record

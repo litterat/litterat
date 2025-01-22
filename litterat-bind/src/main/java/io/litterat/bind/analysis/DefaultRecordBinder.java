@@ -1,9 +1,10 @@
 package io.litterat.bind.analysis;
 
+import io.litterat.annotation.Field;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Union;
 import io.litterat.bind.*;
-import io.litterat.bind.annotation.FieldOrder;
-import io.litterat.bind.analysis.ComponentInfo;
-import io.litterat.bind.analysis.NewFeatures;
+import io.litterat.annotation.FieldOrder;
 
 
 import java.lang.invoke.MethodHandle;
@@ -111,8 +112,8 @@ public class DefaultRecordBinder {
 				try {
 
 					// Only attempt to add children if the union doesn't have child types specified.
-					io.litterat.bind.annotation.Union union = superClass
-							.getAnnotation(io.litterat.bind.annotation.Union.class);
+					Union union = superClass
+							.getAnnotation(Union.class);
 					if (union != null && (union.value() == null || union.value().length == 0)
 							&& !newFeatures.isSealed(superClass)) {
 						DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(superClass);
@@ -132,8 +133,8 @@ public class DefaultRecordBinder {
 			try {
 
 				// Only attempt to add children if the union doesn't have child types specified.
-				io.litterat.bind.annotation.Union union = targetInterface
-						.getAnnotation(io.litterat.bind.annotation.Union.class);
+				Union union = targetInterface
+						.getAnnotation(Union.class);
 				if (union != null && (union.value() == null || union.value().length == 0)
 						&& !newFeatures.isSealed(targetInterface)) {
 					DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(targetInterface);
@@ -159,7 +160,7 @@ public class DefaultRecordBinder {
 	}
 
 	private boolean isRequired(ComponentInfo info) {
-		io.litterat.bind.annotation.Field fieldAnnotation = info.getField();
+		Field fieldAnnotation = info.getField();
 		boolean isRequired = false;
 		if (fieldAnnotation != null) {
 			isRequired = fieldAnnotation.required();
@@ -168,7 +169,7 @@ public class DefaultRecordBinder {
 	}
 
 	private String fieldName(ComponentInfo info) {
-		io.litterat.bind.annotation.Field fieldAnnotation = info.getField();
+		Field fieldAnnotation = info.getField();
 
 		String fieldName = info.getName();
 		if (fieldAnnotation != null) {
@@ -186,13 +187,14 @@ public class DefaultRecordBinder {
 
 		DataClassField component;
 
-		io.litterat.bind.annotation.Field fieldAnnotation = info.getField();
+		Field fieldAnnotation = info.getField();
 
-		if (fieldAnnotation != null && fieldAnnotation.bridge() != null
-				&& fieldAnnotation.bridge() != IdentityBridge.class) {
-
-			component = resolveBridgeField(context, targetClass, info, index);
-		} else if (info.getType() == Optional.class && info.getParamType() != null) {
+//		if (fieldAnnotation != null && fieldAnnotation.bridge() != null
+//				&& fieldAnnotation.bridge() != IdentityBridge.class) {
+//
+//			component = resolveBridgeField(context, targetClass, info, index);
+//		} else
+		if (info.getType() == Optional.class && info.getParamType() != null) {
 
 			component = resolveOptionalField(context, targetClass, info, index);
 		} else if (info.getType() == OptionalInt.class
@@ -262,7 +264,7 @@ public class DefaultRecordBinder {
 	}
 
 	private DataClassField resolveUnionField(DataBindContext context, Class<?> targetClass,
-			io.litterat.bind.annotation.Union union, ComponentInfo info, int index)
+											 Union union, ComponentInfo info, int index)
 			throws NoSuchMethodException, IllegalAccessException, DataBindException {
 		MethodHandle accessor = accessor(info);
 		MethodHandle setter = setter(info);
@@ -312,20 +314,20 @@ public class DefaultRecordBinder {
 		return new DataClassField(index, fieldName, unionClass, dataUnion, isRequired, isPresent, accessorFilter,
 				setter);
 	}
-
+/*
 	private DataClassField resolveBridgeField(DataBindContext context, Class<?> targetClass, ComponentInfo info, int index)
 			throws DataBindException, IllegalAccessException, NoSuchMethodException, SecurityException {
 
-		io.litterat.bind.annotation.Field fieldAnnotation = info.getField();
+		Field fieldAnnotation = info.getField();
 		MethodHandle accessor = accessor(info);
 		MethodHandle setter = setter(info);
 		boolean isRequired = isRequired(info);
 		String fieldName = fieldName(info);
 
-		@SuppressWarnings("rawtypes")
-		Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
+		//@SuppressWarnings("rawtypes")
+		//Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
 
-		ParameterizedType bridgeTypes = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
+		//ParameterizedType bridgeTypes = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
 
 		// ToData has one parameter so this should be safe.
 		Type bridgeDataType = bridgeTypes.getActualTypeArguments()[0];
@@ -399,7 +401,7 @@ public class DefaultRecordBinder {
 		return new DataClassField(index, fieldName, bridgeDataClass, tupleData, isRequired, isPresent, accessor,
 				setter);
 	}
-
+*/
 	private DataClassField resolveOptionalField(DataBindContext context, Class<?> targetClass, ComponentInfo info,
 			int index) throws DataBindException, NoSuchMethodException, IllegalAccessException {
 
@@ -580,8 +582,8 @@ public class DefaultRecordBinder {
 
 		// Does it have an annotation?
 		for (Constructor<?> constructor : constructors) {
-			io.litterat.bind.annotation.Record dataAnnotation = constructor
-					.getAnnotation(io.litterat.bind.annotation.Record.class);
+			Record dataAnnotation = constructor
+					.getAnnotation(Record.class);
 			if (dataAnnotation != null) {
 				return constructor;
 			}
@@ -591,8 +593,8 @@ public class DefaultRecordBinder {
 		Method[] methods = dataClass.getMethods();
 		for (Method method : methods) {
 			if (Modifier.isStatic(method.getModifiers())) {
-				io.litterat.bind.annotation.Record dataAnnotation = method
-						.getAnnotation(io.litterat.bind.annotation.Record.class);
+				Record dataAnnotation = method
+						.getAnnotation(Record.class);
 				if (dataAnnotation != null) {
 					// There must be a matching constructor that matches the parameters of the
 					// static constructor.
@@ -616,8 +618,8 @@ public class DefaultRecordBinder {
 
 		// Does it have an annotation?
 		for (Constructor<?> constructor : constructors) {
-			io.litterat.bind.annotation.Record dataAnnotation = constructor
-					.getAnnotation(io.litterat.bind.annotation.Record.class);
+			Record dataAnnotation = constructor
+					.getAnnotation(Record.class);
 			if (dataAnnotation != null) {
 				return MethodHandles.publicLookup().unreflectConstructor(constructor);
 			}
@@ -627,8 +629,8 @@ public class DefaultRecordBinder {
 		Method[] methods = dataClass.getMethods();
 		for (Method method : methods) {
 			if (Modifier.isStatic(method.getModifiers())) {
-				io.litterat.bind.annotation.Record dataAnnotation = method
-						.getAnnotation(io.litterat.bind.annotation.Record.class);
+				Record dataAnnotation = method
+						.getAnnotation(Record.class);
 				if (dataAnnotation != null) {
 					return MethodHandles.publicLookup().unreflect(method);
 				}
@@ -767,7 +769,8 @@ public class DefaultRecordBinder {
 
 		MethodHandle arrayIndexGetter;
 
-		io.litterat.bind.annotation.Field fieldAnnotation = field.getField();
+		Field fieldAnnotation = field.getField();
+		/*
 		if (fieldAnnotation != null && fieldAnnotation.bridge() != null
 				&& fieldAnnotation.bridge() != IdentityBridge.class) {
 
@@ -820,7 +823,9 @@ public class DefaultRecordBinder {
 			// (values[]):bridgeType -> bridge.toObject( (bridgeData) values[inputIndex] ):bridgeObject
 			arrayIndexGetter = MethodHandles.collectArguments(bridgeToObject, 0, arrayIndexGetter);
 
-		} else if (field.getType() == Optional.class && field.getParamType() != null) {
+		} else
+			*/
+			if (field.getType() == Optional.class && field.getParamType() != null) {
 
 			Class<?> optionalType = (Class<?>) field.getParamType().getActualTypeArguments()[0];
 

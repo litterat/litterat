@@ -15,7 +15,7 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.annotation.Typename;
+import io.litterat.annotation.Typename;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -26,7 +26,7 @@ import java.util.Objects;
  *
  */
 
-@io.litterat.bind.annotation.Record
+@io.litterat.annotation.Record
 @Typename(namespace = "meta", name = "record")
 public class Record implements Element {
 

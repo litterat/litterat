@@ -27,7 +27,7 @@ public class UnionResolver implements TypeResolver<Union, DataClassUnion> {
         return new Union(unionMembers, dataClass.isSealed());
     }
 /*
-        io.litterat.bind.annotation.Union union = targetClass.getAnnotation(io.litterat.bind.annotation.Union.class);
+        io.litterat.annotation.Union union = targetClass.getAnnotation(io.litterat.annotation.Union.class);
         if (union != null) {
             if (union.value() != null && union.value().length > 0) {
 

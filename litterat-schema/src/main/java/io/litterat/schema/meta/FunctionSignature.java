@@ -15,8 +15,10 @@
  */
 package io.litterat.schema.meta;
 
-@io.litterat.bind.annotation.Record
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "signature")
+import io.litterat.annotation.Record;
+
+@Record
+@io.litterat.annotation.Typename(namespace = "meta", name = "signature")
 public class FunctionSignature {
 
 	private final Typename[] arguments;

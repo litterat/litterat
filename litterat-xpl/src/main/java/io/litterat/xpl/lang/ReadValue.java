@@ -15,7 +15,7 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 import io.litterat.schema.meta.Typename;
 
 /**
@@ -25,7 +25,7 @@ import io.litterat.schema.meta.Typename;
  */
 
 @Record
-@io.litterat.bind.annotation.Typename(namespace = "xpl", name = "read_value")
+@io.litterat.annotation.Typename(namespace = "xpl", name = "read_value")
 public class ReadValue implements Expression {
 
 	private final Typename type;

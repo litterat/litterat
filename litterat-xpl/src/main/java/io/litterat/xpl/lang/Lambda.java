@@ -15,11 +15,12 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Typename;
+import io.litterat.annotation.Record;
 import io.litterat.schema.meta.FunctionSignature;
 
 @Record
-@io.litterat.bind.annotation.Typename(namespace = "xpl", name = "lambda")
+@Typename(namespace = "xpl", name = "lambda")
 public class Lambda {
 
 	private final FunctionSignature signature;

@@ -15,7 +15,8 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ import java.util.Objects;
  * required or not. The type can be a Typename, Array, Union, or Record.
  */
 
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "field")
+@Typename(namespace = "meta", name = "field")
 public class Field {
 
 	private final String name;

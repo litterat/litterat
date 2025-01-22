@@ -15,7 +15,7 @@
  */
 package io.litterat.test.bind.union;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 // This is not part of the SealedInterfaceUnion member list so is considered invalid.
 @Record

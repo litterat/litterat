@@ -13,8 +13,8 @@
  */
 package io.litterat.bind.analysis;
 
-import io.litterat.bind.annotation.Field;
-import io.litterat.bind.annotation.Union;
+import io.litterat.annotation.Field;
+import io.litterat.annotation.Union;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.ParameterizedType;

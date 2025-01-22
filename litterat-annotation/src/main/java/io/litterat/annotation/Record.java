@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.bind.annotation;
+package io.litterat.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * Annotations for the type library add additional meta data to a class to provide enough
- * information to generate the correct meta data from the class to create a schema. This is required
- * where the bind library can't get enough information from the class alone.
+ *
+ *
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.CONSTRUCTOR, ElementType.TYPE })
+public @interface Record {
+
+}

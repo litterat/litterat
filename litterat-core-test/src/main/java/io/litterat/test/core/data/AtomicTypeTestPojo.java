@@ -15,7 +15,7 @@
  */
 package io.litterat.test.core.data;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 @Record
 public class AtomicTypeTestPojo {

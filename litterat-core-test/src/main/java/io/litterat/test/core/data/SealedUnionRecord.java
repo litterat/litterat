@@ -17,8 +17,8 @@ package io.litterat.test.core.data;
 
 import java.util.List;
 
-import io.litterat.bind.annotation.Field;
-import io.litterat.bind.annotation.Union;
+import io.litterat.annotation.Field;
+import io.litterat.annotation.Union;
 
 public class SealedUnionRecord {
 

@@ -15,8 +15,8 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.annotation.Record;
-import io.litterat.bind.annotation.Typename;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 
 @Record
 @Typename(namespace = "xpl", name = "expression")

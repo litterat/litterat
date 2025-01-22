@@ -1,7 +1,9 @@
 package io.litterat.schema.meta;
 
-@io.litterat.bind.annotation.Record
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "entry")
+import io.litterat.annotation.Record;
+
+@Record
+@io.litterat.annotation.Typename(namespace = "meta", name = "entry")
 public class Entry {
 
 	private final Typename typename;

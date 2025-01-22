@@ -15,7 +15,7 @@
  */
 package io.litterat.test.core.union;
 
-import io.litterat.bind.annotation.Union;
+import io.litterat.annotation.Union;
 
 @Union({ SealedInterfaceUnionPoint.class, SealedInterfaceUnionCircle.class })
 public interface SealedInterfaceUnion {

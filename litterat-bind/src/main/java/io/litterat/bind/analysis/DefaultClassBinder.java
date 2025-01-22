@@ -2,6 +2,8 @@ package io.litterat.bind.analysis;
 
 
 import io.litterat.annotation.Atom;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Union;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
@@ -79,8 +81,8 @@ public class DefaultClassBinder {
 		if (targetClass.isInterface()) {
 
 			// Interface needs to be marked with @Data or Serializable.
-			io.litterat.bind.annotation.Union unionAnnotation = targetClass
-					.getAnnotation(io.litterat.bind.annotation.Union.class);
+			Union unionAnnotation = targetClass
+					.getAnnotation(Union.class);
 			if (unionAnnotation != null) {
 				return true;
 			}
@@ -95,8 +97,8 @@ public class DefaultClassBinder {
 			}
 
 			// Interface needs to be marked with @Data or Serializable.
-			io.litterat.bind.annotation.Union unionAnnotation = targetClass
-					.getAnnotation(io.litterat.bind.annotation.Union.class);
+			Union unionAnnotation = targetClass
+					.getAnnotation(Union.class);
 			if (unionAnnotation != null) {
 				return true;
 			}
@@ -115,8 +117,8 @@ public class DefaultClassBinder {
 		}
 
 		// if class has annotation this is a tuple.
-		io.litterat.bind.annotation.Record recordAnnotation = targetClass
-				.getAnnotation(io.litterat.bind.annotation.Record.class);
+		Record recordAnnotation = targetClass
+				.getAnnotation(Record.class);
 		if (recordAnnotation != null) {
 			return true;
 		}
@@ -124,7 +126,7 @@ public class DefaultClassBinder {
 		// Check for annotation on constructor.
 		Constructor<?>[] constructors = targetClass.getConstructors();
 		for (Constructor<?> constructor : constructors) {
-			recordAnnotation = constructor.getAnnotation(io.litterat.bind.annotation.Record.class);
+			recordAnnotation = constructor.getAnnotation(Record.class);
 			if (recordAnnotation != null) {
 				return true;
 			}
@@ -134,7 +136,7 @@ public class DefaultClassBinder {
 		Method[] methods = targetClass.getDeclaredMethods();
 		for (Method method : methods) {
 
-			recordAnnotation = method.getAnnotation(io.litterat.bind.annotation.Record.class);
+			recordAnnotation = method.getAnnotation(Record.class);
 			if (Modifier.isStatic(method.getModifiers()) && recordAnnotation != null) {
 				return true;
 			}

@@ -13,20 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.bind.annotation;
+package io.litterat.annotation;
+
+//import io.litterat.bind.DataBridge;
+//import io.litterat.bind.IdentityBridge;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
+/**
+ * Allows specifying the name of a field. Either overriding the name or selecting the name for
+ * parameters where the name cannot be detected.
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
-public @interface Typename {
+@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
+public @interface Field {
 
-	String namespace() default "";
+	// allow overriding the name of the field.
+	String name() default "";
 
-	// specify the model type.
-	String name();
+	// Allow setting that the field is required
+	boolean required() default false;
 
+	//@SuppressWarnings("rawtypes")
+	//Class<? extends DataBridge> bridge() default IdentityBridge.class;
 }

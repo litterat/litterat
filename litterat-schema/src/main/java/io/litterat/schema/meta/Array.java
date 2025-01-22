@@ -15,7 +15,7 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 import java.util.Objects;
 
@@ -29,7 +29,7 @@ import java.util.Objects;
  */
 
 @Record
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "array")
+@io.litterat.annotation.Typename(namespace = "meta", name = "array")
 public class Array implements Element {
 
 	private final Typename type;

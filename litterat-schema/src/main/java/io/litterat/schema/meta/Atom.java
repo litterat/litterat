@@ -15,7 +15,8 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.annotation.Union;
+import io.litterat.annotation.Typename;
+import io.litterat.annotation.Union;
 import io.litterat.schema.meta.atom.AtomAttribute;
 
 import java.util.Arrays;
@@ -27,7 +28,7 @@ import java.util.Objects;
  *
  */
 
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "atom")
+@Typename(namespace = "meta", name = "atom")
 @Union(value = {}, sealed = false)
 public abstract class Atom implements Definition {
 

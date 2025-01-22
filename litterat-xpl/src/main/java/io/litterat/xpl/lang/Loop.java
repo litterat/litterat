@@ -15,8 +15,9 @@
  */
 package io.litterat.xpl.lang;
 
+import io.litterat.annotation.Typename;
 import io.litterat.schema.TypeException;
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 /**
  * Not particularly happy with this loop statement. Should revisit when adding things like a binary
@@ -24,7 +25,7 @@ import io.litterat.bind.annotation.Record;
  */
 
 @Record
-@io.litterat.bind.annotation.Typename(namespace = "xpl", name = "loop")
+@Typename(namespace = "xpl", name = "loop")
 public class Loop extends Statement {
 
 	private final int valSlot;

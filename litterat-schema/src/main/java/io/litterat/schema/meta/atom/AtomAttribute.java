@@ -15,10 +15,10 @@
  */
 package io.litterat.schema.meta.atom;
 
-import io.litterat.bind.annotation.Field;
-import io.litterat.bind.annotation.Record;
-import io.litterat.bind.annotation.Typename;
-import io.litterat.bind.annotation.Union;
+import io.litterat.annotation.Field;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
+import io.litterat.annotation.Union;
 
 @Union
 @Typename(namespace = "schema", name = "atom_attribute")

@@ -1,11 +1,11 @@
 package io.litterat.xpl;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 import io.litterat.schema.meta.Definition;
 import io.litterat.schema.meta.Entry;
 import io.litterat.schema.meta.Typename;
 
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "stream_entry")
+@io.litterat.annotation.Typename(namespace = "meta", name = "stream_entry")
 public class TypeStreamEntry {
 
 	public final static Typename STREAM_ENTRY = new Typename("meta", "stream_entry");

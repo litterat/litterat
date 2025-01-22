@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ * Copyright (c) 2020-2021, Live Media Pty. Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.bind.annotation;
-
-import io.litterat.bind.DataBridge;
-import io.litterat.bind.IdentityBridge;
+package io.litterat.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * Allows specifying the name of a field. Either overriding the name or selecting the name for
- * parameters where the name cannot be detected.
+ * 
+ * Allows setting the data order for any @Data class. By default, immutable classes will use the
+ * order of parameters in the constructor. POJO classes will use alphabetical order of fields
+ * detected. The DataOrder annotation must list all fields found in the class in the expected order.
+ * If any fields are missing or names do not match a runtime error will be returned.
+ *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
-public @interface Field {
+@Target({ ElementType.TYPE })
+public @interface FieldOrder {
 
-	// allow overriding the name of the field.
-	String name() default "";
-
-	// Allow setting that the field is required
-	boolean required() default false;
-
-	@SuppressWarnings("rawtypes")
-	Class<? extends DataBridge> bridge() default IdentityBridge.class;
+	String[] value();
 }

@@ -15,8 +15,8 @@
  */
 package io.litterat.test.bind.data;
 
-import io.litterat.bind.annotation.Record;
-import io.litterat.bind.annotation.Field;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Field;
 
 /**
  * 

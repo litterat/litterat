@@ -15,8 +15,8 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.annotation.Typename;
-import io.litterat.bind.annotation.Union;
+import io.litterat.annotation.Typename;
+import io.litterat.annotation.Union;
 
 /**
  *

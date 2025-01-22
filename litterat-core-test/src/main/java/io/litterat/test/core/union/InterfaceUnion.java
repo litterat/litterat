@@ -15,7 +15,7 @@
  */
 package io.litterat.test.core.union;
 
-import io.litterat.bind.annotation.Union;
+import io.litterat.annotation.Union;
 
 @Union
 public interface InterfaceUnion {

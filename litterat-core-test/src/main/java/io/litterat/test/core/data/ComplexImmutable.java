@@ -15,10 +15,9 @@
  */
 package io.litterat.test.core.data;
 
-import io.litterat.bind.annotation.Field;
-import io.litterat.bind.annotation.Namespace;
-import io.litterat.bind.annotation.Record;
-import io.litterat.bind.annotation.Typename;
+import io.litterat.annotation.Field;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 
 /**
  * 

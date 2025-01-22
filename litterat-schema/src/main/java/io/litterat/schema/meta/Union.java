@@ -15,7 +15,7 @@
  */
 package io.litterat.schema.meta;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 
 @Record
-@io.litterat.bind.annotation.Typename(namespace = "meta", name = "union")
+@io.litterat.annotation.Typename(namespace = "meta", name = "union")
 public class Union implements Element {
 
 

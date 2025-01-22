@@ -15,7 +15,7 @@
  */
 package io.litterat.test.core.union;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 /**
  * This could extend InterfaceUnionPoint, however, that represents another more complex use case.

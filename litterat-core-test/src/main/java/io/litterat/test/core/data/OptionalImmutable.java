@@ -17,7 +17,7 @@ package io.litterat.test.core.data;
 
 import java.util.Optional;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 
 public class OptionalImmutable {
 

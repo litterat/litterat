@@ -15,8 +15,8 @@
  */
 package io.litterat.test.core.data;
 
-import io.litterat.bind.annotation.FieldOrder;
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.FieldOrder;
+import io.litterat.annotation.Record;
 
 /**
  *

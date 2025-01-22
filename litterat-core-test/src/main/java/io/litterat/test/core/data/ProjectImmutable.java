@@ -15,7 +15,7 @@
  */
 package io.litterat.test.core.data;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Record;
 import io.litterat.bind.ToData;
 import io.litterat.test.core.data.ProjectImmutable.ProjectImmutableData;
 

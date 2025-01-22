@@ -1,6 +1,7 @@
 package io.litterat.schema.meta.atom;
 
-import io.litterat.bind.annotation.Record;
+import io.litterat.annotation.Typename;
+import io.litterat.annotation.Record;
 import io.litterat.schema.meta.Atom;
 
 /**
@@ -21,11 +22,11 @@ public class RealAtom extends Atom {
 	}
 
 	@Record
-	@io.litterat.bind.annotation.Typename(namespace = "schema", name = "atom_real")
+	@Typename(namespace = "schema", name = "atom_real")
 	public static class AtomReal extends AtomAttribute {}
 
 	@Record
-	@io.litterat.bind.annotation.Typename(namespace = "schema", name = "atom_ieee756")
+	@Typename(namespace = "schema", name = "atom_ieee756")
 	public static class AtomIEEE756 extends AtomAttribute {}
 
 }

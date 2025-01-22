@@ -55,4 +55,4 @@
 @Namespace("meta")
 package io.litterat.schema.meta;
 
-import io.litterat.bind.annotation.Namespace;
+import io.litterat.annotation.Namespace;
