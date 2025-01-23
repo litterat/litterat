@@ -27,8 +27,7 @@ repositories {
 }
 
 dependencies {
-   //implementation group: 'io.litterat', name: 'litterat-bind', version: '0.5.0'
-
+    implementation project(":litterat-annotation")
     implementation project(":litterat-bind")
     implementation project(":litterat-schema")
     implementation project(":litterat-core")

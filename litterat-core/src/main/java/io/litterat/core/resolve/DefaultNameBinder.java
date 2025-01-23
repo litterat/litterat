@@ -20,9 +20,12 @@ public class DefaultNameBinder implements TypeContextNameBinder {
 		String namespace = clss.getPackageName();
 		String name = clss.getSimpleName();
 
-		Namespace namespaceAnnotation = clss.getPackage().getAnnotation(Namespace.class);
-		if (namespaceAnnotation != null) {
-			namespace = namespaceAnnotation.value();
+		Package pckage = clss.getPackage();
+		if (pckage != null) {
+			Namespace namespaceAnnotation = pckage.getAnnotation(Namespace.class);
+			if (namespaceAnnotation != null) {
+				namespace = namespaceAnnotation.value();
+			}
 		}
 
 		io.litterat.annotation.Typename nameAnnotation = clss

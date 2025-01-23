@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import io.litterat.core.TypeContext;
-import io.litterat.core.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassArray;

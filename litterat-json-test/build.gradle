@@ -29,7 +29,9 @@ repositories {
 }
 
 dependencies {
+   implementation project(":litterat-annotation")
    implementation project(":litterat-bind")
+   implementation project(":litterat-schema")
    implementation project(":litterat-core")
    implementation project(":litterat-core-test")
    implementation project(":litterat-json")
