@@ -13,6 +13,8 @@
  */
 package io.litterat.bind;
 
+import io.litterat.annotation.DataBridge;
+
 /**
  *
  * Default bridge for Enums that converts to/from String.

@@ -1,10 +1,9 @@
 package io.litterat.bind.analysis;
 
+import io.litterat.annotation.*;
 import io.litterat.annotation.Field;
 import io.litterat.annotation.Record;
-import io.litterat.annotation.Union;
 import io.litterat.bind.*;
-import io.litterat.annotation.FieldOrder;
 
 
 import java.lang.invoke.MethodHandle;
@@ -174,8 +173,8 @@ public class DefaultRecordBinder {
 		String fieldName = info.getName();
 		if (fieldAnnotation != null) {
 
-			if (fieldAnnotation.name() != null && !fieldAnnotation.name().isBlank()) {
-				fieldName = fieldAnnotation.name();
+			if (fieldAnnotation.value() != null && !fieldAnnotation.value().isBlank()) {
+				fieldName = fieldAnnotation.value();
 			}
 		}
 
@@ -189,12 +188,11 @@ public class DefaultRecordBinder {
 
 		Field fieldAnnotation = info.getField();
 
-//		if (fieldAnnotation != null && fieldAnnotation.bridge() != null
-//				&& fieldAnnotation.bridge() != IdentityBridge.class) {
-//
-//			component = resolveBridgeField(context, targetClass, info, index);
-//		} else
-		if (info.getType() == Optional.class && info.getParamType() != null) {
+		if (fieldAnnotation != null && fieldAnnotation.bridge() != null
+				&& fieldAnnotation.bridge() != DataBridge.class) {
+
+			component = resolveBridgeField(context, targetClass, info, index);
+		} else if (info.getType() == Optional.class && info.getParamType() != null) {
 
 			component = resolveOptionalField(context, targetClass, info, index);
 		} else if (info.getType() == OptionalInt.class
@@ -314,7 +312,7 @@ public class DefaultRecordBinder {
 		return new DataClassField(index, fieldName, unionClass, dataUnion, isRequired, isPresent, accessorFilter,
 				setter);
 	}
-/*
+
 	private DataClassField resolveBridgeField(DataBindContext context, Class<?> targetClass, ComponentInfo info, int index)
 			throws DataBindException, IllegalAccessException, NoSuchMethodException, SecurityException {
 
@@ -325,9 +323,9 @@ public class DefaultRecordBinder {
 		String fieldName = fieldName(info);
 
 		//@SuppressWarnings("rawtypes")
-		//Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
+		Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
 
-		//ParameterizedType bridgeTypes = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
+		ParameterizedType bridgeTypes = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
 
 		// ToData has one parameter so this should be safe.
 		Type bridgeDataType = bridgeTypes.getActualTypeArguments()[0];
@@ -401,7 +399,7 @@ public class DefaultRecordBinder {
 		return new DataClassField(index, fieldName, bridgeDataClass, tupleData, isRequired, isPresent, accessor,
 				setter);
 	}
-*/
+
 	private DataClassField resolveOptionalField(DataBindContext context, Class<?> targetClass, ComponentInfo info,
 			int index) throws DataBindException, NoSuchMethodException, IllegalAccessException {
 
@@ -770,9 +768,9 @@ public class DefaultRecordBinder {
 		MethodHandle arrayIndexGetter;
 
 		Field fieldAnnotation = field.getField();
-		/*
+
 		if (fieldAnnotation != null && fieldAnnotation.bridge() != null
-				&& fieldAnnotation.bridge() != IdentityBridge.class) {
+				&& fieldAnnotation.bridge() != DataBridge.class) {
 
 			@SuppressWarnings("rawtypes")
 			Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
@@ -823,9 +821,7 @@ public class DefaultRecordBinder {
 			// (values[]):bridgeType -> bridge.toObject( (bridgeData) values[inputIndex] ):bridgeObject
 			arrayIndexGetter = MethodHandles.collectArguments(bridgeToObject, 0, arrayIndexGetter);
 
-		} else
-			*/
-			if (field.getType() == Optional.class && field.getParamType() != null) {
+		} else if (field.getType() == Optional.class && field.getParamType() != null) {
 
 			Class<?> optionalType = (Class<?>) field.getParamType().getActualTypeArguments()[0];
 

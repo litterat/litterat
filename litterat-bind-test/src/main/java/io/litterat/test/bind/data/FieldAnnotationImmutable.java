@@ -21,11 +21,11 @@ import io.litterat.annotation.Field;
 public class FieldAnnotationImmutable {
 
 	// Change name and required.
-	@Field(name = "a", required = true)
+	@Field(value = "a", required = true)
 	private final String ax;
 
 	// Change name only
-	@Field(name = "b")
+	@Field("b")
 	private final String bx;
 
 	// Change required only
@@ -42,8 +42,8 @@ public class FieldAnnotationImmutable {
 	private final String i;
 
 	@Record
-	public FieldAnnotationImmutable(String ax, String b, String c, @Field(name = "d", required = true) String dx,
-			@Field(name = "e") String ex, @Field(required = true) String f, String gx, String hx, String i) {
+	public FieldAnnotationImmutable(String ax, String b, String c, @Field(value = "d", required = true) String dx,
+                                    @Field("e") String ex, @Field(required = true) String f, String gx, String hx, String i) {
 		this.ax = ax;
 		this.bx = b;
 		this.c = c;
@@ -84,12 +84,12 @@ public class FieldAnnotationImmutable {
 		return f;
 	}
 
-	@Field(name = "g", required = true)
+	@Field(value = "g", required = true)
 	public String gx() {
 		return gx;
 	}
 
-	@Field(name = "h")
+	@Field("h")
 	public String hx() {
 		return hx;
 	}

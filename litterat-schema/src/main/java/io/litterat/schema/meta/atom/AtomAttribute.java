@@ -50,7 +50,7 @@ public abstract class AtomAttribute {
 		@Typename(name = "uint8")
 		private final int maxBytes;
 
-		public AtomVariableLength(@Field(name = "min_bytes") int minBytes, @Field(name = "max_bytes") int maxBytes) {
+		public AtomVariableLength(@Field("min_bytes") int minBytes, @Field("max_bytes") int maxBytes) {
 			this.minBytes = minBytes;
 			this.maxBytes = maxBytes;
 		}

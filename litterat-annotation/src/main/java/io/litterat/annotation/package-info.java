@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.annotation;
+
 /**
  * Annotations for the type library add additional meta data to a class to provide enough
  * information to generate the correct meta data from the class to create a schema. This is required
  * where the bind library can't get enough information from the class alone.
  */
+package io.litterat.annotation;

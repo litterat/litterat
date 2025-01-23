@@ -15,6 +15,8 @@
  */
 package io.litterat.bind;
 
+import io.litterat.annotation.DataBridge;
+
 /**
  *
  * The identity bridge. Mainly here as a placeholder for the default bridge in @Field annotation.
@@ -24,12 +26,12 @@ package io.litterat.bind;
 public class IdentityBridge implements DataBridge {
 
 	@Override
-	public Object toData(Object b) throws DataBindException {
+	public Object toData(Object b) {
 		return b;
 	}
 
 	@Override
-	public Object toObject(Object s) throws DataBindException {
+	public Object toObject(Object s) {
 		return s;
 	}
 

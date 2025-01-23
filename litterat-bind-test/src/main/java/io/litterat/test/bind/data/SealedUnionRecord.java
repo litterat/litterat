@@ -24,7 +24,7 @@ public class SealedUnionRecord {
 
 	public static sealed interface SealedShape permits RecordPoint,RecordCircle {};
 
-	public static record RecordPoint(@Field(name = "x") int xx, int y) implements SealedShape {}
+	public static record RecordPoint(@Field("x") int xx, int y) implements SealedShape {}
 
 	public static record RecordCircle(int x, int y, int radius, @Union( { String.class, Integer.class }) Object tag)
 			implements SealedShape{}

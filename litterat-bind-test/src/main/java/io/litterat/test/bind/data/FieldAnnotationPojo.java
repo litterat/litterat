@@ -22,11 +22,11 @@ import io.litterat.annotation.Field;
 public class FieldAnnotationPojo {
 
 	// Change name and required.
-	@Field(name = "a", required = true)
+	@Field(value = "a", required = true)
 	private String ax;
 
 	// Change name only
-	@Field(name = "b")
+	@Field("b")
 	private String bx;
 
 	// Change required only
@@ -57,12 +57,12 @@ public class FieldAnnotationPojo {
 		this.c = c;
 	}
 
-	@Field(name = "d", required = true)
+	@Field(value = "d", required = true)
 	public void setDx(String dx) {
 		this.dx = dx;
 	}
 
-	@Field(name = "e")
+	@Field("e")
 	public void setEx(String ex) {
 		this.ex = ex;
 	}
@@ -108,12 +108,12 @@ public class FieldAnnotationPojo {
 		return f;
 	}
 
-	@Field(name = "g", required = true)
+	@Field(value = "g", required = true)
 	public String getGx() {
 		return gx;
 	}
 
-	@Field(name = "h")
+	@Field("h")
 	public String getHx() {
 		return hx;
 	}

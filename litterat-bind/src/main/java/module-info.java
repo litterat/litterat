@@ -17,5 +17,6 @@ module io.litterat.bind {
 
 	requires org.objectweb.asm;
 	requires org.objectweb.asm.tree;
+
 	requires io.litterat.annotation;
 }

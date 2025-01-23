@@ -17,7 +17,7 @@ package io.litterat.test.bind.data;
 
 import java.util.UUID;
 
-import io.litterat.bind.DataBridge;
+import io.litterat.annotation.DataBridge;
 
 /**
  * 

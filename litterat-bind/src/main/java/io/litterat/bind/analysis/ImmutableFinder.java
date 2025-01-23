@@ -85,7 +85,7 @@ public class ImmutableFinder implements ComponentFinder {
 						component.setField(field);
 					} else {
 						// Add the parameter.
-						component = new ComponentInfo(field.name(), params[x].getType());
+						component = new ComponentInfo(field.value(), params[x].getType());
 						component.setConstructorArgument(x);
 						component.setField(field);
 
@@ -104,7 +104,7 @@ public class ImmutableFinder implements ComponentFinder {
 						component.setUnion(union);
 					} else {
 						// Add the parameter.
-						component = new ComponentInfo(field.name(), params[x].getType());
+						component = new ComponentInfo(field.value(), params[x].getType());
 						component.setConstructorArgument(x);
 						component.setUnion(union);
 

@@ -14,7 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.PACKAGE})
 public @interface Namespace {
-
     // specify the model type.
     String value();
 }

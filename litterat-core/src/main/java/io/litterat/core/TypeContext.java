@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.litterat.annotation.DataBridge;
 import io.litterat.bind.*;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.TypeLibrary;

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.bind;
+package io.litterat.annotation;
 
 public interface DataBridge<D, T> {
 
-	D toData(T b) throws DataBindException;
+	D toData(T b);
 
-	T toObject(D s) throws DataBindException;
+	T toObject(D s);
 }

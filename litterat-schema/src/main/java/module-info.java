@@ -17,5 +17,4 @@ module io.litterat.schema {
 	exports io.litterat.schema.meta.atom;
 
 	requires transitive io.litterat.annotation;
-	requires transitive io.litterat.bind;
 }

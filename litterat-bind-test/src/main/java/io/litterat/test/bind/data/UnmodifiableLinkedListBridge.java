@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.litterat.bind.DataBridge;
+import io.litterat.annotation.DataBridge;
 
 /**
  *

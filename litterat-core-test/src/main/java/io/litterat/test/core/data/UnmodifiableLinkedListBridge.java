@@ -15,7 +15,7 @@ package io.litterat.test.core.data;
 
 import java.util.*;
 
-import io.litterat.bind.DataBridge;
+import io.litterat.annotation.DataBridge;
 
 /**
  *

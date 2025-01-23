@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.litterat.annotation.DataBridge;
 import io.litterat.bind.analysis.DefaultClassBinder;
 
 public class DataBindContext {

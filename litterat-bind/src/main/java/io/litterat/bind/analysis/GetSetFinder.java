@@ -126,13 +126,13 @@ public class GetSetFinder implements ComponentFinder {
 			public int compare(ComponentInfo o1, ComponentInfo o2) {
 
 				String o1Name = o1.getName();
-				if (o1.getField() != null && !o1.getField().name().strip().equals("")) {
-					o1Name = o1.getField().name();
+				if (o1.getField() != null && !o1.getField().value().strip().equals("")) {
+					o1Name = o1.getField().value();
 				}
 
 				String o2Name = o2.getName();
-				if (o2.getField() != null && !o2.getField().name().strip().equals("")) {
-					o2Name = o2.getField().name();
+				if (o2.getField() != null && !o2.getField().value().strip().equals("")) {
+					o2Name = o2.getField().value();
 				}
 
 				return o1Name.compareTo(o2Name);

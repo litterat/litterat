@@ -31,7 +31,6 @@ repositories {
 
 dependencies {
     implementation project(":litterat-annotation")
-    implementation project(":litterat-bind")
 }
 
 

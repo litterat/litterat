@@ -23,7 +23,7 @@ import io.litterat.annotation.Record;
 public class UnmodifiableLinkedList {
 
 	//@Field(name = "list", bridge = UnmodifiableLinkedListBridge.class)
-	@Field(name ="list")
+	@Field("list")
 	private final List<String> list;
 
 	@Record

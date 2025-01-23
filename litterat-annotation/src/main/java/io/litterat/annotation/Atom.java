@@ -21,11 +21,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * Used to tag a class as being an Atom data type. An Atom must contain
  * a constructor that accepts a single primitive value and implement
  * ToData which uses the same data type.
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.CONSTRUCTOR, ElementType.TYPE, ElementType.METHOD })
