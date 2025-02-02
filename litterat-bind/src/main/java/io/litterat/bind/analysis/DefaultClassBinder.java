@@ -18,9 +18,7 @@ import java.util.Collection;
 public class DefaultClassBinder {
 
 
-	private final boolean createDefinitions;
-
-	private final NewFeatures newFeatures;
+    private final NewFeatures newFeatures;
 
 	// private final TypeContextNameBinder nameBinder;
 
@@ -30,10 +28,9 @@ public class DefaultClassBinder {
 	private final DefaultArrayBinder arrayBinder;
 
 
-	public DefaultClassBinder(boolean createDefinitions) {
-		this.createDefinitions = createDefinitions;
+	public DefaultClassBinder() {
 
-		newFeatures = new NewFeatures();
+        newFeatures = new NewFeatures();
 		recordBinder = new DefaultRecordBinder();
 		atomBinder = new DefaultAtomBinder();
 		unionBinder = new DefaultUnionBinder();
@@ -46,11 +43,12 @@ public class DefaultClassBinder {
 		DataClass result = null;
 
 		// If this is a schema first situation then this will return a definition and the job is to bind to
-		// it. If it is a code first situation then we expect this to throw an exception and we need to
+		// it. If it is a code first situation then we expect this to throw an exception, and we need to
 		// first create the definition and then bind the class to that definition.
 
-
-		if (isRecord(targetClass)) {
+		if (isProxy(targetClass)) {
+			result = recordBinder.resolveProjection(context, targetClass);
+		} else if (isRecord(targetClass)) {
 			result = recordBinder.resolveRecord(context, targetClass);
 		} else if (isUnion(targetClass)) {
 			result = unionBinder.resolveUnion(context, targetClass, parameterizedType);
@@ -117,8 +115,7 @@ public class DefaultClassBinder {
 		}
 
 		// if class has annotation this is a tuple.
-		Record recordAnnotation = targetClass
-				.getAnnotation(Record.class);
+		Record recordAnnotation = targetClass.getAnnotation(Record.class);
 		if (recordAnnotation != null) {
 			return true;
 		}
@@ -143,21 +140,13 @@ public class DefaultClassBinder {
 		}
 
 		// Class has implemented ToData so exports/imports a data class.
-		if (ToData.class.isAssignableFrom(targetClass)) {
-			return true;
-		}
-
-		return false;
-	}
+        return false;
+    }
 
 	private boolean isProxy(Class<?> targetClass) {
 		// Class has implemented ToData so exports/imports a data class.
-		if (ToData.class.isAssignableFrom(targetClass)) {
-			return true;
-		}
-
-		return false;
-	}
+        return ToData.class.isAssignableFrom(targetClass);
+    }
 
 	private boolean isArray(Class<?> targetClass) {
 

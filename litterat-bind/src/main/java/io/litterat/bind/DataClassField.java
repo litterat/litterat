@@ -106,6 +106,12 @@ public class DataClassField {
 		return isRequired;
 	}
 
+	/**
+	 * Using the same naming as Optional.isPresent, returns a method handle that checks
+	 * if the specific field has a non-null value. Will always return true for primitive types.
+	 *
+	 * @return MethodHandle that has signature, boolean isPresent(Object o);
+	 */
 	public MethodHandle isPresent() {
 		return isPresent;
 	}

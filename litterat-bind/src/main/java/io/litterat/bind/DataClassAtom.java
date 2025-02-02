@@ -31,24 +31,18 @@ public class DataClassAtom extends DataClass {
 	// Converts from dataClass -> typeClass.
 	private final MethodHandle toObject;
 
-	protected DataClassAtom(Class<?> targetType, Class<?> serialType, MethodHandle toData,
-			MethodHandle toObject, DataClassType dataType) {
-		super(targetType, dataType);
+	public DataClassAtom(Class<?> targetType, Class<?> serialType, MethodHandle toData,
+			MethodHandle toObject) {
+		super(targetType);
 
 		this.dataClass = serialType;
 		this.toData = toData;
 		this.toObject = toObject;
 	}
 
-	// An Atom with conversion functions. e.g. String <--> UUID
-	public DataClassAtom(Class<?> targetType, Class<?> dataClass, MethodHandle toData,
-			MethodHandle toObject) {
-		this(targetType, dataClass, toData, toObject, DataClassType.ATOM);
-	}
-
 	// An Atom uses identity function for toData/toObject and construct.
 	public DataClassAtom(Class<?> targetType) {
-		this(targetType, targetType, identity(targetType), identity(targetType), DataClassType.ATOM);
+		this(targetType, targetType, identity(targetType), identity(targetType));
 	}
 
 	private static MethodHandle identity(Class<?> targetType) {

@@ -48,7 +48,7 @@ public class DefaultUnionBinder {
 				return new DataClassUnion(targetClass, unionMembers, unionAnnotation.sealed());
 
 			} else {
-				return new DataClassUnion(targetClass);
+				return new DataClassUnion(targetClass,  new Class[0], false);
 			}
 		}
 

@@ -1,12 +1,14 @@
 package io.litterat.core.resolve;
 
-import java.lang.reflect.Type;
-
 import io.litterat.annotation.Namespace;
 import io.litterat.core.TypeContext;
 import io.litterat.core.TypeContextNameBinder;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Typename;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is the default method of converting from a code first Class to a schema typename.
@@ -14,6 +16,8 @@ import io.litterat.schema.meta.Typename;
  * or Namespace annotations.
  */
 public class DefaultNameBinder implements TypeContextNameBinder {
+
+	private final Map<String,Package> namespaceMap = new HashMap<>();
 
 	@Override
 	public Typename resolve(TypeContext context, Class<?> clss, Type type) throws TypeException {
@@ -47,6 +51,37 @@ public class DefaultNameBinder implements TypeContextNameBinder {
 		}
 
 		return new Typename(namespace, name);
+	}
+
+	@Override
+	public Class<?> resolve(TypeContext context, Typename typename) throws TypeException {
+
+		String namespace = typename.namespace();
+		String name = typename.name();
+		Class<?> result = null;
+
+        try {
+            result = Class.forName(namespace+"." + name);
+        } catch (ClassNotFoundException e) {
+            // ignore
+        }
+
+		Package pkg = namespaceMap.get(namespace);
+		if (pkg != null) {
+			namespace = pkg.getName();
+			try {
+				result = Class.forName(namespace+"." + name);
+			} catch (ClassNotFoundException e) {
+				// ignore
+			}
+		}
+
+        return result;
+	}
+
+	@Override
+	public void registerPackage(String namespace, Package pkg) {
+		namespaceMap.put(namespace,pkg);
 	}
 
 }

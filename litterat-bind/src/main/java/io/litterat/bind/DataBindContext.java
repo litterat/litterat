@@ -15,6 +15,9 @@
  */
 package io.litterat.bind;
 
+import io.litterat.annotation.DataBridge;
+import io.litterat.bind.analysis.DefaultClassBinder;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -22,9 +25,6 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
-
-import io.litterat.annotation.DataBridge;
-import io.litterat.bind.analysis.DefaultClassBinder;
 
 public class DataBindContext {
 
@@ -64,7 +64,7 @@ public class DataBindContext {
 
 	private DataBindContext(Builder builder) {
 
-		this.dataClassResolver = new DefaultClassBinder(true);
+		this.dataClassResolver = new DefaultClassBinder();
 
 		try {
 			registerAtom(Boolean.class);
@@ -92,10 +92,6 @@ public class DataBindContext {
 			throw new IllegalArgumentException();
 		}
 
-	}
-
-	public void registerAtom(Class<?> targetClass) throws DataBindException {
-		register(targetClass, new DataClassAtom(targetClass));
 	}
 
 	public DataClass getDescriptor(Class<?> targetClass) throws DataBindException {
@@ -128,6 +124,11 @@ public class DataBindContext {
 		checkExists(targetClass);
 
 		descriptors.put(targetClass, descriptor);
+	}
+
+
+	public void registerAtom(Class<?> targetClass) throws DataBindException {
+		register(targetClass, new DataClassAtom(targetClass));
 	}
 
 	public DataClassAtom registerAtom(Class<?> targetClass, DataBridge<?, ?> bridge) throws DataBindException {

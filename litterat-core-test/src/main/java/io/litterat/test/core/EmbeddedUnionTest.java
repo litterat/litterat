@@ -15,19 +15,22 @@
  */
 package io.litterat.test.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.litterat.bind.*;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import io.litterat.core.TypeContext;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
+import io.litterat.core.TypeContext;
 import io.litterat.test.core.union.EmbeddedUnion;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class EmbeddedUnionTest {
 
@@ -43,7 +46,6 @@ public class EmbeddedUnionTest {
 	}
 
 	@Test
-	@Disabled
 	public void checkDescriptor() throws Throwable {
 
 		DataClass descriptor = context.getDescriptor(EmbeddedUnion.class);

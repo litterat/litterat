@@ -3,7 +3,7 @@ package io.litterat.bind.analysis;
 import io.litterat.annotation.Atom;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClassAtom;
-import io.litterat.bind.EnumBridge;
+import io.litterat.bind.bridge.EnumStringBridge;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -29,11 +29,8 @@ public class DefaultAtomBinder {
 			Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class));
 
 	private boolean isPrimitive(Class<?> targetClass) {
-		if (targetClass.isPrimitive() || WRAPPER_TYPES.contains(targetClass)) {
-			return true;
-		}
-		return false;
-	}
+        return targetClass.isPrimitive() || WRAPPER_TYPES.contains(targetClass);
+    }
 
 	public DataClassAtom resolveAtom(DataBindContext context, Class<?> targetClass)
 			throws CodeAnalysisException {
@@ -63,8 +60,7 @@ public class DefaultAtomBinder {
 
 					// TODO Should do additional checks. Is return type same as constructor type.
 					// Also should check for ToData interface implementation or @Atom on specific
-					// method as could be different
-					// ways to say which method is toData.
+					// method as could be different ways to say which method is toData.
 					Method toDataMethod = targetClass.getDeclaredMethod(TODATA_METHOD);
 
 					MethodHandle toData = MethodHandles.lookup().unreflect(toDataMethod);
@@ -122,13 +118,13 @@ public class DefaultAtomBinder {
 					.getAnnotation(Atom.class);
 			if (targetClass.isEnum() && enumAtom != null) {
 
-				EnumBridge bridge = new EnumBridge(targetClass);
+				EnumStringBridge bridge = new EnumStringBridge(targetClass);
 
 				MethodHandle toObject = MethodHandles.lookup()
-						.findVirtual(EnumBridge.class, TOOBJECT_METHOD, MethodType.methodType(Enum.class, String.class))
+						.findVirtual(EnumStringBridge.class, TOOBJECT_METHOD, MethodType.methodType(Enum.class, String.class))
 						.bindTo(bridge).asType(MethodType.methodType(targetClass, String.class));
 				MethodHandle toData = MethodHandles.lookup()
-						.findVirtual(EnumBridge.class, TODATA_METHOD, MethodType.methodType(String.class, Enum.class))
+						.findVirtual(EnumStringBridge.class, TODATA_METHOD, MethodType.methodType(String.class, Enum.class))
 						.bindTo(bridge).asType(MethodType.methodType(String.class, targetClass));
 
 				descriptor = new DataClassAtom(targetClass, String.class, toData, toObject);

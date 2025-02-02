@@ -25,15 +25,14 @@ import java.util.Optional;
  */
 public class DataClassRecord extends DataClass {
 
-	// Method handle to convert object to data object.
-	// Converts from typeClass -> dataClasss.
-	// private final MethodHandle toData;
+	private final boolean hasProjection;
 
-	// Method handle to convert data object to target object.
-	// Converts from dataClass -> typeClass.
-	// private final MethodHandle toObject;
 
-	// Optional empty constructor for data object.
+	private final Class<?> systemClass;
+
+	private final boolean isMutable;
+
+	// Empty constructor/acquirer for data object mutable objects.
 	private final Optional<MethodHandle> creator;
 
 	// Constructor for the data object.
@@ -42,32 +41,38 @@ public class DataClassRecord extends DataClass {
 	// All fields in the projected class.
 	private final DataClassField[] fields;
 
-	public DataClassRecord( Class<?> targetType, MethodHandle creator, MethodHandle constructor,
-			DataClassField[] fields) {
-		super(targetType, DataClassType.RECORD);
+	public DataClassRecord( Class<?> targetType, Class<?> systemClass, boolean isMutable, MethodHandle creator, MethodHandle constructor,  DataClassField[] fields) {
+		super(targetType);
 
-		// this.toData = toData;
-		// this.toObject = toObject;
+		this.hasProjection = targetType != systemClass;
+		this.systemClass = systemClass;
 		this.fields = fields;
+		this.isMutable = isMutable;
 		this.creator = Optional.ofNullable(creator);
 		this.constructor = constructor;
 	}
 
-	public DataClassRecord(Class<?> targetType, MethodHandle constructor,
-			DataClassField[] fields) {
-		this(targetType, null, constructor, fields);
+	public Class<?> systemClass() {
+		return systemClass;
 	}
 
-//	/**
-//	 * @return A MethodHandle that has the signature T embed(Object[] values).
-//	 */
+	public boolean hasProjection() {
+		return hasProjection;
+	}
+
+	public boolean isMutable() {
+		return isMutable;
+	}
+	/**
+	 * @return A MethodHandle that has the signature T toObject( P values).
+	 */
 //	public MethodHandle toObject() {
 //		return toObject;
 //	}
-//
-//	/**
-//	 * @return A MethodHandle that has the signature Object[] project(T object)
-//	 */
+
+	/**
+	 * @return A MethodHandle that has the signature P toData(T object)
+	 */
 //	public MethodHandle toData() {
 //		return toData;
 //	}
@@ -94,4 +99,5 @@ public class DataClassRecord extends DataClass {
 	public String toString() {
 		return "DataClassRecord [ typeClass=" + typeClass().getName() + ", fields=" + Arrays.toString(fields) + "]";
 	}
+
 }

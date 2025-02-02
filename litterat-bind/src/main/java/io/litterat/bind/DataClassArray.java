@@ -92,7 +92,7 @@ public class DataClassArray extends DataClass {
 	public DataClassArray(Class<?> targetType, DataClass arrayDataClass,
 			MethodHandle constructor, MethodHandle size, MethodHandle iterator, MethodHandle get, MethodHandle put)
 			throws NoSuchMethodException, IllegalAccessException {
-		super(targetType, DataClassType.ARRAY);
+		super(targetType);
 
 		this.arrayDataClass = arrayDataClass;
 		this.constructor = constructor;

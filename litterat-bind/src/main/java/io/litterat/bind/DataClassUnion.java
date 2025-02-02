@@ -16,6 +16,7 @@
 package io.litterat.bind;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 
@@ -38,14 +39,10 @@ public class DataClassUnion extends DataClass {
 	private final boolean isSealed;
 
 	public DataClassUnion(Class<?> targetType, Class<?>[] members, boolean isSealed) {
-		super( targetType, DataClassType.UNION);
+		super( targetType);
 
-		this.memberTypes = members;
+		this.memberTypes = Objects.requireNonNull(members);
 		this.isSealed = isSealed;
-	}
-
-	public DataClassUnion(Class<?> targetType) {
-		this(targetType, new Class[0], false);
 	}
 
 	public Class<?>[] memberTypes() {

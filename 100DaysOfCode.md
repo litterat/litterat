@@ -3,6 +3,15 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
+Immediate issues
+ - Revisit DataClass and data projections.
+ - Record projections and if the projected class is listed as a DataClass
+ - Field projections
+ - ToData interface. Not particularly nice or flexible.
+ - Interfaces instead of MethodHandles?
+ - 
+
+
 Next steps list. A general list of things that could be done next in no particular order.
 
  litterat-core
@@ -11,7 +20,6 @@ Next steps list. A general list of things that could be done next in no particul
  - Create bind error examples and test edge cases. To be completed as issues found.
  - Review model arrays and look at multi-dimensional arrays as part of schema design.
  - Investigate how Annotations might work.
- - Registering packages
  
  litterat-xpl
  - Review the lang package and SchemaResolver to match more correctly to the model.

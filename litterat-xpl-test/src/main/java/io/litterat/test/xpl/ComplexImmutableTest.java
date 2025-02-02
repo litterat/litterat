@@ -15,15 +15,14 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.schema.TypeException;
 import io.litterat.test.core.data.ComplexImmutable;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 public class ComplexImmutableTest {
 
@@ -42,6 +41,7 @@ public class ComplexImmutableTest {
 		out.close();
 
 		TypeInputStream in = new TypeInputStream(buffer);
+		in.typeMap().context().registerPackage("test", ComplexImmutable.class.getPackage());
 		ComplexImmutable p2 = in.readObject();
 
 		Assertions.assertNotNull(p2);

@@ -1,17 +1,38 @@
 package io.litterat.bind.analysis;
 
-import io.litterat.annotation.*;
+import io.litterat.annotation.DataBridge;
 import io.litterat.annotation.Field;
+import io.litterat.annotation.FieldOrder;
 import io.litterat.annotation.Record;
-import io.litterat.bind.*;
-
+import io.litterat.annotation.Union;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassProjection;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
+import io.litterat.bind.ToData;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.stream.Collectors;
 
 /**
@@ -30,10 +51,61 @@ public class DefaultRecordBinder {
 		this.newFeatures = new NewFeatures();
 	}
 
+	public DataClassProjection resolveProjection(DataBindContext context, Class<?> targetClass) throws DataBindException {
+		// If the class if exporting/importing a dataclass.
+		if (!ToData.class.isAssignableFrom(targetClass)) {
+			throw new DataBindException("Unexpected");
+		}
 
+		try {
+			Class<?> dataType = findToDataClass(targetClass);
+
+			// We require that a constructor be present that takes the data class as input.
+			MethodHandle toObject = MethodHandles.publicLookup()
+					.unreflectConstructor(targetClass.getConstructor(dataType));
+
+			// The class implements ToData so get the method.
+			MethodHandle toData = MethodHandles.publicLookup()
+					.unreflect(targetClass.getMethod(TODATA_METHOD));
+
+			// The constructor and data components are copied from the data class.
+			return new DataClassProjection(targetClass, dataType, toData, toObject);
+
+		} catch (NoSuchMethodException | IllegalAccessException ex) {
+			throw new DataBindException(String.format(
+					"Failed to get data descriptor. Failed to find constructor for %s", targetClass.getName()));
+		}
+	}
+
+	private Class<?> findToDataClass(Class<?> targetClass) throws DataBindException {
+		if (!ToData.class.isAssignableFrom(targetClass)) {
+			throw new DataBindException("Unexpected");
+		}
+
+		for (Type genericInterface : targetClass.getGenericInterfaces()) {
+
+			if (genericInterface instanceof ParameterizedType
+					&& ((ParameterizedType) genericInterface).getRawType() == ToData.class) {
+
+				// ToData has one parameter so this should be safe.
+				return (Class<?>) ((ParameterizedType) genericInterface).getActualTypeArguments()[0];
+			}
+		}
+
+		throw new DataBindException(String.format(
+				"Failed to get data descriptor. Failed to find constructor for %s", targetClass.getName()));
+	}
+
+	/**
+	 * Return a DataClassRecord for the specified targetClass in the provided DataBindContext.
+	 *
+	 * @param context DataBindContext the that targetClass will be resolved to a DataClassRecord
+	 * @param targetClass the target class to create the DataClassRecord
+	 * @return DataClassRecord for the targetClass
+	 * @throws DataBindException where the DataClassRecord can't be successfully created.
+	 */
 	public DataClassRecord resolveRecord(DataBindContext context, Class<?> targetClass)
 			throws DataBindException {
-
 		try {
 			DataClassRecord descriptor = resolveClassRecord(context, targetClass);
 
@@ -44,13 +116,20 @@ public class DefaultRecordBinder {
 			// Same applies to super classes that are abstract.
 			registerUnionSubclasses(context, targetClass);
 
-			return new DataClassRecord(descriptor.typeClass(), descriptor.creator().orElse(null),
+			return new DataClassRecord(descriptor.typeClass(), descriptor.systemClass(), descriptor.isMutable() ,descriptor.creator().orElse(null),
 					descriptor.constructor(), descriptor.fields());
 		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | DataBindException e) {
 			throw new DataBindException("Failed to resolve", e);
 		}
 	}
 
+	/**
+	 * Performs the main work of collecting the information for the fields for the DataClassRecord
+	 *
+	 * @param context DataBindContext that the DataClassRecord will be added.
+	 * @param targetClass targetClass that must be a Record/Pojo/class that has multiple fields.
+	 * @return DataClassRecord for the targetClass
+	 */
 	private DataClassRecord resolveClassRecord(DataBindContext context, Class<?> targetClass)
 			throws IllegalAccessException, NoSuchMethodException, SecurityException, DataBindException {
 		// This is a data class so need to decide what is/isn't data.
@@ -99,9 +178,19 @@ public class DefaultRecordBinder {
 			// ignore.
 		}
 
-		return new DataClassRecord(targetClass, creator, constructor, dataComponents);
+		// This is a data class so toObject/toData is identity functions.
+//		MethodHandle toObject = MethodHandles.identity(targetClass);
+//		MethodHandle toData = MethodHandles.identity(targetClass);
+
+		return new DataClassRecord(targetClass, targetClass, false, creator, constructor, dataComponents);
 	}
 
+	/**
+	 * Search through any super-classes of the target class and add this class any Union parent classes
+	 *
+	 * @param context DataBindContext for that the target class is being registered.
+	 * @param targetClass target class
+	 */
 	private void registerUnionSubclasses(DataBindContext context, Class<?> targetClass) {
 		Class<?> superClass = targetClass;
 		while ((superClass = superClass.getSuperclass()) != null) {
@@ -117,7 +206,9 @@ public class DefaultRecordBinder {
 							&& !newFeatures.isSealed(superClass)) {
 						DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(superClass);
 
-						targetUnion.addMemberType(targetClass);
+						if (!targetUnion.isMemberType(targetClass)) {
+							targetUnion.addMemberType(targetClass);
+						}
 					}
 				} catch (Throwable t) {
 					// ignore.
@@ -126,6 +217,13 @@ public class DefaultRecordBinder {
 		}
 	}
 
+	/**
+	 * Search through any implemented interfaces for the target class and if a Union has been declared
+	 * add this to the member list.
+	 *
+	 * @param context DataBindContext for that the target class is being registered.
+	 * @param targetClass target class
+	 */
 	private void registerUnionInterfaces(DataBindContext context, Class<?> targetClass) {
 		Class<?>[] interfaces = targetClass.getInterfaces();
 		for (Class<?> targetInterface : interfaces) {
@@ -138,7 +236,9 @@ public class DefaultRecordBinder {
 						&& !newFeatures.isSealed(targetInterface)) {
 					DataClassUnion targetUnion = (DataClassUnion) context.getDescriptor(targetInterface);
 
-					targetUnion.addMemberType(targetClass);
+					if (!targetUnion.isMemberType(targetClass)) {
+						targetUnion.addMemberType(targetClass);
+					}
 				}
 			} catch (Throwable t) {
 				// ignore.
@@ -181,6 +281,18 @@ public class DefaultRecordBinder {
 		return fieldName;
 	}
 
+	/**
+	 * Returns the DataClassField for the targetClass. Depending on the type of field build the DataClassField:
+	 * - DataBridge - use the DataBridge as part of toData/toObject
+	 * - Optional - use isPresent and unwrap/wrap for toData/toObject
+	 * - OptionalInt, OptionalLong, OptionalDouble - use isPresent and unwrap/wrap.
+	 * - Union -
+	 * @param context DataBindContext that the DataClassRecord is being resoled. Recursively find member DataClass.
+	 * @param targetClass target class for that the field is being found.
+	 * @param info The ComponentInfo for the field that is being created.
+	 * @param index The field index
+	 * @return DataClassField for the ComponentField of the record.
+	 */
 	private DataClassField resolveField(DataBindContext context, Class<?> targetClass, ComponentInfo info, int index)
 			throws NoSuchMethodException, IllegalAccessException, DataBindException {
 
@@ -190,23 +302,21 @@ public class DefaultRecordBinder {
 
 		if (fieldAnnotation != null && fieldAnnotation.bridge() != null
 				&& fieldAnnotation.bridge() != DataBridge.class) {
-
+			// The field annotation has a DataBridge
 			component = resolveBridgeField(context, targetClass, info, index);
 		} else if (info.getType() == Optional.class && info.getParamType() != null) {
-
+			// If the input is Optional wrap the isPresent
 			component = resolveOptionalField(context, targetClass, info, index);
 		} else if (info.getType() == OptionalInt.class
 				|| info.getType() == OptionalLong.class | info.getType() == OptionalDouble.class) {
-
+			// Similar to Optional, use specific methods for isPresent
 			component = resolveOptionalNumberField(context, targetClass, info, index);
-
 		} else if (info.getUnion() != null) {
-
+			//
 			component = resolveUnionField(context, targetClass, info.getUnion(), info, index);
-
 		} else {
+			// Use basic information to build the DataClassField
 			component = resolveSimpleField(context, targetClass, info, index);
-
 		}
 
 		return component;
@@ -214,6 +324,7 @@ public class DefaultRecordBinder {
 
 	/**
 	 * A simple field is the last option for resolveField and assumes a known atomic or compound type.
+	 *
 	 * @param context The TypeContext that maps the TypeLibrary to the DataClass.
 	 * @param targetClass The target record class that the field is a member.
 	 * @param info ComponentInfo is the information collected about the field.
@@ -286,10 +397,10 @@ public class DefaultRecordBinder {
 			unionTypes[z] = clss;
 
 			/*
-			 * if (unionTypes[z] instanceof DataClassUnion || unionTypes[z] instanceof DataClassArray) { //
-			 * Embedded unions will require more work to decide on how valid other unions or // arrays would be.
-			 * Unions with unknown type sets is problematic. If another union // member set is known it might be
-			 * ok to add all children to the parent. Something // for future. throw new DataBindException(
+			 * if (unionTypes[z] instanceof DataClassUnion || unionTypes[z] instanceof DataClassArray) {
+			 * Embedded unions will require more work to decide on how valid other unions or arrays would be.
+			 * Unions with unknown type sets is problematic. If another union member set is known it might be
+			 * ok to add all children to the parent. Something for future. throw new DataBindException(
 			 * "Embedded union types can not include other unions or arrays"); }
 			 */
 		}
@@ -322,7 +433,7 @@ public class DefaultRecordBinder {
 		boolean isRequired = isRequired(info);
 		String fieldName = fieldName(info);
 
-		//@SuppressWarnings("rawtypes")
+		@SuppressWarnings("rawtypes")
 		Class<? extends DataBridge> bridgeClass = fieldAnnotation.bridge();
 
 		ParameterizedType bridgeTypes = (ParameterizedType) bridgeClass.getGenericInterfaces()[0];
@@ -660,7 +771,7 @@ public class DefaultRecordBinder {
 		MethodHandle create = createEmbedConstructor(dataClass, dataConstructor, fields, dataFields);
 
 		// (serialClass, Object[]) -> serialClass.setValues(Object[x]);
-		MethodHandle setters = createEmbedSetters(create, dataClass, fields, dataFields);
+		MethodHandle setters = createEmbedSetters(dataClass, fields, dataFields);
 
 		// (Object[], Object[]) -> ctor(Object[]).setvalues(Object[])
 		MethodHandle createAndSet = MethodHandles.collectArguments(setters, 0, create);
@@ -716,9 +827,9 @@ public class DefaultRecordBinder {
 	}
 
 	/**
-	 * Creates a MethodHandle that takes an Object[] as input and calls any field setters.
+	 * Creates a MethodHandle that takes an Object[] as input and calls any field setters for mutable objects.
 	 */
-	private MethodHandle createEmbedSetters(MethodHandle ctorSignature, Class<?> dataClass, List<ComponentInfo> fields,
+	private MethodHandle createEmbedSetters(Class<?> dataClass, List<ComponentInfo> fields,
 			DataClassField[] dataFields)
 			throws IllegalAccessException, NoSuchMethodException, SecurityException, CodeAnalysisException {
 
@@ -757,10 +868,18 @@ public class DefaultRecordBinder {
 		return result;
 	}
 
-	// The constructor uses an Object[] as the carrier to either call a constructor and/or call the
-	// required setters of an object. Some field types such as bridges, Optional, OptionalInt requires
-	// special handling to prepare the value prior to calling the constructor or setter. This makes the
-	// required adaptations.
+	/**
+	 * The constructor uses an Object[] as the carrier to either call a constructor and/or call the
+	 * required setters of an object. Some field types such as bridges, Optional, OptionalInt requires
+	 * special handling to prepare the value prior to calling the constructor or setter. This makes the
+	 * required adaptations.
+	 *
+	 * @param field The field information that needs to be adapted. Includes reflection information
+	 * @param dataField The DataClassField that has the data field information.
+	 * @param arrayGetter MethodHandle with (value[],x):Object -> value[x]
+	 * @param index index of the field
+	 * @return MethodHandle with (values[]) -> values[inputIndex]) and can perform additional modifications.
+	 */
 	private MethodHandle dataArrayToObject(ComponentInfo field, DataClassField dataField, MethodHandle arrayGetter,
 			MethodHandle index)
 			throws CodeAnalysisException, IllegalAccessException, NoSuchMethodException, SecurityException {
