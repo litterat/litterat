@@ -15,17 +15,17 @@
  */
 package io.litterat.test.bind.data;
 
-import java.util.List;
-
 import io.litterat.annotation.Field;
 import io.litterat.annotation.Record;
 
+import java.util.List;
+
+@Record
 public class UnmodifiableLinkedList {
 
 	@Field(value = "list", bridge = UnmodifiableLinkedListBridge.class)
 	private final List<String> list;
 
-	@Record
 	public UnmodifiableLinkedList(List<String> list) {
 		this.list = list;
 	}

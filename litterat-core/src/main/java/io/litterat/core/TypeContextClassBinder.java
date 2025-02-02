@@ -1,10 +1,10 @@
 package io.litterat.core;
 
-import java.lang.reflect.Type;
-
 import io.litterat.bind.DataClass;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Typename;
+
+import java.lang.reflect.Type;
 
 /**
  * 

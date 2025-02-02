@@ -15,24 +15,21 @@
  */
 package io.litterat.test.core;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import io.litterat.core.TypeContext;
-import io.litterat.schema.TypeException;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
+import io.litterat.core.TypeContext;
+import io.litterat.schema.TypeException;
 import io.litterat.test.core.data.ProjectImmutable;
 import io.litterat.test.core.data.ProjectImmutable.ProjectImmutableData;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Disabled
+import java.util.Arrays;
+import java.util.Map;
+
 public class ProjectImmutableTest {
 
 	final static int TEST_X = 1;

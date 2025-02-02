@@ -78,6 +78,132 @@ All serialization solutions (format and metadata) must have enough information p
 
 For the rest of this document, we're interested in studying these "data/schema complete" solutions. To do this, we must first look at schemas. With a strong understanding of schemas and the structures that underly the data, we'll have a strong basis to define data systems. If there's a chicken and egg problems between data and schemas, it is definitely that the schema should come first (although that is not often the case in practice).
 
+## Embedded Projection
+
+The concept of the [embedded-projection](https://mail.openjdk.java.net/pipermail/amber-dev/2020-August/006445.html) pairs relates to the conversion of information between two domains; one richer than the other. A useful property of ep-pairs is that once a conversion from the richer domain to the other domain occurs the values can be mapped back and forth without further loss of information. This is a good framework from which to view
+the conversion of Java's object orientated domain to the serialization or data domain. We can view Java's object orientated domain complete with methods as being "live", while the data domain without methods as being "dead". A simple definition of ep-paris, is that there is a subset S(small) for any class B(big) that we want to convert.  We want to define two functions, **project** and **embed** to go to and from S (the structure to serialize) and B (the target object).
+
+```
+project: B -> S
+embed: S -> B
+```
+
+Looking closer at the two domains, Java's domain provides a very rich language of both data and methods defined by 
+the language specification. While the data domain is less complex, we need a way of building a concept of
+a serialization data domain that can act as the proto-model for more than one serialization format. One way to 
+investigate the data domain is to use first principles and find a real world analogy and find
+other analogies in computer science.
+
+From a structural point of view serialization is similar to the description of a string of beads. The string of beads
+is a single line of beads (atoms) that can be organised in many different orders. If we use letters to represent
+different beads (atoms), there is a limited number of ways to describe the beads. The following beads could be described
+as array[A].
+
+```
+-----A-A-A-A-A-A-A-----
+```
+
+A more complex record could be Record( A, C, D, C ):
+
+```
+----[-A-C-D-C-]---------
+```
+
+Using this model of beads there is a limited number of elements required to describe the structure of the
+data domain.
+
+ * atom : An atom or atomic type is a data type natively understood by the serialization format. 
+ * record: A record is an ordered set of atoms. Required/optional fields included.
+ * array: A repeated list of elements listed here.
+ * union: A choice of what follows (e.g. A or B).
+
+These same elements can be found in numerous data formats as well as in the Backus-Naur form of specifying
+grammars. All data is effectively a string of beads, so there keeping the data domain as simple as possible
+is useful. There are at least two concepts that require further investigation as to if they should be added
+to the above:
+
+ * map: Often available as a native fascility be data formats.
+ * tag: Having the ability to comment or attach additional information to some data.
+
+
+
+However, the data domain can be classified simply (see further discussion) as:
+
+```
+element: atom | record | array
+atom: primitive
+record: element*
+array: element[]
+union: choice of element[]
+```
+
+This simple definition of the data domain fits reasonably well to a wide variety of data structures and encoding. The 
+samples provided by the library include array and map data structures. However, this could easily apply to most 
+serialization encodings, and text based encodings such as XML and JSON. To convert between the two domains, ep-pairs 
+for each of tuple, array and atom must be provided by Java. If this can be achieved in a simple and consistent way then 
+the same library can be used for many different data encoding libraries.
+
+So, from a programming point of view, we're attempting to project the rich Java language onto a limited set of 
+capabilities provided by the serialization domain. In the above, we describe Java as being richer that the serialization
+domain. However, that is not always the case, in some cases they differ and the serialization domain can support 
+capabilities not supported by the Java domain. Union types are one such example that don't have a comparable concept. 
+For instance a field in serialization that can be the union of integer or string. 
+
+The litterat bind library task is to create a mapping and interface between the Java domain and a model of the serialization
+domain that can then be written to the required data format. As such, the serialization domain is attempting to be a superset
+of the capabilities of various serialization data formats. 
+
+The serialization domain is made up of various concepts. At its core though, serialization is the ability to write data in a single
+ordered line. While the potential combinations of order are infitie, the actual data format restrains the possible data 
+and then if present, a schema confines the format further.
+
+As a domain, serialization has a number of concepts that can be easily mapped to similar aspects of Java.
+The Java record, an immutable object with fields maps very cleanly to most concepts of a record or data structure
+in most serialization format (XML being one obvious counter example that contains both attributes and fields). The more complex Java
+objects, such as abstract classes, classes with private or volatile fields, unmatched getters/setters and
+other such situations do not. For these, there needs to be a strategy developed so that these classes are made to have the
+features of a record. Various solutions also require high performance and low heap allocation (to reduce garbage collection).
+
+Atomic types are those that have a corresponding type in the serialization domain. But it is also possible
+that a type requires a translation into the serialization domain. For instance, an Integer would be able to be 
+understood and serialized directly, however, a Decimal, Date, UUID, may need to be converted to a String to be
+written to serialization. The decision for a serialization library to directly support more complex types is up
+to the particular library. In addition, the developer of the application may want the flexibility to choose the
+conversion.
+
+Using the concept of embedded-projection, the atomic type requires the ability to optionally convert an atomic
+type to a value understood by the data domain. 
+
+```java
+interface Projection<T,D> {
+    D toData(T value);
+    T toValue(D data);
+}
+```
+
+The projection could be applied to a value type or more specifically to an individual field.
+
+
+A possible interface for a record is to provide a very simple interface to construct/deconstruct an object.
+
+```java
+interface Bridge<T> {
+   <T> construct( Object[] params);
+   Object[] deconstruct( T t );
+   List<Field> fields();
+}
+
+class Field {
+    String name;
+    Type fieldType;
+}
+```
+
+It is possible to use MethodHandles and other tricks to generate a binding between these interface methods
+to both construct and deconstruct and object. Additionally, parameter names and types also need to be provided.
+
+
+
 
 ## Schema theory and background
 
@@ -658,10 +784,177 @@ An issue with specifying date-time formats is which pattern definition to use. T
 As dates and timestamps are often encoded using an underlying type (string, int, long) they often don't need their own data type. Avro uses [Logical Types](https://avro.apache.org/docs/1.8.0/spec.html#Logical+Types) to define the dates and timestamps.
 
 
+### Projected Embedded Pairs for Objects
 
+The concept of the [embedded-projection](https://mail.openjdk.java.net/pipermail/amber-dev/2020-August/006445.html) 
+pairs relates to the conversion of information between two domains; one richer than the other. A useful property of 
+ep-pairs is that once a conversion from the richer domain to the other domain occurs the values can be mapped back 
+and forth without further loss of information. This is a good framework from which to view the conversion of Java's 
+object orientated domain to the serialization or data domain. We can view Java's object orientated domain complete 
+with methods as being "live", while the data domain without methods as being "dead". A simple definition of ep-paris, 
+is that there is a subset S(small) for any class B(big) that we want to convert.  We want to define two functions,
+**project** and **embed** to go to and from S (the structure to serialize) and B (the target object).
+
+```
+project: B -> S
+embed: S -> B
+```
+
+There's a few issues to deal with in the case of working with Java Objects.
+
+- The projected S data may have a different form to that of the B object. So the B object used by the application
+  has a different set of fields to that of S. It may be that there is internal state that must not be leaked or
+  some data which needs to combined or separated as it is projected to S. This gives rise to the concept of 
+  `S toData(B b)` and `B toObject(S s)` functions. It is likely that in most cases these are the identity function,
+  so it raises the question of if from a performance perspective if they should always be called. It may be that
+  calling if/else would be slow and the compiler can optimise the code out.
+- On the embed side, many immutable classes will be constructed by a constructor that takes the specific arguments.
+  This can be wrapped in a `S contruct(Object[] params)` method. However, there's also mutable classes that may have
+  object pools that would be created via `S acquire()` followed by calls to field setters.  
+
+
+```java
+void writeRecord(DataClassRecord dataClass, Object data) {
+    if (dataClass.hasProjection()) {
+        data = dataClass.toData(data);
+    }
+    DataClassField[] fields = dataRecord.fields();
+    for (fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
+        DataClassField field = fields[fieldIndex];
+        if (field.isPresent(data)) {
+            DataClass fieldDataClass = field.dataClass();
+            // Recursive call toMap which calls toData()
+            Object fieldValue = toData(fieldDataClass, field.get(object));
+            writeValue(fieldValue);
+        }
+    }
+}
+```
+
+Expanding the ideas above, reading a record is more complex, however using MethodHandles this could easily be
+streamlined to remove all if statements by building a specific function for the type. Both `isMutable` and 
+`hasProjection` have are final.
+
+```java 
+Object readRecord(DataClassRecord dataRecord, Object object) {
+    DataClassField[] fields = dataRecord.fields();
+    if (dataClass.isMutable()) {
+        v = dataRecord.construct().invoke();
+        for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+            DataClassField field = fields[fieldIndex];
+            Object fieldValue = readValue(field);
+
+            // Recursively convert maps back to objects.
+            if (fv != null) {
+                DataClass fieldDataClass = field.dataClass();
+                field.set(v, readValue(fieldValue));
+            }
+        }
+    } else {
+        // Collect fieldValues and call constructor
+        Object[] fieldValues = new Object[fields.length];
+        for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+            DataClassField field = fields[fieldIndex];
+            Object fieldValue = readValue(field);
+
+            // Recursively convert maps back to objects.
+            if (fv != null) {
+                DataClass fieldDataClass = field.dataClass();
+                fieldValues[fieldIndex] = toObject(fieldDataClass, fieldValue);
+            }
+        }
+        v = dataRecord.constructor().invoke(fieldValues);
+    }
     
+    if (dataRecord.hasProjection()) {
+        v = dataRecord.toObject().invoke(v);
+    }
+    return v;
+}
+```
 
 
-  
+### Garbage Collection and High Performance Serialization
+
+It is common that there is a requirement for serialization to have features of 
+high performance and create little garbage in the serialization process. In some applications such as 
+algorithmic trading, this requirement is a necessity. As such the application designer will make choices in the 
+schema and data that ensure this requirement can be met. Object pools that allow the re-use of objects is a common
+feature of these systems. High performance systems usually prefer simple types over objects in Java as they are
+allocated as part of the object. Enums are also safe as there is limited allocation.
+
+#### Records
+
+With features like Java record classes, which are designed to be immutable, it is impossible
+to use object pools. However, record classes are also preferred in situations where high performance is not a
+requirement. As such there's two very different styles of projected embedded pairs required to 
+interact with these classes. 
+
+Focusing in on the interaction with the Litterat bind library and the DataClassRecord, there's the
+basic concept of toData and toObject capabilities that use Object[] as the carrier of the data to either 
+construct (toObject) or deconstruct (toData) objects.
+
+```
+toData: extract(export(object))
+toObject: import(inject(data))
+``` 
+
+#### toData
+
+The current implementation of MapMapper involves invoking toData() which in many cases will be an identity function and 
+return the same object (or for a projected toData interface implementation a different object). To allow each member to 
+also allow toData to be called, a check for isPresent (null check) followed by field.get(object), which recursively 
+calls toMap. Finally, the map.put(field.name(), fv) is equivalent to writing the object to stream.
+
+```
+Object data = dataClass.toData().invoke(object);
+Map<String, Object> map = new HashMap<>();
+
+DataClassField[] fields = dataRecord.fields();
+for (fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
+    DataClassField field = fields[fieldIndex];
+    if (field.isPresent(object)) {
+        DataClass fieldDataClass = field.dataClass();
+        // Recursive call toMap which calls toData()
+        Object fv = toMap(fieldDataClass, field.get(object));
+        map.put(field.name(), fv);
+    }
+}
+
+v = map;
+```
+
+Other than the allocation of the output HashMap, there is no allocation when calling toData(). Another alternative 
+would be to have the library return Object[] of values that have already had toData() called on each field. The 
+Object[] would need to be allocated and while it does make the toData/toObject interfaces symmetric, it would hide 
+more magic to the implementer of serialization. The allocation of Object[] could be passed in to the toData allowing 
+the serialization implementer to pool Object[]. But this creates more work for the benefit of a nice interface.
+
+#### toObject
+
+The construction of the object follows a different path where an Object[] is built up with the components
+of the class and then the constructor is invoked to create the class.
+
+```
+Map<String, Object> map = (Map<String, Object>) data;
+DataClassField[] fields = dataRecord.fields();
+Object[] construct = new Object[fields.length];
+for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+    DataClassField field = fields[fieldIndex];
+    Object fieldValue = map.get(field.name());
+
+    // Recursively convert maps back to objects.
+    if (fv != null) {
+        DataClass fieldDataClass = field.dataClass();
+        construct[fieldIndex] = toObject(fieldDataClass, fieldValue);
+    }
+}
+
+v = dataRecord.constructor().invoke(construct);
+return dataRecord.toObject().invoke(v);
+```
+
+The constructor() 
+
 
    

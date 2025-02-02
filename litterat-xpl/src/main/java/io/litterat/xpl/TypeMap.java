@@ -15,11 +15,6 @@
  */
 package io.litterat.xpl;
 
-import java.lang.reflect.Type;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.litterat.core.TypeContext;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Array;
@@ -32,6 +27,11 @@ import io.litterat.schema.meta.Record;
 import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.resolve.SchemaResolver;
 import io.litterat.xpl.util.IntObjectHashMap;
+
+import java.lang.reflect.Type;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TypeMap {
 
@@ -152,10 +152,15 @@ public class TypeMap {
 		TypeMapEntry entry = getEntry(def.streamId());
 		if (entry == null) {
 
+			// Register the typename and definition to the context.
+			// will attempt to find a native class to bind to.
+			context.register(def.typename(),def.definition());
+
 			// Generate the reader/writer.
 			entry = resolver.map(def.typename());
 
 			register(def.streamId(), entry);
+
 		} else {
 			if (!def.typename().equals(entry.typename())) {
 				throw new TypeException("No match for type on stream");

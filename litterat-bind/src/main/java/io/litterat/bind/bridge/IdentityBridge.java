@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.bind;
+package io.litterat.bind.bridge;
 
 import io.litterat.annotation.DataBridge;
 
@@ -22,8 +22,7 @@ import io.litterat.annotation.DataBridge;
  * The identity bridge. Mainly here as a placeholder for the default bridge in @Field annotation.
  */
 
-@SuppressWarnings("rawtypes")
-public class IdentityBridge implements DataBridge {
+public class IdentityBridge implements DataBridge<Object,Object> {
 
 	@Override
 	public Object toData(Object b) {

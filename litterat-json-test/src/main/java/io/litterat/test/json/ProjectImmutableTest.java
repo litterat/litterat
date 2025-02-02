@@ -15,16 +15,13 @@
  */
 package io.litterat.test.json;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.core.TypeContext;
 import io.litterat.json.JsonMapper;
 import io.litterat.test.core.data.ProjectImmutable;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Disabled
 public class ProjectImmutableTest {
 
 	final static int TEST_X = 1;
@@ -46,13 +43,13 @@ public class ProjectImmutableTest {
 
 		System.out.println("json: " + json);
 
-		ProjectImmutable object = JsonMapper.fromJson(json, ProjectImmutable.class);
-
-		// Validate
+		Object object = JsonMapper.fromJson(json, ProjectImmutable.class);
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ProjectImmutable);
-		Assertions.assertEquals(TEST_X, object.x());
-		Assertions.assertEquals(TEST_Y, object.y());
+
+		ProjectImmutable p = (ProjectImmutable) object;
+		Assertions.assertEquals(TEST_X, p.x());
+		Assertions.assertEquals(TEST_Y, p.y());
 
 	}
 

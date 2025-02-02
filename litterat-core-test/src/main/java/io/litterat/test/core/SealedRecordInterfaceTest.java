@@ -15,27 +15,25 @@
  */
 package io.litterat.test.core;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import io.litterat.bind.DataBindException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import io.litterat.core.TypeContext;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
+import io.litterat.core.TypeContext;
 import io.litterat.test.core.data.SealedRecordInterface.RecordCircle;
 import io.litterat.test.core.data.SealedRecordInterface.RecordPoint;
 import io.litterat.test.core.data.SealedRecordInterface.RecordRectangle;
 import io.litterat.test.core.data.SealedRecordInterface.SealedShape;
 import io.litterat.test.core.data.SealedRecordInterface.SealedShapeList;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class SealedRecordInterfaceTest {
 
@@ -64,7 +62,6 @@ public class SealedRecordInterfaceTest {
 	}
 
 	@Test
-	@Disabled
 	public void checkDescriptor() throws Throwable {
 
 		DataClassUnion descriptor = (DataClassUnion) context.getDescriptor(SealedShape.class);

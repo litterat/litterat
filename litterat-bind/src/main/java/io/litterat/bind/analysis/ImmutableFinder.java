@@ -18,11 +18,15 @@ package io.litterat.bind.analysis;
 import io.litterat.annotation.Field;
 import io.litterat.annotation.Union;
 import io.litterat.bind.DataBindException;
-
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -31,7 +35,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 public class ImmutableFinder implements ComponentFinder {
 
@@ -407,7 +415,7 @@ public class ImmutableFinder implements ComponentFinder {
 	 * in the GETFIELD instruction must have previously been used and found in the constructor.
 	 *
 	 * @param clss
-	 * @param fieldMap
+	 * @param fields
 	 * @param method
 	 * @return field name
 	 * @throws NoSuchMethodException

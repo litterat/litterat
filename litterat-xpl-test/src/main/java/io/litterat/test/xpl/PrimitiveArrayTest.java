@@ -15,17 +15,15 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.schema.TypeException;
 import io.litterat.test.core.data.PrimitiveArray;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 public class PrimitiveArrayTest {
 
@@ -34,7 +32,6 @@ public class PrimitiveArrayTest {
 	PrimitiveArray test = new PrimitiveArray(TEST);
 
 	@Test
-	@Disabled
 	public void testWriteAndReadSimpleArray() throws IOException, TypeException {
 
 		// Test writing out a Point.

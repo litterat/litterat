@@ -15,13 +15,6 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.core.TypeContext;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Meta;
@@ -30,6 +23,12 @@ import io.litterat.test.core.data.UUIDBridge;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.TypeOutputStream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class UUIDBridgeTest {
 
@@ -58,7 +57,7 @@ public class UUIDBridgeTest {
 
 		// Test writing out a Point.
 		byte[] buffer = new byte[500];
-		TypeOutputStream out = new TypeOutputStream(new TypeMap(TypeContext.builder().build()), buffer);
+		TypeOutputStream out = new TypeOutputStream(new TypeMap(context), buffer);
 		out.writeObject(test);
 		out.close();
 

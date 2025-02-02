@@ -15,7 +15,15 @@
  */
 package io.litterat.bind.mapper;
 
-import io.litterat.bind.*;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassProjection;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,18 +58,18 @@ public class MapMapper {
 		try {
 			Object v = null;
             switch (dataClass) {
-                case DataClassAtom dataClassAtom -> v = dataClassAtom.toData().invoke(object);
-
-/*			} else if (dataClass instanceof DataClassProxy) {
-				DataClassProxy dataProxy = (DataClassProxy) dataClass;
-				v = toMap(dataProxy.toData().invoke(object));
- */
+                case DataClassProjection dataClassProjection -> {
+                    Object projection = dataClassProjection.toData().invoke(object);
+                    v = toMap(context.getDescriptor(dataClassProjection.dataClass()), projection);
+                }
+                case DataClassAtom dataClassAtom -> {
+                    v = dataClassAtom.toData().invoke(object);
+                }
                 case DataClassRecord dataRecord -> {
-
+                    //Object data = dataRecord.toData().invoke(object);
                     Map<String, Object> map = new HashMap<>();
-
                     DataClassField[] fields = dataRecord.fields();
-                    for (fieldIndex = 0; fieldIndex < dataRecord.fields().length; fieldIndex++) {
+                    for (fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
                         DataClassField field = fields[fieldIndex];
 
                         if (field.isPresent(object)) {
@@ -75,15 +83,13 @@ public class MapMapper {
                 }
                 case DataClassArray arrayClass -> {
 
-                    Object arrayData = object;
-                    int length = (int) arrayClass.size().invoke(arrayData);
+                    int length = (int) arrayClass.size().invoke(object);
                     Object[] outputArray = new Object[length];
-                    Object iterator = arrayClass.iterator().invoke(arrayData);
+                    Object iterator = arrayClass.iterator().invoke(object);
 
                     DataClass arrayDataClass = arrayClass.arrayDataClass();
-
                     for (int x = 0; x < length; x++) {
-                        Object av = arrayClass.get().invoke(arrayData, iterator);
+                        Object av = arrayClass.get().invoke(object, iterator);
                         outputArray[x] = toMap(arrayDataClass, av);
                     }
 
@@ -112,7 +118,7 @@ public class MapMapper {
             }
 			return v;
 		} catch (Throwable t) {
-			throw new DataBindException(String.format("Failed to convert %s to Map", dataClass.typeClass()), t);
+            throw new DataBindException(String.format("Failed to convert %s to Map", dataClass.typeClass()), t);
 		}
 	}
 
@@ -132,12 +138,13 @@ public class MapMapper {
 		try {
 			Object v = null;
             switch (dataClass) {
-                case DataClassAtom dataClassAtom -> v = dataClassAtom.toObject().invoke(data);
-
-/*			} else if (dataClass instanceof DataClassProxy) {
-				DataClassProxy dataProxy = (DataClassProxy) dataClass;
-				v = dataProxy.toObject().invoke(toObject(dataProxy.proxyDataClass(), data));
- */
+                case DataClassProjection dataClassProjection -> {
+                    v = toObject(context.getDescriptor(dataClassProjection.dataClass()), data);
+                    v = dataClassProjection.toObject().invoke(v);
+                }
+                case DataClassAtom dataClassAtom -> {
+                    v = dataClassAtom.toObject().invoke(data);
+                }
                 case DataClassRecord dataRecord -> {
                     Map<String, Object> map = (Map<String, Object>) data;
                     DataClassField[] fields = dataRecord.fields();
@@ -158,6 +165,7 @@ public class MapMapper {
                     }
 
                     v = dataRecord.constructor().invoke(construct);
+                    // v = dataRecord.toObject().invoke(v);
                 }
                 case DataClassArray arrayClass -> {
 

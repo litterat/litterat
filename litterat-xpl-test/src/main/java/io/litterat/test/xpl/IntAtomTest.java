@@ -13,18 +13,16 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.core.TypeContext;
 import io.litterat.schema.TypeException;
 import io.litterat.test.core.data.IntAtom;
 import io.litterat.test.core.data.IntAtomData;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 public class IntAtomTest {
 
@@ -35,7 +33,6 @@ public class IntAtomTest {
 	TypeContext context;
 
 	// Disabled until after refactor
-	@Disabled
 	@Test
 	public void testWriteAndReadMixedImmutable() throws IOException, TypeException {
 

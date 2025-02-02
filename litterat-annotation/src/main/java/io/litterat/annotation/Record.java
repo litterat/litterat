@@ -28,4 +28,5 @@ import java.lang.annotation.Target;
 @Target({ ElementType.CONSTRUCTOR, ElementType.TYPE })
 public @interface Record {
 
+    boolean isMutable() default false;
 }

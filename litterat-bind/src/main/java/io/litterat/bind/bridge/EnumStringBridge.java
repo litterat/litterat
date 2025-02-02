@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.litterat.bind;
+package io.litterat.bind.bridge;
 
 import io.litterat.annotation.DataBridge;
 
@@ -22,11 +22,11 @@ import io.litterat.annotation.DataBridge;
  */
 
 @SuppressWarnings("rawtypes")
-public class EnumBridge implements DataBridge<String, Enum> {
+public class EnumStringBridge implements DataBridge<String, Enum> {
 
 	private final Class enumType;
 
-	public EnumBridge(Class enumType) {
+	public EnumStringBridge(Class enumType) {
 		this.enumType = enumType;
 	}
 

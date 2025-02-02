@@ -1,11 +1,19 @@
 package io.litterat.core;
 
-import java.lang.reflect.Type;
-import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
-
 import io.litterat.annotation.DataBridge;
-import io.litterat.bind.*;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
+import io.litterat.core.resolve.ArrayResolver;
+import io.litterat.core.resolve.AtomResolver;
+import io.litterat.core.resolve.CodeAnalysisException;
+import io.litterat.core.resolve.DefaultNameBinder;
+import io.litterat.core.resolve.RecordResolver;
+import io.litterat.core.resolve.UnionResolver;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.TypeLibrary;
 import io.litterat.schema.TypeLibraryState;
@@ -13,7 +21,10 @@ import io.litterat.schema.TypeNotDefinedException;
 import io.litterat.schema.meta.Definition;
 import io.litterat.schema.meta.Meta;
 import io.litterat.schema.meta.Typename;
-import io.litterat.core.resolve.*;
+
+import java.lang.reflect.Type;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The TypeContext binds the Class/DataClass pair provided by the DataBindContext with the Typename/Definition
@@ -113,6 +124,8 @@ public class TypeContext {
 
 			register(Meta.FLOAT, Float.class, Float.class);
 			register(Meta.FLOAT, float.class, float.class);
+
+			register(Meta.STRING, String.class, String.class);
         } catch (TypeException e) {
             throw new RuntimeException(e);
         }
@@ -127,6 +140,9 @@ public class TypeContext {
 		return typeLibrary;
 	}
 
+	public void registerPackage(String name, Package pkg) {
+		nameBinder.registerPackage(name, pkg);
+	}
 	public DataClass getDescriptor(Class<?> targetClass) throws TypeException {
 		// Use the erased type if type parameters not provided.
 		return getDescriptor(targetClass, targetClass);
@@ -173,6 +189,29 @@ public class TypeContext {
 		}
 		return typename;
 	}
+
+	public DataClass register(Typename typename, Definition definition) throws TypeException {
+
+		// Register the schema.
+		typeLibrary.register(typename, definition);
+
+		// Find a class
+		Class<?> targetClass = nameBinder.resolve(this, typename);
+		if (targetClass == null) {
+			throw new TypeException("Failed to find system class for :" + typename);
+		}
+
+		// Get the DataClass.
+        try {
+            DataClass dataClass = dataBindContext().getDescriptor(targetClass);
+			typenameClass.putIfAbsent(typename, targetClass);
+			classTypename.putIfAbsent(targetClass, typename);
+			return dataClass;
+		} catch (DataBindException e) {
+            throw new TypeException("Failed to find data class for :" + targetClass.getName());
+        }
+
+    }
 
 	public DataClass register(Typename typename, Class<?> targetClass, Type parameterizedType) throws TypeException {
 

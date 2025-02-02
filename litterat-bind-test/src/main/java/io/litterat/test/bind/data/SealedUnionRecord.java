@@ -15,21 +15,21 @@
  */
 package io.litterat.test.bind.data;
 
-import java.util.List;
-
 import io.litterat.annotation.Field;
 import io.litterat.annotation.Union;
 
+import java.util.List;
+
 public class SealedUnionRecord {
 
-	public static sealed interface SealedShape permits RecordPoint,RecordCircle {};
+	public sealed interface SealedShape permits RecordPoint,RecordCircle {};
 
-	public static record RecordPoint(@Field("x") int xx, int y) implements SealedShape {}
+	public record RecordPoint(@Field("x") int xx, int y) implements SealedShape {}
 
-	public static record RecordCircle(int x, int y, int radius, @Union( { String.class, Integer.class }) Object tag)
+	public record RecordCircle(int x, int y, int radius, @Union( { String.class, Integer.class }) Object tag)
 			implements SealedShape{}
 
 	// List of union type.
-	public static record SealedShapeList(List<SealedShape> list, SealedShape[] array) {}
+	public record SealedShapeList(List<SealedShape> list, SealedShape[] array) {}
 
 }
