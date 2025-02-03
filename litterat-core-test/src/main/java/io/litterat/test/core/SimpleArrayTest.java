@@ -26,9 +26,9 @@ import io.litterat.core.TypeContext;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.schema.meta.Meta;
-import io.litterat.test.core.data.SimpleArray;
-import io.litterat.test.core.data.SimpleImmutable;
-import io.litterat.test.core.data.UUIDBridge;
+import io.litterat.test.data.SimpleArray;
+import io.litterat.test.data.SimpleImmutable;
+import io.litterat.test.data.UUIDBridge;
 
 public class SimpleArrayTest {
 

@@ -1,6 +1,12 @@
 package io.litterat.core.resolve;
 
-import io.litterat.bind.*;
+import io.litterat.annotation.ToData;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 import io.litterat.core.TypeContext;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Array;

@@ -16,7 +16,7 @@
 package io.litterat.test.xpl;
 
 import io.litterat.schema.TypeException;
-import io.litterat.test.core.data.ComplexImmutable;
+import io.litterat.test.data.ComplexImmutable;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;

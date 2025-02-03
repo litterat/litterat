@@ -26,8 +26,8 @@ import io.litterat.core.TypeContext;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.schema.meta.Meta;
-import io.litterat.test.core.data.SimpleUUIDImmutable;
-import io.litterat.test.core.data.UUIDBridge;
+import io.litterat.test.data.SimpleUUIDImmutable;
+import io.litterat.test.data.UUIDBridge;
 
 public class UUIDBridgeTest {
 

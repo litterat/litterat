@@ -15,25 +15,24 @@
  */
 package io.litterat.test.core;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import io.litterat.bind.DataBindException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import io.litterat.core.TypeContext;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.core.union.AbstractUnion;
-import io.litterat.test.core.union.AbstractUnionCircle;
-import io.litterat.test.core.union.AbstractUnionList;
-import io.litterat.test.core.union.AbstractUnionRectangle;
+import io.litterat.core.TypeContext;
+import io.litterat.test.data.union.AbstractUnionCircle;
+import io.litterat.test.data.union.AbstractUnionList;
+import io.litterat.test.data.union.AbstractUnionRectangle;
+import io.litterat.test.data.union.AbstractUnion;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class AbstractUnionTest {
 

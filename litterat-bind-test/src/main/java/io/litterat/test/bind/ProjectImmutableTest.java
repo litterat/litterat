@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.data.ProjectImmutable;
+import io.litterat.test.data.ProjectImmutable;
 
 public class ProjectImmutableTest {
 

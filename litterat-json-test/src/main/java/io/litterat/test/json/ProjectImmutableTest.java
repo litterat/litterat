@@ -17,7 +17,7 @@ package io.litterat.test.json;
 
 import io.litterat.core.TypeContext;
 import io.litterat.json.JsonMapper;
-import io.litterat.test.core.data.ProjectImmutable;
+import io.litterat.test.data.ProjectImmutable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

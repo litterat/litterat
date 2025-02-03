@@ -9,7 +9,7 @@ Immediate issues
  - Field projections
  - ToData interface. Not particularly nice or flexible.
  - Interfaces instead of MethodHandles?
- - 
+ - Re-look at array binding. Allow user defined wrappers.
 
 
 Next steps list. A general list of things that could be done next in no particular order.

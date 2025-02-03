@@ -15,20 +15,19 @@
  */
 package io.litterat.test.json;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.UUID;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Meta;
+import io.litterat.test.data.SimpleUUIDImmutable;
+import io.litterat.test.data.UUIDBridge;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.core.TypeContext;
-import io.litterat.schema.TypeException;
-import io.litterat.schema.meta.Meta;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.core.data.SimpleUUIDImmutable;
-import io.litterat.test.core.data.UUIDBridge;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.UUID;
 
 public class UUIDBridgeTest {
 

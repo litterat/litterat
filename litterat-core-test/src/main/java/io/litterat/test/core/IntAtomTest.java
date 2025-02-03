@@ -24,8 +24,8 @@ import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.core.data.IntAtom;
-import io.litterat.test.core.data.IntAtomData;
+import io.litterat.test.data.IntAtom;
+import io.litterat.test.data.IntAtomData;
 
 public class IntAtomTest {
 

@@ -1,6 +1,7 @@
 package io.litterat.core;
 
 import io.litterat.annotation.DataBridge;
+import io.litterat.annotation.Namespace;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
@@ -138,6 +139,13 @@ public class TypeContext {
 
 	public TypeLibrary library() {
 		return typeLibrary;
+	}
+
+	public void registerPackage(Package pkg) {
+		Namespace namespace = pkg.getAnnotation(Namespace.class);
+		if (namespace != null) {
+			nameBinder.registerPackage(namespace.value(), pkg);
+		}
 	}
 
 	public void registerPackage(String name, Package pkg) {

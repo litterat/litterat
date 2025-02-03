@@ -15,13 +15,12 @@
  */
 package io.litterat.test.json;
 
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.test.data.ComplexImmutable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import io.litterat.core.TypeContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.core.data.ComplexImmutable;
 
 public class ComplexImmutableTest {
 

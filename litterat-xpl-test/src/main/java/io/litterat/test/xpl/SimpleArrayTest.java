@@ -15,17 +15,16 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-import java.util.Arrays;
-
+import io.litterat.schema.TypeException;
+import io.litterat.test.data.SimpleArray;
+import io.litterat.test.data.SimpleImmutable;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.schema.TypeException;
-import io.litterat.test.core.data.SimpleArray;
-import io.litterat.test.core.data.SimpleImmutable;
-import io.litterat.xpl.TypeInputStream;
-import io.litterat.xpl.TypeOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class SimpleArrayTest {
 

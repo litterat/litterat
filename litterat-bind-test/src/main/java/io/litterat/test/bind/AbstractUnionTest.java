@@ -30,10 +30,10 @@ import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.union.AbstractUnion;
-import io.litterat.test.bind.union.AbstractUnionCircle;
-import io.litterat.test.bind.union.AbstractUnionList;
-import io.litterat.test.bind.union.AbstractUnionRectangle;
+import io.litterat.test.data.union.AbstractUnion;
+import io.litterat.test.data.union.AbstractUnionCircle;
+import io.litterat.test.data.union.AbstractUnionList;
+import io.litterat.test.data.union.AbstractUnionRectangle;
 
 public class AbstractUnionTest {
 

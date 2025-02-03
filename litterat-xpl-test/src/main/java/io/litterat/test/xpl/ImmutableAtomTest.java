@@ -14,8 +14,8 @@
 package io.litterat.test.xpl;
 
 import io.litterat.schema.TypeException;
-import io.litterat.test.core.data.ImmutableAtom;
-import io.litterat.test.core.data.SimpleEnum;
+import io.litterat.test.data.ImmutableAtom;
+import io.litterat.test.data.SimpleEnum;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;

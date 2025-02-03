@@ -30,6 +30,7 @@
             <option value="$PROJECT_DIR$/litterat-json-test" />
             <option value="$PROJECT_DIR$/litterat-schema" />
             <option value="$PROJECT_DIR$/litterat-schema-test" />
+            <option value="$PROJECT_DIR$/litterat-test-data" />
             <option value="$PROJECT_DIR$/litterat-xpl" />
             <option value="$PROJECT_DIR$/litterat-xpl-test" />
           </set>

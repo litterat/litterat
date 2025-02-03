@@ -26,7 +26,7 @@ import io.litterat.core.TypeContext;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.core.data.SimpleImmutable;
+import io.litterat.test.data.SimpleImmutable;
 
 public class SimpleImmutableTest {
 

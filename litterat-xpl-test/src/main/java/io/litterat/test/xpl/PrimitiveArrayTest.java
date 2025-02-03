@@ -16,7 +16,7 @@
 package io.litterat.test.xpl;
 
 import io.litterat.schema.TypeException;
-import io.litterat.test.core.data.PrimitiveArray;
+import io.litterat.test.data.PrimitiveArray;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;

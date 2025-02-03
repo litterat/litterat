@@ -3,11 +3,11 @@ package io.litterat.bind.analysis;
 
 import io.litterat.annotation.Atom;
 import io.litterat.annotation.Record;
+import io.litterat.annotation.ToData;
 import io.litterat.annotation.Union;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
-import io.litterat.bind.ToData;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

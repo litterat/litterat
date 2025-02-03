@@ -4,6 +4,7 @@ import io.litterat.annotation.DataBridge;
 import io.litterat.annotation.Field;
 import io.litterat.annotation.FieldOrder;
 import io.litterat.annotation.Record;
+import io.litterat.annotation.ToData;
 import io.litterat.annotation.Union;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
@@ -12,7 +13,6 @@ import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassProjection;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
-import io.litterat.bind.ToData;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

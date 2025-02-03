@@ -15,19 +15,18 @@
  */
 package io.litterat.test.json;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.schema.meta.Meta;
+import io.litterat.test.data.ImmutableAtom;
+import io.litterat.test.data.SimpleEnum;
+import io.litterat.test.data.UUIDBridge;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.core.TypeContext;
-import io.litterat.schema.meta.Meta;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.core.data.ImmutableAtom;
-import io.litterat.test.core.data.SimpleEnum;
-import io.litterat.test.core.data.UUIDBridge;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ImmutableAtomTest {
 

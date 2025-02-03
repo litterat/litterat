@@ -15,15 +15,14 @@
  */
 package io.litterat.test.json;
 
-import java.util.List;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.test.data.ListOfString;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.core.TypeContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.core.data.ListOfString;
+import java.util.List;
 
 public class ListOfStringTest {
 

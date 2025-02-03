@@ -30,11 +30,11 @@ import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.union.InterfaceUnion;
-import io.litterat.test.bind.union.InterfaceUnionCircle;
-import io.litterat.test.bind.union.InterfaceUnionList;
-import io.litterat.test.bind.union.InterfaceUnionPoint;
-import io.litterat.test.bind.union.InterfaceUnionRectangle;
+import io.litterat.test.data.union.InterfaceUnion;
+import io.litterat.test.data.union.InterfaceUnionCircle;
+import io.litterat.test.data.union.InterfaceUnionList;
+import io.litterat.test.data.union.InterfaceUnionPoint;
+import io.litterat.test.data.union.InterfaceUnionRectangle;
 
 public class InterfaceUnionTest {
 

@@ -32,6 +32,8 @@ dependencies {
     implementation project(":litterat-schema")
     implementation project(":litterat-core")
 
+    implementation project(":litterat-test-data")
+
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
     implementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.11.4'
 

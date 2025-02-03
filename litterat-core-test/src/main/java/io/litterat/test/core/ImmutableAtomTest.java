@@ -28,9 +28,9 @@ import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.schema.meta.Meta;
-import io.litterat.test.core.data.ImmutableAtom;
-import io.litterat.test.core.data.SimpleEnum;
-import io.litterat.test.core.data.UUIDBridge;
+import io.litterat.test.data.ImmutableAtom;
+import io.litterat.test.data.SimpleEnum;
+import io.litterat.test.data.UUIDBridge;
 
 public class ImmutableAtomTest {
 

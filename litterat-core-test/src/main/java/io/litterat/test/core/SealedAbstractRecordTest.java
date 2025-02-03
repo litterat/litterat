@@ -30,10 +30,10 @@ import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.core.data.SealedAbstractRecord.RecordCircle;
-import io.litterat.test.core.data.SealedAbstractRecord.RecordPoint;
-import io.litterat.test.core.data.SealedAbstractRecord.SealedShape;
-import io.litterat.test.core.data.SealedAbstractRecord.SealedShapeList;
+import io.litterat.test.data.SealedAbstractRecord.RecordCircle;
+import io.litterat.test.data.SealedAbstractRecord.RecordPoint;
+import io.litterat.test.data.SealedAbstractRecord.SealedShape;
+import io.litterat.test.data.SealedAbstractRecord.SealedShapeList;
 
 public class SealedAbstractRecordTest {
 

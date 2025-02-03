@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Test;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.data.SimpleUUIDImmutable;
-import io.litterat.test.bind.data.UUIDBridge;
+import io.litterat.test.data.SimpleUUIDImmutable;
+import io.litterat.test.data.UUIDBridge;
 
 public class UUIDBridgeTest {
 

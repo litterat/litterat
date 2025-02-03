@@ -14,7 +14,7 @@ import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.core.data.UnmodifiableLinkedList;
+import io.litterat.test.data.UnmodifiableLinkedList;
 
 public class UnmodifiableLinkedListTest {
 

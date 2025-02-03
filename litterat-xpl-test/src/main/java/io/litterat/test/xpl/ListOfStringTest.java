@@ -15,16 +15,15 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-import java.util.List;
-
+import io.litterat.schema.TypeException;
+import io.litterat.test.data.ListOfString;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.schema.TypeException;
-import io.litterat.test.core.data.ListOfString;
-import io.litterat.xpl.TypeInputStream;
-import io.litterat.xpl.TypeOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class ListOfStringTest {
 

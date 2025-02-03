@@ -24,7 +24,7 @@ import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.core.TypeContext;
-import io.litterat.test.core.union.EmbeddedUnion;
+import io.litterat.test.data.union.EmbeddedUnion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

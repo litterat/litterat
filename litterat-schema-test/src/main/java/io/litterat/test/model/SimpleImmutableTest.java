@@ -15,16 +15,18 @@
  */
 package io.litterat.test.model;
 
-import io.litterat.schema.meta.*;
-import io.litterat.schema.meta.Record;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClass;
 import io.litterat.schema.TypeLibrary;
-import io.litterat.test.bind.data.SimpleImmutable;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Field;
+import io.litterat.schema.meta.Meta;
+import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.Typename;
+import io.litterat.test.core.data.SimpleImmutable;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class SimpleImmutableTest {
 
@@ -56,7 +58,7 @@ public class SimpleImmutableTest {
 
 		Typename typePoint = new Typename("point");
 
-		typeLibrary.register(typePoint, simpleImmutableType, simpleImmutableDataClass);
+		typeLibrary.register(typePoint, simpleImmutableType);
 
 		Definition pointDef = typeLibrary.getDefinition(typePoint);
 

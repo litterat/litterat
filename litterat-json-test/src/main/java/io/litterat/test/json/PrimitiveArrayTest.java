@@ -15,15 +15,14 @@
  */
 package io.litterat.test.json;
 
-import java.util.Arrays;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.test.data.PrimitiveArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.core.TypeContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.core.data.PrimitiveArray;
+import java.util.Arrays;
 
 public class PrimitiveArrayTest {
 

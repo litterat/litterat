@@ -15,17 +15,16 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-import java.util.Optional;
-
+import io.litterat.core.TypeContext;
+import io.litterat.schema.TypeException;
+import io.litterat.test.data.OptionalImmutable;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.core.TypeContext;
-import io.litterat.schema.TypeException;
-import io.litterat.test.core.data.OptionalImmutable;
-import io.litterat.xpl.TypeInputStream;
-import io.litterat.xpl.TypeOutputStream;
+import java.io.IOException;
+import java.util.Optional;
 
 public class OptionalImmutableTest {
 

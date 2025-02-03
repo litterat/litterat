@@ -20,7 +20,7 @@ open module io.litterat.test.xpl {
 	requires io.litterat.xpl;
 
 	// The test data.
-	requires io.litterat.test.core;
+	requires io.litterat.test.data;
 
 	requires org.junit.jupiter.api;
 
