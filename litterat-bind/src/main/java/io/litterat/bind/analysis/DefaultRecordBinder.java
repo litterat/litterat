@@ -9,8 +9,8 @@ import io.litterat.annotation.Union;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassBridge;
 import io.litterat.bind.DataClassField;
-import io.litterat.bind.DataClassProjection;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 
@@ -51,7 +51,8 @@ public class DefaultRecordBinder {
 		this.newFeatures = new NewFeatures();
 	}
 
-	public DataClassProjection resolveProjection(DataBindContext context, Class<?> targetClass) throws DataBindException {
+
+	private DataClassBridge resolveBridge(DataBindContext context, Class<?> targetClass) throws DataBindException {
 		// If the class if exporting/importing a dataclass.
 		if (!ToData.class.isAssignableFrom(targetClass)) {
 			throw new DataBindException("Unexpected");
@@ -69,7 +70,7 @@ public class DefaultRecordBinder {
 					.unreflect(targetClass.getMethod(TODATA_METHOD));
 
 			// The constructor and data components are copied from the data class.
-			return new DataClassProjection(targetClass, dataType, toData, toObject);
+			return new DataClassBridge(dataType, toData, toObject);
 
 		} catch (NoSuchMethodException | IllegalAccessException ex) {
 			throw new DataBindException(String.format(
@@ -107,17 +108,30 @@ public class DefaultRecordBinder {
 	public DataClassRecord resolveRecord(DataBindContext context, Class<?> targetClass)
 			throws DataBindException {
 		try {
-			DataClassRecord descriptor = resolveClassRecord(context, targetClass);
 
-			// At this point descriptor is not null but hasn't been added to context.
-			// Loop through know interfaces and if we find a union type add this descriptor to it.
-			registerUnionInterfaces(context, targetClass);
+			DataClassBridge bridge = null;
+			if (ToData.class.isAssignableFrom(targetClass)) {
 
-			// Same applies to super classes that are abstract.
-			registerUnionSubclasses(context, targetClass);
+				bridge = resolveBridge(context, targetClass);
 
-			return new DataClassRecord(descriptor.typeClass(), descriptor.systemClass(), descriptor.isMutable() ,descriptor.creator().orElse(null),
-					descriptor.constructor(), descriptor.fields());
+				DataClassRecord descriptor = resolveClassRecord(context, bridge.dataClass());
+
+				return new DataClassRecord(targetClass, bridge, descriptor.isMutable(), descriptor.creator(),
+						descriptor.constructor(), descriptor.fields());
+			} else {
+
+				DataClassRecord descriptor = resolveClassRecord(context, targetClass);
+
+				// At this point descriptor is not null but hasn't been added to context.
+				// Loop through know interfaces and if we find a union type add this descriptor to it.
+				registerUnionInterfaces(context, targetClass);
+
+				// Same applies to super classes that are abstract.
+				registerUnionSubclasses(context, targetClass);
+
+				return new DataClassRecord(descriptor.typeClass(), bridge, descriptor.isMutable(), descriptor.creator(),
+						descriptor.constructor(), descriptor.fields());
+			}
 		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | DataBindException e) {
 			throw new DataBindException("Failed to resolve", e);
 		}
@@ -178,11 +192,7 @@ public class DefaultRecordBinder {
 			// ignore.
 		}
 
-		// This is a data class so toObject/toData is identity functions.
-//		MethodHandle toObject = MethodHandles.identity(targetClass);
-//		MethodHandle toData = MethodHandles.identity(targetClass);
-
-		return new DataClassRecord(targetClass, targetClass, false, creator, constructor, dataComponents);
+		return new DataClassRecord(targetClass, null, false, creator, constructor, dataComponents);
 	}
 
 	/**
@@ -344,17 +354,7 @@ public class DefaultRecordBinder {
 		if (dataClass.typeClass().isPrimitive()) {
 			isRequired = true;
 		}
-/*
-		if (dataClass instanceof DataClassAtom) {
 
-			DataClassAtom atom = (DataClassAtom) dataClass;
-
-			Typename typename = context.getTypename(info.getType(),
-					(info.getParamType() != null ? info.getParamType() : info.getType()));
-//			dataClass = new DataClassReference(typename, targetClass, atom.typeClass(), atom, atom.toData(),
-//					atom.toObject());
-		}
-*/
 		// Make isPresent return true for primitives/isRequired or call Objects.nonNull(value)
 		MethodHandle isPresent = null;
 		if (info.getType().isPrimitive()) {
@@ -758,14 +758,6 @@ public class DefaultRecordBinder {
 	private MethodHandle createTupleConstructor(Class<?> dataClass, List<ComponentInfo> fields,
 			DataClassField[] dataFields, MethodHandle dataConstructor)
 			throws IllegalAccessException, NoSuchMethodException, CodeAnalysisException {
-
-		// Class<?>[] params = new Class[fields.size()];
-		// for (int x = 0; x < fields.size(); x++) {
-		// params[x] = fields.get(x).getType();
-		// }
-		//
-		// MethodHandle signature = MethodHandles.empty(MethodType.methodType(dataClass,
-		// params));
 
 		// (Object[]):serialClass -> ctor(Object[])
 		MethodHandle create = createEmbedConstructor(dataClass, dataConstructor, fields, dataFields);

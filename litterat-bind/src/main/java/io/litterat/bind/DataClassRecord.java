@@ -17,7 +17,6 @@ package io.litterat.bind;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * A DataClassRecord provides a descriptor for record data classes projected/embedded pair for use
@@ -25,15 +24,10 @@ import java.util.Optional;
  */
 public class DataClassRecord extends DataClass {
 
-	private final boolean hasProjection;
-
-
-	private final Class<?> systemClass;
-
 	private final boolean isMutable;
 
 	// Empty constructor/acquirer for data object mutable objects.
-	private final Optional<MethodHandle> creator;
+	private final MethodHandle creator;
 
 	// Constructor for the data object.
 	private final MethodHandle constructor;
@@ -41,43 +35,19 @@ public class DataClassRecord extends DataClass {
 	// All fields in the projected class.
 	private final DataClassField[] fields;
 
-	public DataClassRecord( Class<?> targetType, Class<?> systemClass, boolean isMutable, MethodHandle creator, MethodHandle constructor,  DataClassField[] fields) {
-		super(targetType);
-
-		this.hasProjection = targetType != systemClass;
-		this.systemClass = systemClass;
+	public DataClassRecord( Class<?> targetType, DataClassBridge bridge, boolean isMutable, MethodHandle creator, MethodHandle constructor,  DataClassField[] fields) {
+		super(targetType, bridge);
 		this.fields = fields;
 		this.isMutable = isMutable;
-		this.creator = Optional.ofNullable(creator);
+		this.creator = creator;
 		this.constructor = constructor;
-	}
-
-	public Class<?> systemClass() {
-		return systemClass;
-	}
-
-	public boolean hasProjection() {
-		return hasProjection;
 	}
 
 	public boolean isMutable() {
 		return isMutable;
 	}
-	/**
-	 * @return A MethodHandle that has the signature T toObject( P values).
-	 */
-//	public MethodHandle toObject() {
-//		return toObject;
-//	}
 
-	/**
-	 * @return A MethodHandle that has the signature P toData(T object)
-	 */
-//	public MethodHandle toData() {
-//		return toData;
-//	}
-
-	public Optional<MethodHandle> creator() {
+	public MethodHandle creator() {
 		return creator;
 	}
 

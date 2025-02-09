@@ -16,6 +16,7 @@
 package io.litterat.bind;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 
@@ -23,13 +24,21 @@ import java.util.Objects;
  * DataClassAtom, DataClassRecord, DatClassArray and DataClassUnion.
  *
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class DataClass {
 
 	// The application type data class.
 	private final Class<?> typeClass;
 
-	public DataClass( Class<?> targetType) {
+	private final Optional<DataClassBridge> bridge;
+
+	public DataClass( Class<?> targetType, DataClassBridge bridge) {
 		this.typeClass = Objects.requireNonNull(targetType);
+		this.bridge = Optional.ofNullable(bridge);
+	}
+
+	public DataClass( Class<?> targetType) {
+		this(targetType, null);
 	}
 
 	/**
@@ -39,5 +48,14 @@ public abstract class DataClass {
 		return typeClass;
 	}
 
+	public Optional<DataClassBridge> bridge() {
+		return bridge;
+	}
 
+	public Class<?> dataClass() {
+		if (bridge().isPresent()) {
+			return bridge().get().dataClass();
+		}
+		return typeClass;
+	}
 }

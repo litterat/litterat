@@ -3,6 +3,7 @@ package io.litterat.bind.analysis;
 import io.litterat.annotation.Atom;
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassBridge;
 import io.litterat.bind.bridge.EnumStringBridge;
 
 import java.lang.invoke.MethodHandle;
@@ -65,7 +66,8 @@ public class DefaultAtomBinder {
 
 					MethodHandle toData = MethodHandles.lookup().unreflect(toDataMethod);
 
-					descriptor = new DataClassAtom(targetClass, dataClass, toData, toObject);
+					DataClassBridge bridge = new DataClassBridge(dataClass, toData, toObject);
+					descriptor = new DataClassAtom(targetClass, bridge);
 					break;
 				}
 			}
@@ -107,7 +109,8 @@ public class DefaultAtomBinder {
 						throw new CodeAnalysisException("Atom accessor @Atom annotation not found");
 					}
 
-					descriptor = new DataClassAtom(targetClass, param, toData, toObject);
+					DataClassBridge bridge = new DataClassBridge(param, toData, toObject);
+					descriptor = new DataClassAtom(targetClass, bridge);
 
 				}
 			}
@@ -127,7 +130,8 @@ public class DefaultAtomBinder {
 						.findVirtual(EnumStringBridge.class, TODATA_METHOD, MethodType.methodType(String.class, Enum.class))
 						.bindTo(bridge).asType(MethodType.methodType(String.class, targetClass));
 
-				descriptor = new DataClassAtom(targetClass, String.class, toData, toObject);
+				DataClassBridge enumBridge = new DataClassBridge(String.class, toData, toObject);
+				descriptor = new DataClassAtom(targetClass, enumBridge);
 
 			}
 		} catch (SecurityException | IllegalAccessException | NoSuchMethodException | CodeAnalysisException e) {

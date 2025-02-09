@@ -15,14 +15,13 @@
  */
 package io.litterat.test.core;
 
+import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.core.TypeContext;
-import io.litterat.schema.TypeException;
 import io.litterat.test.data.ProjectImmutable;
-import io.litterat.test.data.ProjectImmutable.ProjectImmutableData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,8 +52,8 @@ public class ProjectImmutableTest {
 		//DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(proxyDescriptor.dataClass());
 		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(ProjectImmutable.class);
 
-		Assertions.assertEquals(ProjectImmutableData.class, descriptor.typeClass());
-		// Assertions.assertEquals(ProjectImmutable.ProjectImmutableData.class, descriptor.dataClass());
+		Assertions.assertEquals(ProjectImmutable.class, descriptor.typeClass());
+		Assertions.assertEquals(ProjectImmutable.ProjectImmutableData.class, descriptor.dataClass());
 
 		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
@@ -117,7 +116,7 @@ public class ProjectImmutableTest {
 		// corrupting the map by putting an invalid value for a.
 		map.put("a", "error");
 
-		Assertions.assertThrows(TypeException.class, () -> {
+		Assertions.assertThrows(DataBindException.class, () -> {
 			mapMapper.toObject(ProjectImmutable.class, map);
 		});
 

@@ -20,8 +20,8 @@ import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassArray;
 import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassBridge;
 import io.litterat.bind.DataClassField;
-import io.litterat.bind.DataClassProjection;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 
@@ -57,13 +57,16 @@ public class MapMapper {
 
 		try {
 			Object v = null;
+
+            // If there's a bridge convert it.
+            if (dataClass.bridge().isPresent()) {
+                DataClassBridge bridge = dataClass.bridge().get();
+                object = bridge.toData().invoke(object);
+            }
+
             switch (dataClass) {
-                case DataClassProjection dataClassProjection -> {
-                    Object projection = dataClassProjection.toData().invoke(object);
-                    v = toMap(context.getDescriptor(dataClassProjection.dataClass()), projection);
-                }
-                case DataClassAtom dataClassAtom -> {
-                    v = dataClassAtom.toData().invoke(object);
+                case DataClassAtom dataAtom -> {
+                    v = object;
                 }
                 case DataClassRecord dataRecord -> {
                     //Object data = dataRecord.toData().invoke(object);
@@ -137,13 +140,11 @@ public class MapMapper {
 
 		try {
 			Object v = null;
+
             switch (dataClass) {
-                case DataClassProjection dataClassProjection -> {
-                    v = toObject(context.getDescriptor(dataClassProjection.dataClass()), data);
-                    v = dataClassProjection.toObject().invoke(v);
-                }
+
                 case DataClassAtom dataClassAtom -> {
-                    v = dataClassAtom.toObject().invoke(data);
+                    v = data;
                 }
                 case DataClassRecord dataRecord -> {
                     Map<String, Object> map = (Map<String, Object>) data;
@@ -207,7 +208,12 @@ public class MapMapper {
                 }
                 case null, default -> throw new IllegalArgumentException("unrecognised type");
             }
-			return v;
+
+            if (dataClass.bridge().isPresent()) {
+                v = dataClass.bridge().get().toObject().invoke(v);
+            }
+
+            return v;
 		} catch (Throwable t) {
 			throw new DataBindException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
 		}

@@ -46,9 +46,7 @@ public class DefaultClassBinder {
 		// it. If it is a code first situation then we expect this to throw an exception, and we need to
 		// first create the definition and then bind the class to that definition.
 
-		if (isProxy(targetClass)) {
-			result = recordBinder.resolveProjection(context, targetClass);
-		} else if (isRecord(targetClass)) {
+		if (isRecord(targetClass)) {
 			result = recordBinder.resolveRecord(context, targetClass);
 		} else if (isUnion(targetClass)) {
 			result = unionBinder.resolveUnion(context, targetClass, parameterizedType);
@@ -140,12 +138,7 @@ public class DefaultClassBinder {
 		}
 
 		// Class has implemented ToData so exports/imports a data class.
-        return false;
-    }
-
-	private boolean isProxy(Class<?> targetClass) {
-		// Class has implemented ToData so exports/imports a data class.
-        return ToData.class.isAssignableFrom(targetClass);
+		return ToData.class.isAssignableFrom(targetClass);
     }
 
 	private boolean isArray(Class<?> targetClass) {

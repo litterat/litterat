@@ -15,7 +15,15 @@
  */
 package io.litterat.bind.mapper;
 
-import io.litterat.bind.*;
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassBridge;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -129,44 +137,47 @@ public class ArrayMapper {
 	private MethodHandle createToObjectFunction(DataClass dataClass) throws DataBindException {
 
 		// return MethodHandles.collectArguments(dataClass.toObject(), 0, create);
-
 		MethodHandle result = null;
+
         switch (dataClass) {
             case DataClassAtom dataClassAtom -> {
 				// Use identity here because calling function wraps the toObject method.
-				// identity( dataObject ):dataObject
-				result = dataClassAtom.toObject()
-						.asType(dataClassAtom.toObject().type().changeParameterType(0, Object.class));
+				// identity -> ( dataObject ):dataObject
+				if (dataClassAtom.bridge().isPresent()) {
+					result = MethodHandles.identity(dataClassAtom.bridge().get().dataClass());
+				} else {
+					result = MethodHandles.identity(dataClass.typeClass());
+				}
+				// ( Object ):dataObject
+				//result = result.asType(result.type().changeParameterType(0, Object.class));
 			}
             case DataClassRecord dataClassRecord -> {
 
+				// (Object[]):typeClass -> new TypeClass( params );
                 result = dataClassRecord.constructor();
 
                 DataClassField[] fields = dataClassRecord.fields();
-                for (int x = 0; x < dataClassRecord.fields().length; x++) {
-                    DataClassField field = fields[x];
+                for (int fieldIndex = 0; fieldIndex < dataClassRecord.fields().length; fieldIndex++) {
+					DataClass fieldDataClass = fields[fieldIndex].dataClass();
 
-                    int inputIndex = x;
-
-                    // (values[],int) -> values[int]
+                    // (Object[],int) -> values[int]:Object
                     MethodHandle arrayGetter = MethodHandles.arrayElementGetter(Object[].class);
 
-                    // () -> inputIndex
-                    MethodHandle index = MethodHandles.constant(int.class, inputIndex);
+                    // () -> fieldIndex
+                    MethodHandle index = MethodHandles.constant(int.class, fieldIndex);
 
-                    DataClass fieldDataClass = field.dataClass();
-
-                    // (values[]) -> values[inputIndex]
+                    // (Object[]):Object -> (values[inputIndex]):Object
                     MethodHandle arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index);
-                    // .asType(MethodType.methodType(fieldDataClass.dataClass(), Object[].class));
 
-                    // TODO Needs to be check for nulls before calling toObject or array to Object.
+					// (dataClass):typeClass -> toObject(dataClass):typeClass
+					MethodHandle fieldToObject = createToObjectFunction(fieldDataClass);
 
-                    // Pass the object through toObject if it isn't an atom.
-                    // (values[]) -> toObject(values[x])
+					// (values[]) -> (values[inputIndex)):dataType
+					MethodType arrayIndexGetterType = arrayIndexGetter.type().changeReturnType(fieldToObject.type().parameterType(0));
+					MethodHandle typedArrayIndexGetter = arrayIndexGetter.asType(arrayIndexGetterType);
 
-                    arrayIndexGetter = MethodHandles.collectArguments(createToObjectFunction(fieldDataClass), 0,
-                            arrayIndexGetter);
+                    // (values[]):fieldType -> toObject(values[x])
+                    arrayIndexGetter = MethodHandles.collectArguments(fieldToObject, 0, typedArrayIndexGetter);
 
                     // (values[],int,Object):void -> values[int] = Object;
                     MethodHandle arraySetter = MethodHandles.arrayElementSetter(Object[].class);
@@ -186,10 +197,7 @@ public class ArrayMapper {
 
                 }
 
-                // (Object[]) -> toObject( ctor(Object[]).setValues(Object[]) )
-                //result = MethodHandles.collectArguments(dataClassRecord.toObject(), 0, result);
-
-                result = result.asType(result.type().changeReturnType(dataClass.typeClass()));
+                result = result.asType(result.type().changeReturnType(dataClass.dataClass()));
             }
             case DataClassArray dataArrayClass -> {
 
@@ -225,21 +233,18 @@ public class ArrayMapper {
                     throw new DataBindException("failed to build bridge for array", e);
                 }
             }
-            case DataClassProjection dataClassProjection -> {
-
-                DataClass projectionDataClass = context.getDescriptor(dataClassProjection.dataClass());
-                MethodHandle valueToObject = createToObjectFunction(projectionDataClass);
-
-                // Use identity here because calling function wraps the toObject method.
-                // identity( dataObject ):dataObject
-                result = dataClassProjection.toObject()
-                        .asType(dataClassProjection.toObject().type().changeParameterType(0, Object.class));
-
-                // (Object[]) -> toObject( ctor(Object[]).setValues(Object[]) )
-                result = MethodHandles.collectArguments(dataClassProjection.toObject(), 0, valueToObject);
-            }
             case null, default -> throw new DataBindException("unexpected data class type");
         }
+
+		if (dataClass.bridge().isPresent()) {
+			DataClassBridge bridge = dataClass.bridge().get();
+
+			// toObject( dataObject ):targetObject
+			MethodHandle toObject = bridge.toObject();
+
+			// (Object[]) -> toObject( result )
+			result = MethodHandles.collectArguments(toObject, 0, result);
+		}
 
 		return result;
 	}
@@ -260,7 +265,10 @@ public class ArrayMapper {
 		MethodHandle toDataMethod = null;
 
         switch (dataClass) {
-            case DataClassAtom dataClassAtom -> toDataMethod = dataClassAtom.toData();
+			case DataClassAtom dataClassAtom -> {
+				// (typeClass):typeClass
+				toDataMethod = MethodHandles.identity(dataClass.dataClass());
+			}
             case DataClassRecord dataClassRecord -> {
 
                 // (int):Object[] -> new Object[int]
@@ -316,14 +324,19 @@ public class ArrayMapper {
 					throw new DataBindException("failed to build array bridge", e);
 				}
 			}
-			case  DataClassProjection dataClassProjection -> {
-				DataClass projectionDataClass = context.getDescriptor(dataClassProjection.dataClass());
-				MethodHandle proxyToData = createToDataFunction(projectionDataClass);
 
-				toDataMethod = MethodHandles.collectArguments(proxyToData, 0, dataClassProjection.toData());
-            }
             case null, default -> throw new DataBindException("unexpected data class type");
         }
+
+		if (dataClass.bridge().isPresent()) {
+			DataClassBridge bridge = dataClass.bridge().get();
+
+			// toData( targetObject ):dataObject
+			MethodHandle toData = bridge.toData();
+
+			// (typeClass):Object[] -> toData( result ):Object[]
+			toDataMethod = MethodHandles.collectArguments(toDataMethod, 0, toData);
+		}
 
 		return toDataMethod;
 	}
@@ -338,8 +351,8 @@ public class ArrayMapper {
 		// (object[]):object[] -> return object[];
 		MethodHandle identity = MethodHandles.identity(Object[].class);
 
-		// (Object[], embedClass):object[] -> return object[];
-		MethodHandle result = MethodHandles.dropArguments(identity, 1, dataClass.typeClass());
+		// (Object[], dataClass):object[] -> return object[];
+		MethodHandle result = MethodHandles.dropArguments(identity, 1, dataClass.dataClass());
 
 		DataClassField[] fields = dataClass.fields();
 		for (int x = 0; x < fields.length; x++) {
@@ -365,9 +378,12 @@ public class ArrayMapper {
 				throw new IllegalArgumentException("Recursive structures not yet supported for array mapper");
 			}
 
+			// ( typeClass ):dataClass -> (dataClass) toData(typeClass)
+			MethodHandle toDataFunction = createToDataFunction(fieldDataClass);
+
 			// (<targettype>):<fieldtype> -> toData( object.getter() );
-			fieldBox = MethodHandles.collectArguments(createToDataFunction(fieldDataClass), 0, fieldBox)
-					.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
+			fieldBox = MethodHandles.collectArguments(toDataFunction, 0, fieldBox)
+					.asType(MethodType.methodType(Object.class, dataClass.dataClass()));
 
 			// (value[],object):void -> value[inputIndex] = toData( object.getter() )
 			MethodHandle arrayValueSetter = MethodHandles.collectArguments(arrayIndexSetter, 1, fieldBox);
@@ -382,7 +398,7 @@ public class ArrayMapper {
 			MethodHandle noop = MethodHandles.constant(Void.class, null).asType(MethodType.methodType(void.class));
 
 			// (value[],object):void -> void;
-			MethodHandle noopElse = MethodHandles.dropArguments(noop, 0, Object[].class, dataClass.typeClass());
+			MethodHandle noopElse = MethodHandles.dropArguments(noop, 0, Object[].class, dataClass.dataClass());
 
 			// (value[],object):void -> if(isPresent(object)) { value[inputIndex] = toData( object.getter() ) }
 			MethodHandle checkAndSet = MethodHandles.guardWithTest(isPresentTest, arrayValueSetter, noopElse);

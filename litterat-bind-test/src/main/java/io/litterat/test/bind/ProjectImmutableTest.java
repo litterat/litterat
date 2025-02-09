@@ -15,18 +15,20 @@
  */
 package io.litterat.test.bind;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import io.litterat.bind.*;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.test.data.ProjectImmutable;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Map;
 
 public class ProjectImmutableTest {
 
@@ -46,17 +48,15 @@ public class ProjectImmutableTest {
 	public void checkDescriptor() throws Throwable {
 		DataBindContext context = new DataBindContext.Builder().build();
 
-		DataClassProjection projection = (DataClassProjection) context.getDescriptor(ProjectImmutable.class);
-		Assertions.assertNotNull(projection);
-		Assertions.assertEquals(ProjectImmutable.class, projection.typeClass());
-		Assertions.assertEquals(ProjectImmutable.ProjectImmutableData.class, projection.dataClass());
-
-		DataClassRecord descriptor = (DataClassRecord) context.getDescriptor(projection.dataClass());
+		DataClass descriptor = context.getDescriptor(ProjectImmutable.class);
 		Assertions.assertNotNull(descriptor);
-		Assertions.assertEquals(ProjectImmutable.ProjectImmutableData.class, descriptor.typeClass());
-		Assertions.assertEquals(ProjectImmutable.class, descriptor.systemClass());
+		Assertions.assertEquals(ProjectImmutable.class, descriptor.typeClass());
+		Assertions.assertEquals(ProjectImmutable.ProjectImmutableData.class, descriptor.dataClass());
 
-		DataClassField[] fields = descriptor.fields();
+		Assertions.assertInstanceOf(DataClassRecord.class, descriptor);
+		DataClassRecord record = (DataClassRecord) descriptor;
+
+		DataClassField[] fields = record.fields();
 		Assertions.assertNotNull(fields);
 		Assertions.assertEquals(2, fields.length);
 

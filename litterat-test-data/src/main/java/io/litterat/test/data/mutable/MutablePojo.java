@@ -13,23 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.litterat.annotation;
+package io.litterat.test.data.mutable;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import io.litterat.annotation.Record;
 
 /**
- *
+ * 
+ * Example of a Mutable Pojo with empty constructor and getter/setters to access data.
  *
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.CONSTRUCTOR, ElementType.TYPE })
-public @interface Record {
 
-    boolean isMutable() default false;
+@Record(isMutable = true, creator = ObjectPool.class)
+public class MutablePojo implements PooledObject {
 
-    // Allow specifying a creator for mutable instances to allow Object pooling.
-    Class<? extends DataCreator> creator() default DataCreator.class;
+	private int x;
+	private int y;
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	@Override
+	public void reset() {
+		this.x = 0;
+		this.y = 0;
+	}
 }

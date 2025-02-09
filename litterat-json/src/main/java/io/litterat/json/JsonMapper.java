@@ -15,6 +15,20 @@
  */
 package io.litterat.json;
 
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassBridge;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
+import io.litterat.core.TypeContext;
+import io.litterat.json.parser.JsonReader;
+import io.litterat.json.parser.JsonToken;
+import io.litterat.json.parser.JsonWriter;
+import io.litterat.schema.TypeException;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -27,19 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import io.litterat.core.TypeContext;
-import io.litterat.schema.TypeException;
-import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassAtom;
-import io.litterat.bind.DataClassField;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassUnion;
-import io.litterat.json.parser.JsonReader;
-import io.litterat.json.parser.JsonToken;
-import io.litterat.json.parser.JsonWriter;
 
 public class JsonMapper {
 	private final TypeContext context;
@@ -78,64 +79,56 @@ public class JsonMapper {
 
 		try {
 
-			if (dataClass instanceof DataClassAtom) {
-				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-
-				Object data = dataClassAtom.toData().invoke(object);
-
-				writeAtom(data, writer);
-			} else if (dataClass instanceof DataClassRecord) {
-				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
-
-				Object data = object;
-
-				writer.beginObject();
-
-				DataClassField[] fields = dataClassRecord.fields();
-
-				for (fieldIndex = 0; fieldIndex < dataClassRecord.fields().length; fieldIndex++) {
-					DataClassField field = fields[fieldIndex];
-
-					Object v = field.accessor().invoke(data);
-
-					// Recursively convert object to map.
-					if (v != null) {
-						DataClass fieldDataClass = field.dataClass();
-
-						writer.name(field.name());
-
-						toJson(v, fieldDataClass, writer);
-					}
-
-				}
-
-				writer.endObject();
-			} else if (dataClass instanceof DataClassArray) {
-				DataClassArray arrayClass = (DataClassArray) dataClass;
-
-				writer.beginArray();
-
-				Object arrayData = object;
-				int length = (int) arrayClass.size().invoke(arrayData);
-				Object iterator = arrayClass.iterator().invoke(arrayData);
-				DataClass arrayDataClass = arrayClass.arrayDataClass();
-
-				for (int x = 0; x < length; x++) {
-					Object av = arrayClass.get().invoke(arrayData, iterator);
-					toJson(av, arrayDataClass, writer);
-				}
-
-				writer.endArray();
-			} else if (dataClass instanceof DataClassUnion) {
-				throw new DataBindException("union not implemented");
-/*			} else if (dataClass instanceof DataClassReference) {
-				DataClassReference proxyClass = (DataClassReference) dataClass;
-
-				toJson(proxyClass.toData().invoke(object), proxyClass.proxyDataClass(), writer);
- */
-			} else {
-				throw new DataBindException("unexpected data class type");
+			// If there's a bridge convert it.
+			if (dataClass.bridge().isPresent()) {
+				DataClassBridge bridge = dataClass.bridge().get();
+				object = bridge.toData().invoke(object);
 			}
+
+            switch (dataClass) {
+                case DataClassAtom dataClassAtom -> writeAtom(object, writer);
+                case DataClassRecord dataClassRecord -> {
+
+                    writer.beginObject();
+
+                    DataClassField[] fields = dataClassRecord.fields();
+
+                    for (fieldIndex = 0; fieldIndex < dataClassRecord.fields().length; fieldIndex++) {
+                        DataClassField field = fields[fieldIndex];
+
+                        Object v = field.accessor().invoke(object);
+
+                        // Recursively convert object to map.
+                        if (v != null) {
+                            DataClass fieldDataClass = field.dataClass();
+
+                            writer.name(field.name());
+
+                            toJson(v, fieldDataClass, writer);
+                        }
+
+                    }
+
+                    writer.endObject();
+                }
+                case DataClassArray arrayClass -> {
+
+                    writer.beginArray();
+
+                    int length = (int) arrayClass.size().invoke(object);
+                    Object iterator = arrayClass.iterator().invoke(object);
+                    DataClass arrayDataClass = arrayClass.arrayDataClass();
+
+                    for (int x = 0; x < length; x++) {
+                        Object av = arrayClass.get().invoke(object, iterator);
+                        toJson(av, arrayDataClass, writer);
+                    }
+
+                    writer.endArray();
+                }
+                case DataClassUnion dataClassUnion -> throw new DataBindException("union not implemented");
+                default -> throw new DataBindException("unexpected data class type");
+            }
 
 		} catch (Throwable t) {
 			throw new TypeException(String.format("Failed to convert %s to Map.", dataClass.typeClass()), t);
@@ -171,9 +164,16 @@ public class JsonMapper {
 
 	private Map<String, DataClassField> componentMap(DataClassRecord dataClass) {
 		return fieldMaps.computeIfAbsent(dataClass, (clss) -> {
-			return Arrays.asList(clss.fields()).stream().collect(Collectors.toMap(DataClassField::name, item -> item));
+			return Arrays.stream(clss.fields()).collect(Collectors.toMap(DataClassField::name, item -> item));
 		});
 
+	}
+
+	private Object toObject(DataClass dataClass, Object value) throws Throwable {
+		if (dataClass.bridge().isPresent()) {
+			return dataClass.bridge().get().toObject().invoke(value);
+		}
+		return value;
 	}
 
 	private Object fromJson(DataClass dataClass, JsonReader reader) throws TypeException {
@@ -186,26 +186,26 @@ public class JsonMapper {
 			case NUMBER:
 				// This needs to be more defensive. Currently assumes NUMBER, STRING and BOOLEAN are Atoms.
 				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-				return dataClassAtom.toObject().invoke(readNumber(dataClassAtom, reader));
+				return toObject(dataClassAtom, readNumber(dataClassAtom, reader));
 
 			case STRING:
 				dataClassAtom = (DataClassAtom) dataClass;
 				String v = reader.nextString();
 				if (dataClassAtom.dataClass() == String.class) {
-					return dataClassAtom.toObject().invoke(v);
+					return toObject(dataClassAtom, v);
 				} else if (dataClassAtom.dataClass() == Character.class) {
 					Character c = Character.valueOf(v.toCharArray()[0]);
-					return dataClassAtom.toObject().invoke(c);
+					return toObject(dataClassAtom, c);
 				} else if (dataClassAtom.dataClass() == char.class) {
 					char c = v.toCharArray()[0];
-					return dataClassAtom.toObject().invoke(c);
+					return toObject(dataClassAtom, c);
 				}
 				throw new DataBindException(
 						String.format("Could not convert string to %s", dataClassAtom.dataClass().getName()));
 			case BOOLEAN:
 				dataClassAtom = (DataClassAtom) dataClass;
 				if (dataClassAtom.dataClass() == boolean.class || dataClassAtom.dataClass() == Boolean.class) {
-					return dataClassAtom.toObject().invoke(reader.nextBoolean());
+					return toObject(dataClassAtom, reader.nextBoolean());
 				}
 				throw new DataBindException(
 						String.format("Could not convert boolean to %s", dataClassAtom.dataClass().getName()));
@@ -219,12 +219,6 @@ public class JsonMapper {
 					throw new IllegalStateException();
 				}
 
-//				if (dataClass instanceof DataClassReference) {
-//					DataClassReference proxyClass = (DataClassReference) dataClass;
-//
-//					return proxyClass.toObject().invoke(fromJson(proxyClass.proxyDataClass(), reader));
-//
-//				} else {
 
 					reader.beginObject();
 
@@ -262,7 +256,7 @@ public class JsonMapper {
 
 						reader.endObject();
 
-						return dataClassRecord.constructor().invoke(construct);
+						return toObject(dataClassRecord, dataClassRecord.constructor().invoke(construct));
 
 					}
 					// return dataClassRecord.toObject().invoke(data);

@@ -143,7 +143,8 @@ public class DataBindContext {
 			MethodHandle toData = MethodHandles.publicLookup().unreflect(toDataMethod).bindTo(bridge);
 			MethodHandle toObject = MethodHandles.publicLookup().unreflect(toObjectMethod).bindTo(bridge);
 
-			DataClassAtom dataClass = new DataClassAtom(targetClass, toDataMethod.getReturnType(), toData, toObject);
+			DataClassBridge dataClassBridge = new DataClassBridge(toDataMethod.getReturnType(), toData, toObject);
+			DataClassAtom dataClass = new DataClassAtom(targetClass,dataClassBridge);
 			register(targetClass, dataClass);
 			return dataClass;
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | DataBindException e) {

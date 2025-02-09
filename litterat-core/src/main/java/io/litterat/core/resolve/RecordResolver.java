@@ -13,6 +13,8 @@ import io.litterat.schema.meta.Array;
 import io.litterat.schema.meta.Element;
 import io.litterat.schema.meta.Field;
 import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.Typename;
+import io.litterat.schema.meta.Union;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -27,23 +29,21 @@ public class RecordResolver implements TypeResolver<Record, DataClassRecord> {
                 DataClassField classField = classFields[x];
                 DataClass fieldDataClass = classField.dataClass();
 
-                Element element = null;
-                if (fieldDataClass instanceof DataClassAtom atom) {
-                    element = context.getTypename( atom.dataClass() );
-                } else if (fieldDataClass instanceof DataClassArray array ) {
-                    element = new Array( context.getTypename( array.arrayDataClass().typeClass() ));
-                } else if (fieldDataClass instanceof DataClassUnion union ) {
-                    element = context.getTypename( union.typeClass() );
-                } else if (fieldDataClass instanceof DataClassRecord record ) {
-                    element = context.getTypename(record.typeClass());
-                } else {
-                    throw new TypeException("Unknown field type");
-                }
-                //Definition def = classFields[x].dataClass().definition();
-//				if (!(def instanceof Element)) {
-//					throw new TypeException("Only elemnt types allowed for fields: " + def.getClass().getName());
-//				}
-                //Typename typename = context.getTypename( classField.type() );
+                Element element = switch (fieldDataClass) {
+                    case DataClassAtom atom -> context.getTypename(atom.dataClass());
+                    case DataClassArray array -> new Array(context.getTypename(array.arrayDataClass().dataClass()));
+                    case DataClassUnion union -> {
+                        boolean isSealed = union.isSealed();
+                        Class<?>[] unionClasses = union.memberTypes();
+                        Typename[] unionMembers = new Typename[unionClasses.length];
+                        for (int unionMemberIndex=0; unionMemberIndex< unionMembers.length; unionMemberIndex++) {
+                            unionMembers[unionMemberIndex] = context.getTypename(unionClasses[unionMemberIndex]);
+                        }
+                        yield new Union(unionMembers);
+                    }
+                    case DataClassRecord record -> context.getTypename(record.dataClass());
+                    case null, default -> throw new TypeException("Unknown field type");
+                };
 
                 fields[x] = new Field(classField.name(), element, classField.isRequired());
             }
