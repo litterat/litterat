@@ -23,7 +23,7 @@ import io.litterat.schema.meta.Field;
 import io.litterat.schema.meta.Meta;
 import io.litterat.schema.meta.Record;
 import io.litterat.schema.meta.Typename;
-import io.litterat.test.core.data.SimpleImmutable;
+import io.litterat.test.data.SimpleImmutable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

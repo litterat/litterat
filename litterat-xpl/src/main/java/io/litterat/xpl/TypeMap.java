@@ -71,6 +71,8 @@ public class TypeMap {
 			register(7, resolver.register(Meta.ELEMENT, Element.class));
 			register(8, resolver.register(Meta.ARRAY, Array.class));
 			register(9, resolver.register(TypeStreamEntry.STREAM_ENTRY, TypeStreamEntry.class));
+			register( 10, resolver.register(Meta.INT32, int.class));
+			register( 10, resolver.register(Meta.BOOLEAN, boolean.class));
 		} catch (TypeException e) {
 			throw new RuntimeException("Initialization error", e);
 		}

@@ -15,15 +15,23 @@
  */
 package io.litterat.xpl.resolve;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import io.litterat.bind.*;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
 import io.litterat.core.TypeContext;
 import io.litterat.schema.TypeException;
-import io.litterat.schema.meta.*;
+import io.litterat.schema.meta.Array;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Field;
+import io.litterat.schema.meta.FunctionSignature;
+import io.litterat.schema.meta.Meta;
 import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.Typename;
+import io.litterat.schema.meta.Union;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.TypeMapEntry;
@@ -31,8 +39,27 @@ import io.litterat.xpl.TypeOutputStream;
 import io.litterat.xpl.TypeReader;
 import io.litterat.xpl.TypeStream;
 import io.litterat.xpl.TypeWriter;
-import io.litterat.xpl.lang.*;
+import io.litterat.xpl.lang.Block;
+import io.litterat.xpl.lang.ConstructInstance;
+import io.litterat.xpl.lang.Expression;
+import io.litterat.xpl.lang.FieldRead;
+import io.litterat.xpl.lang.FieldSet;
+import io.litterat.xpl.lang.Lambda;
+import io.litterat.xpl.lang.LambdaFunction;
+import io.litterat.xpl.lang.ReadArray;
+import io.litterat.xpl.lang.ReadValue;
+import io.litterat.xpl.lang.ReturnNode;
+import io.litterat.xpl.lang.SlotAssigner;
+import io.litterat.xpl.lang.SlotReference;
+import io.litterat.xpl.lang.SlotSet;
+import io.litterat.xpl.lang.Statement;
+import io.litterat.xpl.lang.WriteArray;
+import io.litterat.xpl.lang.WriteValue;
 import io.litterat.xpl.lang.interpret.LitteratInterpreter;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SchemaResolver {
 
@@ -46,7 +73,7 @@ public class SchemaResolver {
 
 	public TypeMapEntry register(Typename typename, Class<?> targetClass) throws TypeException {
 
-		DataClass dataClass = context.register(typename, targetClass, targetClass);
+		DataClass dataClass = context.register(typename, targetClass);
 		Definition definition = context.library().getDefinition(typename);
 
 		return map(typename, definition, dataClass);
@@ -104,15 +131,12 @@ public class SchemaResolver {
 				Field field = sequenceFields[x];
 				DataClassField dataClassField = dataClassFields[x];
 
-				if (field.type() instanceof Typename) {
-					Typename type = (Typename) field.type();
-					Statement writeField = new WriteValue(type,
+				if (field.type() instanceof Typename type) {
+                    Statement writeField = new WriteValue(type,
 							new FieldRead(new SlotReference(varObject), typeName, field.name()));
 					statements.add(writeField);
-				} else if (field.type() instanceof Array) {
-
-					Array array = (Array) field.type();
-					DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
+				} else if (field.type() instanceof Array array) {
+                    DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
 
 					Class<?> arrayClss = dataArray.arrayDataClass().typeClass();
 					int loopSlot = slots.getSlot(arrayClss);
@@ -121,8 +145,6 @@ public class SchemaResolver {
 
 					Statement loop = new WriteArray(dataArray, loopSlot, readField, writeElement);
 					statements.add(loop);
-
-
 				} else {
 					throw new TypeException("Not recognised field element");
 				}
@@ -221,7 +243,9 @@ public class SchemaResolver {
 					DataClassArray dataArray = (DataClassArray) dataClassField.dataClass();
 
 					constructorBlock[x] = new ReadArray(dataArray, array, new ReadValue(array.type()));
-
+				} else if (field.type() instanceof Union union) {
+					System.out.println("union field:" + field.name());
+					//constructorBlock[x] = new ReadValue(union.);
 				} else {
 					throw new TypeException("not recognised type: " + field.type().getClass().getName());
 				}

@@ -22,10 +22,12 @@ import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
 import io.litterat.core.TypeContext;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Typename;
+import io.litterat.test.data.union.AbstractUnion;
 import io.litterat.test.data.union.AbstractUnionCircle;
 import io.litterat.test.data.union.AbstractUnionList;
 import io.litterat.test.data.union.AbstractUnionRectangle;
-import io.litterat.test.data.union.AbstractUnion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,6 +78,11 @@ public class AbstractUnionTest {
 		DataClass dataClass = context.getDescriptor(memberType);
         Assertions.assertInstanceOf(DataClassRecord.class, dataClass);
 		Assertions.assertEquals(AbstractUnionCircle.class, dataClass.typeClass());
+
+		Typename typename = context.getTypename(AbstractUnion.class);
+		Assertions.assertEquals("AbstractUnion", typename.name());
+		Definition definition = context.getDefinition(typename);
+		Assertions.assertNotNull(definition);
 
 	}
 

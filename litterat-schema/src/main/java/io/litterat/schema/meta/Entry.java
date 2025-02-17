@@ -22,4 +22,12 @@ public class Entry {
 	public Definition definition() {
 		return definition;
 	}
+
+	@Override
+	public String toString() {
+		return "Entry{" +
+				"typename=" + typename +
+				", definition=" + definition +
+				'}';
+	}
 }

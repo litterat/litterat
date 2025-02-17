@@ -19,10 +19,8 @@ import io.litterat.annotation.Record;
 import io.litterat.annotation.ToData;
 
 /**
- *
  * This is an example of a class which uses the ToData interface to expose another class
  * "ProjectImmutableData" as the set of values to be used in the data.
- *
  */
 public class ProjectImmutable implements ToData<ProjectImmutable.ProjectImmutableData> {
 

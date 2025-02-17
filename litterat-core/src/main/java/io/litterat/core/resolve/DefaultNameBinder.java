@@ -1,12 +1,12 @@
 package io.litterat.core.resolve;
 
 import io.litterat.annotation.Namespace;
+import io.litterat.bind.DataClass;
 import io.litterat.core.TypeContext;
 import io.litterat.core.TypeContextNameBinder;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Typename;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +17,13 @@ import java.util.Map;
  */
 public class DefaultNameBinder implements TypeContextNameBinder {
 
+
 	private final Map<String,Package> namespaceMap = new HashMap<>();
 
 	@Override
-	public Typename resolve(TypeContext context, Class<?> clss, Type type) throws TypeException {
+	public Typename resolve(TypeContext context, DataClass dataClass) throws TypeException {
+		Class<?> clss = dataClass.typeClass();
+
 		String namespace = clss.getPackageName();
 		String name = clss.getSimpleName();
 

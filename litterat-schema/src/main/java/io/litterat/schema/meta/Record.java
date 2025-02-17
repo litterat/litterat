@@ -51,4 +51,11 @@ public class Record implements Element {
 	public int hashCode() {
 		return Arrays.hashCode(fields);
 	}
+
+	@Override
+	public String toString() {
+		return "Record{" +
+				"fields=" + Arrays.toString(fields) +
+				'}';
+	}
 }

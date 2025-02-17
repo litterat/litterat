@@ -1,9 +1,8 @@
 package io.litterat.core;
 
+import io.litterat.bind.DataClass;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Typename;
-
-import java.lang.reflect.Type;
 
 /**
  * 
@@ -15,7 +14,7 @@ public interface TypeContextNameBinder {
 	/**
 	 * Derive the schema Typename from the Java targetClass.
 	 */
-	Typename resolve(TypeContext context, Class<?> targetClass, Type parameterizedType) throws TypeException;
+	Typename resolve(TypeContext context, DataClass dataClass) throws TypeException;
 
 	/**
 	 * Find a Java class given

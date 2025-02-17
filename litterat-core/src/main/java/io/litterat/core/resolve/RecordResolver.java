@@ -33,13 +33,20 @@ public class RecordResolver implements TypeResolver<Record, DataClassRecord> {
                     case DataClassAtom atom -> context.getTypename(atom.dataClass());
                     case DataClassArray array -> new Array(context.getTypename(array.arrayDataClass().dataClass()));
                     case DataClassUnion union -> {
-                        boolean isSealed = union.isSealed();
-                        Class<?>[] unionClasses = union.memberTypes();
-                        Typename[] unionMembers = new Typename[unionClasses.length];
-                        for (int unionMemberIndex=0; unionMemberIndex< unionMembers.length; unionMemberIndex++) {
-                            unionMembers[unionMemberIndex] = context.getTypename(unionClasses[unionMemberIndex]);
+
+                        // This is a field union, which means that the union type has its own typename.
+                        // In this case, most of the time, we want the typename of the dataClass of the union.
+                        try {
+                            yield context.getTypename(union.dataClass());
+                        } catch (TypeException ex) {
+                            boolean isSealed = union.isSealed();
+                            Class<?>[] unionClasses = union.memberTypes();
+                            Typename[] unionMembers = new Typename[unionClasses.length];
+                            for (int unionMemberIndex = 0; unionMemberIndex < unionMembers.length; unionMemberIndex++) {
+                                unionMembers[unionMemberIndex] = context.getTypename(unionClasses[unionMemberIndex]);
+                            }
+                            yield new Union(unionMembers, isSealed);
                         }
-                        yield new Union(unionMembers);
                     }
                     case DataClassRecord record -> context.getTypename(record.dataClass());
                     case null, default -> throw new TypeException("Unknown field type");

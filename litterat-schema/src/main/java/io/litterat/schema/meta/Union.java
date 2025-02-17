@@ -65,4 +65,12 @@ public class Union implements Element {
 	public int hashCode() {
 		return Objects.hash(Arrays.hashCode(map), isSealed);
 	}
+
+	@Override
+	public String toString() {
+		return "Union{" +
+				"members=" + Arrays.toString(map) +
+				", isSealed=" + isSealed +
+				'}';
+	}
 }

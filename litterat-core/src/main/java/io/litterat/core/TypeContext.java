@@ -114,19 +114,19 @@ public class TypeContext {
 
         try {
 			// bind atoms to local classes. Not expecting any exception here.
-            register(Meta.BOOLEAN, Boolean.class, Boolean.class);
-			register(Meta.BOOLEAN, boolean.class, boolean.class);
+            register(Meta.BOOLEAN, Boolean.class);
+			register(Meta.BOOLEAN, boolean.class);
 
-			register(Meta.INT32, Integer.class, Integer.class);
-			register(Meta.INT32, int.class, int.class);
+			register(Meta.INT32, Integer.class);
+			register(Meta.INT32, int.class);
 
-			register(Meta.INT16, Short.class, Short.class);
-			register(Meta.INT16, short.class, short.class);
+			register(Meta.INT16, Short.class);
+			register(Meta.INT16, short.class);
 
-			register(Meta.FLOAT, Float.class, Float.class);
-			register(Meta.FLOAT, float.class, float.class);
+			register(Meta.FLOAT, Float.class);
+			register(Meta.FLOAT, float.class);
 
-			register(Meta.STRING, String.class, String.class);
+			register(Meta.STRING, String.class);
         } catch (TypeException e) {
             throw new RuntimeException(e);
         }
@@ -161,8 +161,9 @@ public class TypeContext {
 			DataClass result = null;
 			Typename typename = classTypename.get(targetClass);
 			if (typename == null) {
-				typename = nameBinder.resolve(this, targetClass, parameterizedType);
-				result = register(typename, targetClass, parameterizedType);
+				DataClass dataClass = bindContext.getDescriptor(targetClass, parameterizedType);
+				typename = nameBinder.resolve(this, dataClass);
+				result = register(typename, targetClass);
 			} else {
 				result = bindContext.getDescriptor(targetClass, parameterizedType);
 			}
@@ -170,6 +171,10 @@ public class TypeContext {
         } catch (DataBindException e) {
             throw new TypeException(e);
         }
+	}
+
+	public Definition getDefinition(Typename typename) throws TypeException {
+		return typeLibrary.getDefinition(typename);
 	}
 
 	public DataClass getDescriptor(Typename typename) throws TypeException {
@@ -192,8 +197,13 @@ public class TypeContext {
 	public Typename getTypename(Class<?> targetClass, Type parameterizedType) throws TypeException {
 		Typename typename = classTypename.get(targetClass);
 		if (typename == null) {
-			typename = nameBinder.resolve(this, targetClass, parameterizedType);
-			register(typename, targetClass, parameterizedType);
+			try {
+				DataClass dataClass = bindContext.getDescriptor(targetClass, parameterizedType);
+				typename = nameBinder.resolve(this, dataClass);
+				register(typename, dataClass, parameterizedType);
+			} catch (DataBindException ex) {
+				throw new TypeException(ex);
+			}
 		}
 		return typename;
 	}
@@ -221,10 +231,19 @@ public class TypeContext {
 
     }
 
-	public DataClass register(Typename typename, Class<?> targetClass, Type parameterizedType) throws TypeException {
+	public DataClass register(Typename typename, Class<?> targetClass) throws TypeException {
 
-        try {
-            DataClass dataClass = dataBindContext().getDescriptor(targetClass, parameterizedType);
+		try {
+			DataClass dataClass = dataBindContext().getDescriptor(targetClass);
+			return register(typename, dataClass, dataClass.dataClass());
+		} catch (DataBindException ex) {
+			throw new TypeException(ex);
+		}
+	}
+
+
+	private DataClass register(Typename typename, DataClass dataClass, Type parameterizedType) throws TypeException, DataBindException {
+		Class<?> targetClass = dataClass.typeClass();
 
 			if (registerStack.contains(typename)) {
 				System.out.println("already trying to register: " + typename);
@@ -250,9 +269,6 @@ public class TypeContext {
 
 			registerStack.pop();
 			return dataClass;
-        } catch (DataBindException | CodeAnalysisException e) {
-            throw new TypeException(e);
-        }
 
 	}
 
@@ -281,7 +297,7 @@ public class TypeContext {
 	public void registerAtom(Typename typename, Class<?> targetClass, DataBridge<?, ?> bridge) throws TypeException {
         try {
             DataClassAtom dataClass = bindContext.registerAtom(targetClass, bridge);
-			register(typename, targetClass, targetClass);
+			register(typename, targetClass);
 			//typenameClass.putIfAbsent(typename, targetClass);
         } catch (DataBindException e) {
             throw new TypeException(e);

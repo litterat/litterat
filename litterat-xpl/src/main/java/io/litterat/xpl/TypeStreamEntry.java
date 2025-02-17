@@ -35,4 +35,11 @@ public class TypeStreamEntry {
 		return entry.typename();
 	}
 
+	@Override
+	public String toString() {
+		return "TypeStreamEntry{" +
+				"streamId=" + streamId +
+				", entry=" + entry +
+				'}';
+	}
 }

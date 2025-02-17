@@ -17,6 +17,8 @@ package io.litterat.test.data;
 
 import io.litterat.annotation.Record;
 
+import java.util.Arrays;
+
 /**
  * 
  * This is showing an immutable array being part of another classes tuples.
@@ -35,4 +37,10 @@ public class SimpleArray {
 		return arrayImmutable;
 	}
 
+	@Override
+	public String toString() {
+		return "SimpleArray{" +
+				"arrayImmutable=" + Arrays.toString(arrayImmutable) +
+				'}';
+	}
 }

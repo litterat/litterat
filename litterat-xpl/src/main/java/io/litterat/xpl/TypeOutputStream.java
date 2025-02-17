@@ -15,12 +15,6 @@
  */
 package io.litterat.xpl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.util.Objects;
-
 import io.litterat.core.TypeContext;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Entry;
@@ -28,6 +22,11 @@ import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.io.ByteArrayBaseOutput;
 import io.litterat.xpl.io.ByteBufferBaseOutput;
 import io.litterat.xpl.io.StreamBaseOutput;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class TypeOutputStream implements TypeStream {
 
@@ -89,6 +88,7 @@ public class TypeOutputStream implements TypeStream {
 	}
 
 	public void writeObject(Object object) throws IOException {
+		logOutput("writing object");
 		try {
 			Objects.requireNonNull(object, "writeObject(Object) requires non null value");
 
@@ -97,18 +97,14 @@ public class TypeOutputStream implements TypeStream {
 				entry = register(typeMap.context().getTypename(object.getClass()));
 			}
 
-			logOutput("writing " + object.getClass() + " streamId " + entry.streamId());
-			output().writeUVarInt32(entry.streamId());
-
-			logOutput( "writing object");
-			entry.writer().write(this, object);
-
+			writeObject(entry, object);
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
 	}
 
 	public void writeObject(Typename typename, Object object) throws IOException {
+		logOutput("writing typename, object");
 		try {
 			Objects.requireNonNull(typename, "writeObject(Typename, Object) requires non null value");
 
@@ -116,16 +112,34 @@ public class TypeOutputStream implements TypeStream {
 			if (entry == null) {
 				entry = register(typename);
 			}
-
-			logOutput("writing " + typename + " streamId " + entry.streamId());
-			output().writeUVarInt32(entry.streamId());
-
-			logOutput( "writing object");
-			entry.writer().write(this, object);
-
+			writeObject(entry, object);
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
+	}
+
+	private void writeObject(TypeMapEntry entry, Object object ) throws Throwable {
+		logOutput("writing " + entry.typename() + " streamId " + entry.streamId());
+
+		// If we're writing a Typename, then check if it has been used previously.
+		if (object instanceof Typename typename) {
+			logOutput("writing typename............ " + typename);
+			TypeMapEntry embedded = typeMap.getEntry(typename);
+			if (embedded == null) {
+				logOutput("typename not registered............ " + typename);
+				register(typename);
+			}
+		}
+
+		output().writeUVarInt32(entry.streamId());
+
+		logOutput( "writing object: " + (object != null ? object.toString():"null"));
+		if (entry.dataClass().bridge().isPresent()) {
+			entry.writer().write( this, entry.dataClass().bridge().get().toData().invoke(object));
+		} else {
+			entry.writer().write(this, object);
+		}
+
 	}
 
 	public void logOutput(String msg) {

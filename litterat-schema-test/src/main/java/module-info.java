@@ -13,13 +13,11 @@
  */
 open module io.litterat.test.model {
 
-	requires io.litterat.annotation;
 	requires io.litterat.bind;
 	requires io.litterat.schema;
 
 	// The test data.
-	requires io.litterat.test.core;
+	requires io.litterat.test.data;
 
 	requires org.junit.jupiter.api;
-
 }

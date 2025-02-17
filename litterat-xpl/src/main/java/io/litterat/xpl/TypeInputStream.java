@@ -15,16 +15,16 @@
  */
 package io.litterat.xpl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-
 import io.litterat.core.TypeContext;
 import io.litterat.schema.TypeException;
 import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.io.ByteArrayBaseInput;
 import io.litterat.xpl.io.ByteBufferBaseInput;
 import io.litterat.xpl.io.StreamBaseInput;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 public class TypeInputStream implements TypeStream {
 
@@ -107,7 +107,12 @@ public class TypeInputStream implements TypeStream {
 			if (entry == null) {
 				throw new IOException("type not known in stream: " + type);
 			}
-			return (T) entry.reader().read(this);
+
+			Object value = entry.reader().read(this);
+			if (entry.dataClass().bridge().isPresent()) {
+				value = entry.dataClass().bridge().get().toObject().invoke(value);
+			}
+			return (T) value;
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
@@ -132,7 +137,11 @@ public class TypeInputStream implements TypeStream {
 			if (entry != clssEntry) {
 				throw new IOException("wrong type on stream");
 			}
-			return (T) entry.reader().read(this);
+			Object value = entry.reader().read(this);
+			if (entry.dataClass().bridge().isPresent()) {
+				value = entry.dataClass().bridge().get().toObject().invoke(value);
+			}
+			return (T) value;
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
@@ -151,7 +160,11 @@ public class TypeInputStream implements TypeStream {
 				throw new IOException("wrong type on stream: expected " + typeName.toString() + " found: "
 						+ entry.typename().toString());
 			}
-			return (T) entry.reader().read(this);
+			Object value = entry.reader().read(this);
+			if (entry.dataClass().bridge().isPresent()) {
+				value = entry.dataClass().bridge().get().toObject().invoke(value);
+			}
+			return (T) value;
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}

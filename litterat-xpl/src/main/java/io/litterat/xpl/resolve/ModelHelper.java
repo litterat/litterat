@@ -1,13 +1,13 @@
 package io.litterat.xpl.resolve;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-
-import io.litterat.schema.TypeException;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
+import io.litterat.schema.TypeException;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 
 public final class ModelHelper {
 
@@ -23,26 +23,18 @@ public final class ModelHelper {
 				if (componentClass instanceof DataClassAtom) {
 					DataClassAtom dataClassAtom = (DataClassAtom) componentClass;
 
-					toData = MethodHandles.filterArguments(dataClassAtom.toData(), 0, dataField.accessor());
+					toData = MethodHandles.filterArguments(toDataMethodHandle(dataClassAtom), 0, dataField.accessor());
 
 					if (!dataClassAtom.dataClass().isPrimitive()) {
 						toData = checkIsPresent(dataClass, dataField, toData, dataClassAtom.dataClass());
 					}
 
-				} else if (componentClass instanceof DataClassRecord) {
-
-					DataClassRecord dataClassRecord = (DataClassRecord) componentClass;
-
-					// MethodHandle fieldToData = dataClassRecord.toData();
-
-					// toData = MethodHandles.filterArguments(fieldToData, 0, dataField.accessor());
+				} else if (componentClass instanceof DataClassRecord dataClassRecord) {
 
 					toData = dataField.accessor();
-
-					if (!dataClassRecord.typeClass().isPrimitive()) {
-						toData = checkIsPresent(dataClass, dataField, toData, dataClassRecord.typeClass());
+					if (dataClass.bridge().isPresent()) {
+						toData = MethodHandles.filterArguments(dataClass.bridge().get().toData(), 0, toData);
 					}
-
 				} else {
 					toData = dataField.accessor();
 				}
@@ -56,6 +48,14 @@ public final class ModelHelper {
 				String.format("Field '%s' not found in dataClass '%s'", fieldName, dataClass.typeClass().getName()));
 	}
 
+	private static MethodHandle toDataMethodHandle(DataClass dataClass) {
+		if (dataClass.bridge().isPresent()) {
+			return dataClass.bridge().get().toData();
+		} else {
+			return MethodHandles.identity(dataClass.dataClass());
+		}
+	}
+
 	public static MethodHandle resolveFieldSetter(DataClassRecord dataClass, String field) throws TypeException {
 		for (DataClassField component : dataClass.fields()) {
 			if (component.name().equalsIgnoreCase(field)) {
@@ -66,14 +66,14 @@ public final class ModelHelper {
 				// for the setter. toObject will be identity function if no change required.
 				DataClass componentClass = component.dataClass();
 				if (componentClass instanceof DataClassAtom) {
-					MethodHandle toObject = ((DataClassAtom) componentClass).toObject();
+					MethodHandle toObject = toObjectMethodHandle(componentClass);
 
 					return MethodHandles.filterArguments(setter, 0, toObject);
 				} else if (componentClass instanceof DataClassRecord) {
-					// MethodHandle toObject = ((DataClassRecord) componentClass).toObject();
+					 MethodHandle toObject = toObjectMethodHandle(componentClass);
 
-					// return MethodHandles.filterArguments(setter, 0, toObject);
-					return setter;
+					return MethodHandles.filterArguments(setter, 0, toObject);
+					//return setter;
 				} else {
 					return setter;
 				}
@@ -81,6 +81,14 @@ public final class ModelHelper {
 		}
 
 		throw new TypeException("Field not found");
+	}
+
+	private static MethodHandle toObjectMethodHandle(DataClass dataClass) {
+		if (dataClass.bridge().isPresent()) {
+			return dataClass.bridge().get().toObject();
+		} else {
+			return MethodHandles.identity(dataClass.dataClass());
+		}
 	}
 
 	// If the value is primitive don't wrap it in guard with test. This is mainly because

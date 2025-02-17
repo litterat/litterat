@@ -53,4 +53,11 @@ public class Array implements Element {
 	public int hashCode() {
 		return Objects.hashCode(type);
 	}
+
+	@Override
+	public String toString() {
+		return "Array{" +
+				"type=" + type +
+				'}';
+	}
 }
