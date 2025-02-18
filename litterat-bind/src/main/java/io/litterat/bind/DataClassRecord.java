@@ -17,7 +17,6 @@ package io.litterat.bind;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * A DataClassRecord provides a descriptor for record data classes projected/embedded pair for use
@@ -25,19 +24,10 @@ import java.util.Optional;
  */
 public class DataClassRecord extends DataClass {
 
-	// The embedded class type.
-	private final Class<?> dataClass;
+	private final boolean isMutable;
 
-	// Method handle to convert object to data object.
-	// Converts from typeClass -> dataClasss.
-	private final MethodHandle toData;
-
-	// Method handle to convert data object to target object.
-	// Converts from dataClass -> typeClass.
-	private final MethodHandle toObject;
-
-	// Optional empty constructor for data object.
-	private final Optional<MethodHandle> creator;
+	// Empty constructor/acquirer for data object mutable objects.
+	private final MethodHandle creator;
 
 	// Constructor for the data object.
 	private final MethodHandle constructor;
@@ -45,45 +35,19 @@ public class DataClassRecord extends DataClass {
 	// All fields in the projected class.
 	private final DataClassField[] fields;
 
-	public DataClassRecord(Class<?> targetType, Class<?> serialType, MethodHandle creator, MethodHandle constructor,
-			MethodHandle toData, MethodHandle toObject, DataClassField[] fields) {
-		super(targetType, DataClassType.RECORD);
-
-		this.dataClass = serialType;
-		this.toData = toData;
-		this.toObject = toObject;
+	public DataClassRecord( Class<?> targetType, DataClassBridge bridge, boolean isMutable, MethodHandle creator, MethodHandle constructor,  DataClassField[] fields) {
+		super(targetType, bridge);
 		this.fields = fields;
-		this.creator = Optional.ofNullable(creator);
+		this.isMutable = isMutable;
+		this.creator = creator;
 		this.constructor = constructor;
 	}
 
-	public DataClassRecord(Class<?> targetType, Class<?> serialType, MethodHandle constructor, MethodHandle toData,
-			MethodHandle toObject, DataClassField[] fields) {
-		this(targetType, serialType, null, constructor, toData, toObject, fields);
+	public boolean isMutable() {
+		return isMutable;
 	}
 
-	/**
-	 * @return The embedded class. This may be equal to the target class.
-	 */
-	public Class<?> dataClass() {
-		return dataClass;
-	}
-
-	/**
-	 * @return A MethodHandle that has the signature T embed(Object[] values).
-	 */
-	public MethodHandle toObject() {
-		return toObject;
-	}
-
-	/**
-	 * @return A MethodHandle that has the signature Object[] project(T object)
-	 */
-	public MethodHandle toData() {
-		return toData;
-	}
-
-	public Optional<MethodHandle> creator() {
+	public MethodHandle creator() {
 		return creator;
 	}
 
@@ -103,7 +67,7 @@ public class DataClassRecord extends DataClass {
 
 	@Override
 	public String toString() {
-		return "DataClassRecord [ typeClass=" + typeClass().getName() + ", dataClass=" + dataClass.getName()
-				+ ", fields=" + Arrays.toString(fields) + "]";
+		return "DataClassRecord [ typeClass=" + typeClass().getName() + ", fields=" + Arrays.toString(fields) + "]";
 	}
+
 }

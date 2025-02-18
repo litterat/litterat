@@ -15,19 +15,19 @@
  */
 package io.litterat.test.json;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.UUID;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Meta;
+import io.litterat.test.data.SimpleUUIDImmutable;
+import io.litterat.test.data.UUIDBridge;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataBindException;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.SimpleUUIDImmutable;
-import io.litterat.test.bind.data.UUIDBridge;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.UUID;
 
 public class UUIDBridgeTest {
 
@@ -36,12 +36,12 @@ public class UUIDBridgeTest {
 
 	SimpleUUIDImmutable test = new SimpleUUIDImmutable(FIRST_UUID, SECOND_UUID);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
-	public void setup() throws DataBindException {
-		context = DataBindContext.builder().build();
-		context.registerAtom(UUID.class, new UUIDBridge());
+	public void setup() throws TypeException {
+		context = TypeContext.builder().build();
+		context.registerAtom(Meta.UUID, UUID.class, new UUIDBridge());
 	}
 
 	@Test

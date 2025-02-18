@@ -15,22 +15,22 @@
  */
 package io.litterat.xpl.resolve;
 
-import java.io.IOException;
-
-import io.litterat.model.TypeName;
+import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.TypeInputStream;
 import io.litterat.xpl.TypeOutputStream;
 import io.litterat.xpl.TypeReader;
 import io.litterat.xpl.TypeWriter;
 
+import java.io.IOException;
+
 public class UnionReaderWriter implements TypeReader, TypeWriter {
 
 	@SuppressWarnings("unused")
-	private final TypeName typeName;
+	private final Typename typename;
 
-	public UnionReaderWriter(TypeName typeName) {
+	public UnionReaderWriter(Typename typeName) {
 
-		this.typeName = typeName;
+		this.typename = typeName;
 	}
 
 	@Override

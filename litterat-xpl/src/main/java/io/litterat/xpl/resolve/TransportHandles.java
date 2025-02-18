@@ -22,10 +22,11 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-import io.litterat.model.TypeName;
-import io.litterat.model.library.TypeException;
-import io.litterat.model.library.TypeLibrary;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Meta;
+import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.TypeBaseInput;
 import io.litterat.xpl.TypeBaseOutput;
 import io.litterat.xpl.TypeInputStream;
@@ -35,30 +36,30 @@ import io.litterat.xpl.TypeWriter;
 
 public class TransportHandles {
 
-	private static Lookup lookup = MethodHandles.lookup();
+	private static final Lookup lookup = MethodHandles.lookup();
 
-	private static Map<TypeName, MethodHandle> readHandles = new HashMap<>();
-	private static Map<TypeName, MethodHandle> writeHandles = new HashMap<>();
+	private static final Map<Typename, MethodHandle> readHandles = new HashMap<>();
+	private static final Map<Typename, MethodHandle> writeHandles = new HashMap<>();
 
 	static {
 
 		try {
-			readHandles.put(TypeLibrary.FLOAT,
+			readHandles.put(Meta.FLOAT,
 					lookup.findVirtual(TypeBaseInput.class, "readFloat", MethodType.methodType(float.class)));
 
-			readHandles.put(TypeLibrary.BOOLEAN,
+			readHandles.put(Meta.BOOLEAN,
 					lookup.findVirtual(TypeBaseInput.class, "readBoolean", MethodType.methodType(boolean.class)));
 
-			readHandles.put(TypeLibrary.INT32,
+			readHandles.put(Meta.INT32,
 					lookup.findVirtual(TypeBaseInput.class, "readInt32", MethodType.methodType(int.class)));
 
-			writeHandles.put(TypeLibrary.FLOAT, lookup.findVirtual(TypeBaseOutput.class, "writeFloat",
+			writeHandles.put(Meta.FLOAT, lookup.findVirtual(TypeBaseOutput.class, "writeFloat",
 					MethodType.methodType(void.class, float.class)));
 
-			writeHandles.put(TypeLibrary.BOOLEAN, lookup.findVirtual(TypeBaseOutput.class, "writeBoolean",
+			writeHandles.put(Meta.BOOLEAN, lookup.findVirtual(TypeBaseOutput.class, "writeBoolean",
 					MethodType.methodType(void.class, boolean.class)));
 
-			writeHandles.put(TypeLibrary.INT32, lookup.findVirtual(TypeBaseOutput.class, "writeInt32",
+			writeHandles.put(Meta.INT32, lookup.findVirtual(TypeBaseOutput.class, "writeInt32",
 					MethodType.methodType(void.class, int.class)));
 
 		} catch (NoSuchMethodException | IllegalAccessException e) {
@@ -68,8 +69,8 @@ public class TransportHandles {
 
 	}
 
-	public static MethodHandle getInputHandle(TypeName typeName)
-			throws NoSuchMethodException, IllegalAccessException, TypeException {
+	public static MethodHandle getInputHandle(Typename typeName)
+			throws TypeException {
 		MethodHandle handle = readHandles.get(typeName);
 		if (handle == null) {
 			throw new TypeException("No input handle for type: " + typeName.toString());
@@ -77,8 +78,8 @@ public class TransportHandles {
 		return handle;
 	}
 
-	public static MethodHandle getOutputHandle(TypeName typeName)
-			throws NoSuchMethodException, IllegalAccessException, TypeException {
+	public static MethodHandle getOutputHandle(Typename typeName)
+			throws TypeException {
 
 		MethodHandle handle = writeHandles.get(typeName);
 		if (handle == null) {
@@ -87,8 +88,8 @@ public class TransportHandles {
 		return handle;
 	}
 
-	public static TypeReader getReader(TypeName typeName) {
-		return new TransportTypeReader(readHandles.get(typeName));
+	public static TypeReader getReader(Typename typeName) throws TypeException {
+		return new TransportTypeReader(getInputHandle(typeName));
 	}
 
 	public static class TransportTypeReader implements TypeReader {
@@ -111,8 +112,8 @@ public class TransportHandles {
 
 	}
 
-	public static TypeWriter getWriter(TypeName typeName) {
-		return new TransportTypeWriter(writeHandles.get(typeName));
+	public static TypeWriter getWriter(Typename typeName) throws TypeException {
+		return new TransportTypeWriter(getOutputHandle(typeName));
 	}
 
 	public static class TransportTypeWriter implements TypeWriter {
@@ -120,6 +121,7 @@ public class TransportHandles {
 		private final MethodHandle mh;
 
 		public TransportTypeWriter(MethodHandle mh) {
+			Objects.requireNonNull(mh);
 			this.mh = mh;
 		}
 

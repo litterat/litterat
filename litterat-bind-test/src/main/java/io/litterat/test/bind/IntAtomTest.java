@@ -13,19 +13,18 @@
  */
 package io.litterat.test.bind;
 
-import java.util.Map;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.data.IntAtom;
-import io.litterat.test.bind.data.IntAtomData;
+import io.litterat.test.data.IntAtom;
+import io.litterat.test.data.IntAtomData;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 public class IntAtomTest {
 
@@ -45,8 +44,7 @@ public class IntAtomTest {
 		DataClass descriptor = context.getDescriptor(IntAtom.class);
 
 		Assertions.assertNotNull(descriptor);
-		Assertions.assertTrue(descriptor instanceof DataClassAtom);
-
+		Assertions.assertInstanceOf(DataClassAtom.class, descriptor);
 		DataClassAtom descriptorAtom = (DataClassAtom) descriptor;
 
 		Assertions.assertEquals(IntAtom.class, descriptorAtom.typeClass());
@@ -60,13 +58,15 @@ public class IntAtomTest {
 		ArrayMapper arrayMap = new ArrayMapper(context);
 		Object[] values = arrayMap.toArray(test);
 		Assertions.assertNotNull(values);
+		Assertions.assertInstanceOf(Integer.class, values[0]);
+		Assertions.assertEquals(INT_ATOM_TEST.id(), (int) values[0]);
 
 		// rebuild as an object.
 		IntAtomData object = arrayMap.toObject(IntAtomData.class, values);
 
 		// Validate
 		Assertions.assertNotNull(object);
-		Assertions.assertTrue(object instanceof IntAtomData);
+		Assertions.assertInstanceOf(IntAtomData.class, object);
 		Assertions.assertEquals(INT_ATOM_TEST, test.intAtom());
 	}
 
@@ -80,7 +80,7 @@ public class IntAtomTest {
 
 		// validate result.
 		Assertions.assertNotNull(object);
-		Assertions.assertTrue(object instanceof IntAtomData);
+		Assertions.assertInstanceOf(IntAtomData.class, object);
 		Assertions.assertEquals(INT_ATOM_TEST, test.intAtom());
 	}
 }

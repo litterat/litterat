@@ -16,6 +16,7 @@
 package io.litterat.bind;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 
@@ -35,18 +36,13 @@ public class DataClassUnion extends DataClass {
 
 	private Class<?>[] memberTypes;
 
-	private boolean isSealed;
+	private final boolean isSealed;
 
 	public DataClassUnion(Class<?> targetType, Class<?>[] members, boolean isSealed) {
-		super(targetType, DataClassType.UNION);
+		super( targetType);
 
-		this.memberTypes = members;
+		this.memberTypes = Objects.requireNonNull(members);
 		this.isSealed = isSealed;
-
-	}
-
-	public DataClassUnion(Class<?> targetType) {
-		this(targetType, new Class[0], false);
 	}
 
 	public Class<?>[] memberTypes() {
@@ -75,11 +71,11 @@ public class DataClassUnion extends DataClass {
 
 	/**
 	 * As different implementations of an interface or abstract class will get loaded at different times
-	 * the list of union types will not all be known at startup. Therefore it needs to be possible to
+	 * the list of union types will not all be known at startup. Therefore, it needs to be possible to
 	 * add additional implementations to the list. One of the reasons why sealed classes are a better
 	 * choice.
 	 * 
-	 * @throws DataBindException
+	 * @throws DataBindException when the union is sealed and new members can't be added.
 	 */
 	public synchronized void addMemberType(Class<?> newType) throws DataBindException {
 

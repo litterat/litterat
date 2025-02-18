@@ -19,13 +19,12 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-import io.litterat.bind.DataBindException;
+import io.litterat.schema.TypeException;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.bind.ModelHelper;
-import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldSet;
 import io.litterat.xpl.lang.LitteratMachine;
+import io.litterat.xpl.resolve.ModelHelper;
 
 public class FieldSetGenerator implements StatementGenerator {
 
@@ -44,11 +43,11 @@ public class FieldSetGenerator implements StatementGenerator {
 
 		try {
 			// Get the data class
-			DataClassRecord dataClass = (DataClassRecord) typeMap.library().getTypeClass(fieldSet.type());
+			DataClassRecord dataClass = (DataClassRecord) typeMap.context().getDescriptor(fieldSet.type());
 
 			// find the getter.
 			return ModelHelper.resolveFieldSetter(dataClass, fieldSet.field());
-		} catch (DataBindException e) {
+		} catch (TypeException e) {
 			throw new TypeException("Failed to get getter", e);
 		}
 	}

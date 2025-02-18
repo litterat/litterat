@@ -15,29 +15,30 @@
  */
 package io.litterat.bind;
 
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * 
  * A DataClass represents the interface into data classes. This is also the parent class for
  * DataClassAtom, DataClassRecord, DatClassArray and DataClassUnion.
  *
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class DataClass {
-
-	public enum DataClassType {
-		ATOM, RECORD, ARRAY, UNION
-	}
 
 	// The application type data class.
 	private final Class<?> typeClass;
 
-	// The data class type.
-	private final DataClassType dataClassType;
+	private final Optional<DataClassBridge> bridge;
 
-	public DataClass(Class<?> targetType, DataClassType dataType) {
+	public DataClass( Class<?> targetType, DataClassBridge bridge) {
+		this.typeClass = Objects.requireNonNull(targetType);
+		this.bridge = Optional.ofNullable(bridge);
+	}
 
-		this.typeClass = targetType;
-
-		this.dataClassType = dataType;
+	public DataClass( Class<?> targetType) {
+		this(targetType, null);
 	}
 
 	/**
@@ -47,8 +48,14 @@ public abstract class DataClass {
 		return typeClass;
 	}
 
-	public DataClassType dataClassType() {
-		return dataClassType;
+	public Optional<DataClassBridge> bridge() {
+		return bridge;
 	}
 
+	public Class<?> dataClass() {
+		if (bridge().isPresent()) {
+			return bridge().get().dataClass();
+		}
+		return typeClass;
+	}
 }

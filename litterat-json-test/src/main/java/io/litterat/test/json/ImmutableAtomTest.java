@@ -15,18 +15,18 @@
  */
 package io.litterat.test.json;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.schema.meta.Meta;
+import io.litterat.test.data.ImmutableAtom;
+import io.litterat.test.data.SimpleEnum;
+import io.litterat.test.data.UUIDBridge;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.ImmutableAtom;
-import io.litterat.test.bind.data.SimpleEnum;
-import io.litterat.test.bind.data.UUIDBridge;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ImmutableAtomTest {
 
@@ -37,23 +37,23 @@ public class ImmutableAtomTest {
 
 	ImmutableAtom test = new ImmutableAtom(ENUM_TEST, STR_TEST, BOOL_TEST, OPTION_TEST);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test
 	public void checkDescriptor() throws Throwable {
-		context.registerAtom(UUID.class, new UUIDBridge());
+		context.registerAtom(Meta.UUID, UUID.class, new UUIDBridge());
 
 	}
 
 	@Test
 	public void testToJson() throws Throwable {
 
-		context.registerAtom(UUID.class, new UUIDBridge());
+		context.registerAtom(Meta.UUID, UUID.class, new UUIDBridge());
 
 		// project to an array.
 		String json = JsonMapper.toJson(test);

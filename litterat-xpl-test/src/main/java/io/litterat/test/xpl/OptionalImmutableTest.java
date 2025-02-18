@@ -15,24 +15,23 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-import java.util.Optional;
-
+import io.litterat.core.TypeContext;
+import io.litterat.schema.TypeException;
+import io.litterat.test.data.OptionalImmutable;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.OptionalImmutable;
-import io.litterat.xpl.TypeInputStream;
-import io.litterat.xpl.TypeOutputStream;
+import java.io.IOException;
+import java.util.Optional;
 
 public class OptionalImmutableTest {
 
 	OptionalImmutable test1 = new OptionalImmutable(Optional.empty());
 	OptionalImmutable test2 = new OptionalImmutable(Optional.of("test"));
 
-	DataBindContext context;
+	TypeContext context;
 
 	@Test
 	public void testWriteAndReadMixedImmutable() throws IOException, TypeException {

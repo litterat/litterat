@@ -18,11 +18,11 @@ package io.litterat.xpl.lang;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.bind.Record;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "slot_assigner")
+@Typename(namespace = "xpl", name = "slot_assigner")
 public class SlotAssigner {
 
 	List<Class<?>> slots = new ArrayList<>();

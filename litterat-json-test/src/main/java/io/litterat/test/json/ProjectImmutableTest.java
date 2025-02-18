@@ -15,13 +15,12 @@
  */
 package io.litterat.test.json;
 
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.test.data.ProjectImmutable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import io.litterat.bind.DataBindContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.ProjectImmutable;
 
 public class ProjectImmutableTest {
 
@@ -30,11 +29,11 @@ public class ProjectImmutableTest {
 
 	ProjectImmutable test = new ProjectImmutable(TEST_X, TEST_Y);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test
@@ -44,13 +43,13 @@ public class ProjectImmutableTest {
 
 		System.out.println("json: " + json);
 
-		ProjectImmutable object = JsonMapper.fromJson(json, ProjectImmutable.class);
-
-		// Validate
+		Object object = JsonMapper.fromJson(json, ProjectImmutable.class);
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ProjectImmutable);
-		Assertions.assertEquals(TEST_X, object.x());
-		Assertions.assertEquals(TEST_Y, object.y());
+
+		ProjectImmutable p = (ProjectImmutable) object;
+		Assertions.assertEquals(TEST_X, p.x());
+		Assertions.assertEquals(TEST_Y, p.y());
 
 	}
 

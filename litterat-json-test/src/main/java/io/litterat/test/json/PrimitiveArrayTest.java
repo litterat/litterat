@@ -15,15 +15,14 @@
  */
 package io.litterat.test.json;
 
-import java.util.Arrays;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.test.data.PrimitiveArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.PrimitiveArray;
+import java.util.Arrays;
 
 public class PrimitiveArrayTest {
 
@@ -31,11 +30,11 @@ public class PrimitiveArrayTest {
 
 	PrimitiveArray test = new PrimitiveArray(TEST);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test

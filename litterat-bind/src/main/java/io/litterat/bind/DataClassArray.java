@@ -20,11 +20,11 @@ import java.lang.invoke.MethodHandle;
 /**
  * 
  * Represents an Array data class. The Array could be implemented by either a Java array or
- * collection. This provide an interface made up of MethodHandles to interact with the array
+ * collection. This provides an interface made up of MethodHandles to interact with the array
  * implementation.
- * 
+ * <p>
  * Extracting the values from an array object:
- * 
+ * <p>
  * <pre>
  * DataClassArray arrayClass = (DataClassArray) dataClass;
  * 
@@ -39,9 +39,9 @@ import java.lang.invoke.MethodHandle;
  * 	outputArray[x] = toMap(arrayDataClass, av);
  * }
  * </pre>
- * 
+ * <p>
  * Instantiating and loading values to the array:
- * 
+ * <p>
  * <pre>
  * DataClassArray arrayClass = (DataClassArray) dataClass;
  * Object[] inputArray = (Object[]) data;
@@ -89,10 +89,10 @@ public class DataClassArray extends DataClass {
 	// <value> get( <array>, <iter> );
 	private final MethodHandle get;
 
-	public DataClassArray(Class<?> targetType, DataClass arrayDataClass, MethodHandle constructor, MethodHandle size,
-			MethodHandle iterator, MethodHandle get, MethodHandle put)
+	public DataClassArray(Class<?> targetType, DataClass arrayDataClass,
+			MethodHandle constructor, MethodHandle size, MethodHandle iterator, MethodHandle get, MethodHandle put)
 			throws NoSuchMethodException, IllegalAccessException {
-		super(targetType, DataClassType.ARRAY);
+		super(targetType);
 
 		this.arrayDataClass = arrayDataClass;
 		this.constructor = constructor;

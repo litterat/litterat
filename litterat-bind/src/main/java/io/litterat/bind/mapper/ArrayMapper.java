@@ -15,6 +15,16 @@
  */
 package io.litterat.bind.mapper;
 
+import io.litterat.bind.DataBindContext;
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassBridge;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -22,18 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassAtom;
-import io.litterat.bind.DataClassField;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassUnion;
-
 /**
  * Sample showing how to use the Litterat bind library to convert an Object to/from Object[]
- *
+ * <p>
  * This is intentionally using MethodHandles throughout to demonstrate pre-building method handles
  * for each type. This is the method likely to be used by serialization libraries to improve
  * performance.
@@ -52,12 +53,10 @@ public class ArrayMapper {
 
 	private static class ArrayFunctions {
 
-		// Converts from Object[] to targetClass. Has signature: Object[] project( T
-		// object );
+		// Converts from Object[] to targetClass. Has signature: Object[] project( T object );
 		public final MethodHandle toArray;
 
-		// constructs, calls setters and embeds. Has signature: T embed( Object[] values
-		// ).
+		// constructs, calls setters and embeds. Has signature: T embed( Object[] values ).
 		public final MethodHandle toObject;
 
 		public ArrayFunctions(MethodHandle toArray, MethodHandle toObject) {
@@ -130,118 +129,121 @@ public class ArrayMapper {
 	/**
 	 * Creates the embed method handle. Will create the serial instance, call setters, and class the
 	 * embed method handle to create the target object in a single call. This is equivalent to:
-	 *
+	 * <p>
 	 * // fields mapped as required from value array. T t = new EmbedClass( values[0], values[1], ... );
-	 *
+	 * <p>
 	 * // calls the embed function on the object. return toObject( t );
-	 *
-	 * @param objectConstructor
-	 * @param fields
-	 * @return a single MethodHandle to generate target object from Object[]
-	 * @throws DataBindException
 	 */
 	private MethodHandle createToObjectFunction(DataClass dataClass) throws DataBindException {
 
 		// return MethodHandles.collectArguments(dataClass.toObject(), 0, create);
-
 		MethodHandle result = null;
-		if (dataClass instanceof DataClassAtom) {
-			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-			// Use identity here because calling function wraps the toObject method.
-			// identity( dataObject ):dataObject
-			result = dataClassAtom.toObject()
-					.asType(dataClassAtom.toObject().type().changeParameterType(0, Object.class));
 
-		} else if (dataClass instanceof DataClassRecord) {
-			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
-
-			result = dataClassRecord.constructor();
-
-			DataClassField[] fields = dataClassRecord.fields();
-			for (int x = 0; x < dataClassRecord.fields().length; x++) {
-				DataClassField field = fields[x];
-
-				int inputIndex = x;
-
-				// (values[],int) -> values[int]
-				MethodHandle arrayGetter = MethodHandles.arrayElementGetter(Object[].class);
-
-				// () -> inputIndex
-				MethodHandle index = MethodHandles.constant(int.class, inputIndex);
-
-				DataClass fieldDataClass = field.dataClass();
-
-				// (values[]) -> values[inputIndex]
-				MethodHandle arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index);
-				// .asType(MethodType.methodType(fieldDataClass.dataClass(), Object[].class));
-
-				// TODO Needs to be check for nulls before calling toObject or array to Object.
-
-				// Pass the object through toObject if it isn't an atom.
-				// (values[]) -> toObject(values[x])
-
-				arrayIndexGetter = MethodHandles.collectArguments(createToObjectFunction(fieldDataClass), 0,
-						arrayIndexGetter);
-
-				// (values[],int,Object):void -> values[int] = Object;
-				MethodHandle arraySetter = MethodHandles.arrayElementSetter(Object[].class);
-
-				// (values[],Object):void -> values[x] = Object;
-				MethodHandle arrayIndexSetter = MethodHandles.collectArguments(arraySetter, 1, index);
-
-				// (values[],Object[]):void -> values[x] = toObject(values[x]);
-				MethodHandle arrayValueSetter = MethodHandles.collectArguments(arrayIndexSetter, 1,
-						arrayIndexGetter.asType(MethodType.methodType(Object.class, Object[].class)));
-
-				int[] permuteInput = new int[2];
-				MethodHandle combined = MethodHandles.permuteArguments(arrayValueSetter,
-						MethodType.methodType(void.class, Object[].class), permuteInput);
-
-				result = MethodHandles.foldArguments(result, combined);
-
+        switch (dataClass) {
+            case DataClassAtom dataClassAtom -> {
+				// Use identity here because calling function wraps the toObject method.
+				// identity -> ( dataObject ):dataObject
+				if (dataClassAtom.bridge().isPresent()) {
+					result = MethodHandles.identity(dataClassAtom.bridge().get().dataClass());
+				} else {
+					result = MethodHandles.identity(dataClass.typeClass());
+				}
+				// ( Object ):dataObject
+				//result = result.asType(result.type().changeParameterType(0, Object.class));
 			}
+            case DataClassRecord dataClassRecord -> {
 
-			// (Object[]) -> toObject( ctor(Object[]).setValues(Object[]) )
-			result = MethodHandles.collectArguments(dataClassRecord.toObject(), 0, result);
+				// (Object[]):typeClass -> new TypeClass( params );
+                result = dataClassRecord.constructor();
 
-			result = result.asType(result.type().changeReturnType(dataClass.typeClass()));
+                DataClassField[] fields = dataClassRecord.fields();
+                for (int fieldIndex = 0; fieldIndex < dataClassRecord.fields().length; fieldIndex++) {
+					DataClass fieldDataClass = fields[fieldIndex].dataClass();
 
-		} else if (dataClass instanceof DataClassArray) {
-			DataClassArray dataArrayClass = (DataClassArray) dataClass;
+                    // (Object[],int) -> values[int]:Object
+                    MethodHandle arrayGetter = MethodHandles.arrayElementGetter(Object[].class);
 
-			// toObject( Object[] ):<array>
-			try {
+                    // () -> fieldIndex
+                    MethodHandle index = MethodHandles.constant(int.class, fieldIndex);
 
-				MethodHandle valueToData = createToObjectFunction(dataArrayClass.arrayDataClass());
+                    // (Object[]):Object -> (values[inputIndex]):Object
+                    MethodHandle arrayIndexGetter = MethodHandles.collectArguments(arrayGetter, 1, index);
 
-				ArrayToObjectBridge bridge = new ArrayToObjectBridge(dataArrayClass, valueToData);
+					// (dataClass):typeClass -> toObject(dataClass):typeClass
+					MethodHandle fieldToObject = createToObjectFunction(fieldDataClass);
 
-				result = MethodHandles.lookup().findVirtual(ArrayToObjectBridge.class, "toObject",
-						MethodType.methodType(Object.class, Object[].class)).bindTo(bridge);
+					// (values[]) -> (values[inputIndex)):dataType
+					MethodType arrayIndexGetterType = arrayIndexGetter.type().changeReturnType(fieldToObject.type().parameterType(0));
+					MethodHandle typedArrayIndexGetter = arrayIndexGetter.asType(arrayIndexGetterType);
 
-				result = result.asType(MethodType.methodType(dataArrayClass.typeClass(), Object.class));
+                    // (values[]):fieldType -> toObject(values[x])
+                    arrayIndexGetter = MethodHandles.collectArguments(fieldToObject, 0, typedArrayIndexGetter);
 
-			} catch (NoSuchMethodException | IllegalAccessException e) {
-				throw new DataBindException("failed to build bridge for array", e);
-			}
-		} else if (dataClass instanceof DataClassUnion) {
-			DataClassUnion dataUnionClass = (DataClassUnion) dataClass;
+                    // (values[],int,Object):void -> values[int] = Object;
+                    MethodHandle arraySetter = MethodHandles.arrayElementSetter(Object[].class);
 
-			// toObject( Object[] ):<array>
-			try {
+                    // (values[],Object):void -> values[x] = Object;
+                    MethodHandle arrayIndexSetter = MethodHandles.collectArguments(arraySetter, 1, index);
 
-				UnionToObjectBridge bridge = new UnionToObjectBridge(dataUnionClass);
+                    // (values[],Object[]):void -> values[x] = toObject(values[x]);
+                    MethodHandle arrayValueSetter = MethodHandles.collectArguments(arrayIndexSetter, 1,
+                            arrayIndexGetter.asType(MethodType.methodType(Object.class, Object[].class)));
 
-				result = MethodHandles.lookup().findVirtual(UnionToObjectBridge.class, "toObject",
-						MethodType.methodType(Object.class, Object[].class)).bindTo(bridge);
+                    int[] permuteInput = new int[2];
+                    MethodHandle combined = MethodHandles.permuteArguments(arrayValueSetter,
+                            MethodType.methodType(void.class, Object[].class), permuteInput);
 
-				result = result.asType(MethodType.methodType(dataUnionClass.typeClass(), Object.class));
+                    result = MethodHandles.foldArguments(result, combined);
 
-			} catch (NoSuchMethodException | IllegalAccessException e) {
-				throw new DataBindException("failed to build bridge for array", e);
-			}
-		} else {
-			throw new DataBindException("unexpected data class type");
+                }
+
+                result = result.asType(result.type().changeReturnType(dataClass.dataClass()));
+            }
+            case DataClassArray dataArrayClass -> {
+
+                // toObject( Object[] ):<array>
+                try {
+
+                    MethodHandle valueToData = createToObjectFunction(dataArrayClass.arrayDataClass());
+
+                    ArrayToObjectBridge bridge = new ArrayToObjectBridge(dataArrayClass, valueToData);
+
+                    result = MethodHandles.lookup().findVirtual(ArrayToObjectBridge.class, "toObject",
+                            MethodType.methodType(Object.class, Object[].class)).bindTo(bridge);
+
+                    result = result.asType(MethodType.methodType(dataArrayClass.typeClass(), Object.class));
+
+                } catch (NoSuchMethodException | IllegalAccessException e) {
+                    throw new DataBindException("failed to build bridge for array", e);
+                }
+            }
+            case DataClassUnion dataUnionClass -> {
+
+                // toObject( Object[] ):<array>
+                try {
+
+                    UnionToObjectBridge bridge = new UnionToObjectBridge(dataUnionClass);
+
+                    result = MethodHandles.lookup().findVirtual(UnionToObjectBridge.class, "toObject",
+                            MethodType.methodType(Object.class, Object[].class)).bindTo(bridge);
+
+                    result = result.asType(MethodType.methodType(dataUnionClass.typeClass(), Object.class));
+
+                } catch (NoSuchMethodException | IllegalAccessException e) {
+                    throw new DataBindException("failed to build bridge for array", e);
+                }
+            }
+            case null, default -> throw new DataBindException("unexpected data class type");
+        }
+
+		if (dataClass.bridge().isPresent()) {
+			DataClassBridge bridge = dataClass.bridge().get();
+
+			// toObject( dataObject ):targetObject
+			MethodHandle toObject = bridge.toObject();
+
+			// (Object[]) -> toObject( result )
+			result = MethodHandles.collectArguments(toObject, 0, result);
 		}
 
 		return result;
@@ -250,82 +252,90 @@ public class ArrayMapper {
 	/**
 	 * create project takes a target object and returns an Object[] of values. Not yet complete. Haven't
 	 * worked out how to re-use the Object[] in return value.
-	 *
+	 * <p>
 	 * // Project the instance to the embedded version. EmbeddedClass e = project.invoke(o)
-	 *
+	 * <p>
 	 * // Extract the values from the projected object. Object[] values = new Object[fields.length];
-	 *
+	 * <p>
 	 * // Call the various accessors to fill in the array and return values. return getter.invoke(e,
 	 * values );
-	 *
-	 * @param fields
-	 * @return
-	 * @throws DataBindException
 	 */
 	private MethodHandle createToDataFunction(DataClass dataClass) throws DataBindException {
 
 		MethodHandle toDataMethod = null;
 
-		if (dataClass instanceof DataClassAtom) {
-			DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-
-			toDataMethod = dataClassAtom.toData();
-		} else if (dataClass instanceof DataClassRecord) {
-
-			DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
-
-			// (int):Object[] -> new Object[int]
-			MethodHandle createArray = MethodHandles.arrayConstructor(Object[].class);
-
-			// (int):length -> fields.length
-			MethodHandle index = MethodHandles.constant(int.class, dataClassRecord.fields().length);
-
-			// ():Object[] -> new Object[fields.length]
-			MethodHandle arrayCreate = MethodHandles.collectArguments(createArray, 0, index);
-
-			// (Object[],serialClass):void -> getters(Object[],serialClass)
-			MethodHandle getters = createProjectGetters(dataClassRecord);
-
-			// (Object[],targetClass):void -> getters(Object[], project(targetClass))
-			MethodHandle projectGetters = MethodHandles.collectArguments(getters, 1, dataClassRecord.toData());
-
-			// ():Object[] -> return new Object[fields.length];
-			toDataMethod = MethodHandles.collectArguments(projectGetters, 0, arrayCreate);
-		} else if (dataClass instanceof DataClassArray) {
-
-			try {
-
-				DataClassArray arrayClass = (DataClassArray) dataClass;
-
-				MethodHandle arrayToData = createToDataFunction(arrayClass.arrayDataClass());
-
-				ObjectToArrayBridge bridge = new ObjectToArrayBridge(arrayClass, arrayToData);
-
-				MethodHandle bridgeToData = MethodHandles.lookup().findVirtual(ObjectToArrayBridge.class, "toData",
-						MethodType.methodType(Object[].class, Object.class)).bindTo(bridge);
-
-				toDataMethod = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
-				// fieldBox = MethodHandles.collectArguments(bridgeToData, 0, fieldBox);
-			} catch (NoSuchMethodException | IllegalAccessException e) {
-				throw new DataBindException("failed to build array bridge", e);
+        switch (dataClass) {
+			case DataClassAtom dataClassAtom -> {
+				// (typeClass):typeClass
+				toDataMethod = MethodHandles.identity(dataClass.dataClass());
 			}
-		} else if (dataClass instanceof DataClassUnion) {
-			try {
+            case DataClassRecord dataClassRecord -> {
 
-				DataClassUnion unionClass = (DataClassUnion) dataClass;
+                // (int):Object[] -> new Object[int]
+                MethodHandle createArray = MethodHandles.arrayConstructor(Object[].class);
 
-				ObjectToUnionBridge bridge = new ObjectToUnionBridge(unionClass);
+                // (int):length -> fields.length
+                MethodHandle index = MethodHandles.constant(int.class, dataClassRecord.fields().length);
 
-				MethodHandle bridgeToData = MethodHandles.lookup().findVirtual(ObjectToUnionBridge.class, "toData",
-						MethodType.methodType(Object[].class, Object.class)).bindTo(bridge);
+                // ():Object[] -> new Object[fields.length]
+                MethodHandle arrayCreate = MethodHandles.collectArguments(createArray, 0, index);
 
-				toDataMethod = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
+                // (Object[],serialClass):void -> getters(Object[],serialClass)
+                MethodHandle getters = createProjectGetters(dataClassRecord);
 
-			} catch (NoSuchMethodException | IllegalAccessException e) {
-				throw new DataBindException("failed to build array bridge", e);
+                // (Object[],targetClass):void -> getters(Object[], project(targetClass))
+                //MethodHandle projectGetters = MethodHandles.collectArguments(getters, 1, dataClassRecord.toData());
+
+                // (Object):Object[] -> return getters(new Object[fields.length], serialiClass);
+                toDataMethod = MethodHandles.collectArguments(getters, 0, arrayCreate);
+            }
+            case DataClassArray dataClassArray -> {
+
+                try {
+
+                    DataClassArray arrayClass = (DataClassArray) dataClass;
+
+                    MethodHandle arrayToData = createToDataFunction(arrayClass.arrayDataClass());
+
+                    ObjectToArrayBridge bridge = new ObjectToArrayBridge(arrayClass, arrayToData);
+
+                    MethodHandle bridgeToData = MethodHandles.lookup().findVirtual(ObjectToArrayBridge.class, "toData",
+                            MethodType.methodType(Object[].class, Object.class)).bindTo(bridge);
+
+                    toDataMethod = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
+                    // fieldBox = MethodHandles.collectArguments(bridgeToData, 0, fieldBox);
+                } catch (NoSuchMethodException | IllegalAccessException e) {
+                    throw new DataBindException("failed to build array bridge", e);
+                }
+            }
+            case DataClassUnion dataClassUnion -> {
+				try {
+
+					DataClassUnion unionClass = (DataClassUnion) dataClass;
+
+					ObjectToUnionBridge bridge = new ObjectToUnionBridge(unionClass);
+
+					MethodHandle bridgeToData = MethodHandles.lookup().findVirtual(ObjectToUnionBridge.class, "toData",
+							MethodType.methodType(Object[].class, Object.class)).bindTo(bridge);
+
+					toDataMethod = bridgeToData.asType(MethodType.methodType(Object.class, dataClass.typeClass()));
+
+				} catch (NoSuchMethodException | IllegalAccessException e) {
+					throw new DataBindException("failed to build array bridge", e);
+				}
 			}
-		} else {
-			throw new DataBindException("unexpected data class type");
+
+            case null, default -> throw new DataBindException("unexpected data class type");
+        }
+
+		if (dataClass.bridge().isPresent()) {
+			DataClassBridge bridge = dataClass.bridge().get();
+
+			// toData( targetObject ):dataObject
+			MethodHandle toData = bridge.toData();
+
+			// (typeClass):Object[] -> toData( result ):Object[]
+			toDataMethod = MethodHandles.collectArguments(toDataMethod, 0, toData);
 		}
 
 		return toDataMethod;
@@ -335,17 +345,13 @@ public class ArrayMapper {
 	 * Creates a MethodHandle which converts a Record value into an Object[]. It accepts an empty
 	 * object[] and the record object, and for each field check if a value is present and if available,
 	 * calls the accessor and sets the field.
-	 *
-	 * @param fields
-	 * @return
-	 * @throws DataBindException
 	 */
 	private MethodHandle createProjectGetters(DataClassRecord dataClass) throws DataBindException {
 
 		// (object[]):object[] -> return object[];
 		MethodHandle identity = MethodHandles.identity(Object[].class);
 
-		// (Object[], embedClass):object[] -> return object[];
+		// (Object[], dataClass):object[] -> return object[];
 		MethodHandle result = MethodHandles.dropArguments(identity, 1, dataClass.dataClass());
 
 		DataClassField[] fields = dataClass.fields();
@@ -372,8 +378,11 @@ public class ArrayMapper {
 				throw new IllegalArgumentException("Recursive structures not yet supported for array mapper");
 			}
 
+			// ( typeClass ):dataClass -> (dataClass) toData(typeClass)
+			MethodHandle toDataFunction = createToDataFunction(fieldDataClass);
+
 			// (<targettype>):<fieldtype> -> toData( object.getter() );
-			fieldBox = MethodHandles.collectArguments(createToDataFunction(fieldDataClass), 0, fieldBox)
+			fieldBox = MethodHandles.collectArguments(toDataFunction, 0, fieldBox)
 					.asType(MethodType.methodType(Object.class, dataClass.dataClass()));
 
 			// (value[],object):void -> value[inputIndex] = toData( object.getter() )
@@ -405,7 +414,7 @@ public class ArrayMapper {
 
 	// The ArrayBridge is an easy way out of not writing loops using MethodHandles.
 	// It can be done but is more difficult than above.
-	private class ObjectToArrayBridge {
+	private static class ObjectToArrayBridge {
 
 		private final DataClassArray arrayClass;
 		private final MethodHandle dataToObject;
@@ -490,7 +499,7 @@ public class ArrayMapper {
 		}
 	}
 
-	private class ArrayToObjectBridge {
+	private static class ArrayToObjectBridge {
 
 		private final DataClassArray arrayClass;
 		private final MethodHandle arrayToObject;

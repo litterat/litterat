@@ -15,6 +15,20 @@
  */
 package io.litterat.json;
 
+import io.litterat.bind.DataBindException;
+import io.litterat.bind.DataClass;
+import io.litterat.bind.DataClassArray;
+import io.litterat.bind.DataClassAtom;
+import io.litterat.bind.DataClassBridge;
+import io.litterat.bind.DataClassField;
+import io.litterat.bind.DataClassRecord;
+import io.litterat.bind.DataClassUnion;
+import io.litterat.core.TypeContext;
+import io.litterat.json.parser.JsonReader;
+import io.litterat.json.parser.JsonToken;
+import io.litterat.json.parser.JsonWriter;
+import io.litterat.schema.TypeException;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -28,48 +42,36 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.bind.DataBindException;
-import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassArray;
-import io.litterat.bind.DataClassAtom;
-import io.litterat.bind.DataClassField;
-import io.litterat.bind.DataClassRecord;
-import io.litterat.bind.DataClassUnion;
-import io.litterat.json.parser.JsonReader;
-import io.litterat.json.parser.JsonToken;
-import io.litterat.json.parser.JsonWriter;
-
 public class JsonMapper {
-	private final DataBindContext context;
+	private final TypeContext context;
 
-	public static String toJson(Object object) throws DataBindException {
+	public static String toJson(Object object) throws TypeException {
 		StringWriter writer = new StringWriter();
 		JsonMapper mapper = new JsonMapper();
 		mapper.toJson(object, writer);
 		return writer.toString();
 	}
 
-	public static <T> T fromJson(String json, Class<?> clss) throws DataBindException {
+	public static <T> T fromJson(String json, Class<?> clss) throws TypeException {
 		StringReader reader = new StringReader(json);
 		JsonMapper mapper = new JsonMapper();
 		return mapper.fromJson(json, clss, reader);
 	}
 
-	public JsonMapper(DataBindContext context) {
+	public JsonMapper(TypeContext context) {
 		this.context = context;
 	}
 
 	public JsonMapper() {
-		this(DataBindContext.builder().build());
+		this(TypeContext.builder().build());
 	}
 
-	public void toJson(Object object, Writer writer) throws DataBindException {
+	public void toJson(Object object, Writer writer) throws TypeException {
 		DataClass dataClass = context.getDescriptor(object.getClass());
 		toJson(object, dataClass, new JsonWriter(writer));
 	}
 
-	private void toJson(Object object, DataClass dataClass, JsonWriter writer) throws DataBindException {
+	private void toJson(Object object, DataClass dataClass, JsonWriter writer) throws TypeException {
 
 		Objects.requireNonNull(object);
 
@@ -77,62 +79,59 @@ public class JsonMapper {
 
 		try {
 
-			if (dataClass instanceof DataClassAtom) {
-				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-
-				Object data = dataClassAtom.toData().invoke(object);
-
-				writeAtom(data, writer);
-			} else if (dataClass instanceof DataClassRecord) {
-				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
-
-				Object data = dataClassRecord.toData().invoke(object);
-
-				writer.beginObject();
-
-				DataClassField[] fields = dataClassRecord.fields();
-
-				for (fieldIndex = 0; fieldIndex < dataClassRecord.fields().length; fieldIndex++) {
-					DataClassField field = fields[fieldIndex];
-
-					Object v = field.accessor().invoke(data);
-
-					// Recursively convert object to map.
-					if (v != null) {
-						DataClass fieldDataClass = field.dataClass();
-
-						writer.name(field.name());
-
-						toJson(v, fieldDataClass, writer);
-					}
-
-				}
-
-				writer.endObject();
-			} else if (dataClass instanceof DataClassArray) {
-				DataClassArray arrayClass = (DataClassArray) dataClass;
-
-				writer.beginArray();
-
-				Object arrayData = object;
-				int length = (int) arrayClass.size().invoke(arrayData);
-				Object iterator = arrayClass.iterator().invoke(arrayData);
-				DataClass arrayDataClass = arrayClass.arrayDataClass();
-
-				for (int x = 0; x < length; x++) {
-					Object av = arrayClass.get().invoke(arrayData, iterator);
-					toJson(av, arrayDataClass, writer);
-				}
-
-				writer.endArray();
-			} else if (dataClass instanceof DataClassUnion) {
-				throw new DataBindException("union not implemented");
-			} else {
-				throw new DataBindException("unexpected data class type");
+			// If there's a bridge convert it.
+			if (dataClass.bridge().isPresent()) {
+				DataClassBridge bridge = dataClass.bridge().get();
+				object = bridge.toData().invoke(object);
 			}
 
+            switch (dataClass) {
+                case DataClassAtom dataClassAtom -> writeAtom(object, writer);
+                case DataClassRecord dataClassRecord -> {
+
+                    writer.beginObject();
+
+                    DataClassField[] fields = dataClassRecord.fields();
+
+                    for (fieldIndex = 0; fieldIndex < dataClassRecord.fields().length; fieldIndex++) {
+                        DataClassField field = fields[fieldIndex];
+
+                        Object v = field.accessor().invoke(object);
+
+                        // Recursively convert object to map.
+                        if (v != null) {
+                            DataClass fieldDataClass = field.dataClass();
+
+                            writer.name(field.name());
+
+                            toJson(v, fieldDataClass, writer);
+                        }
+
+                    }
+
+                    writer.endObject();
+                }
+                case DataClassArray arrayClass -> {
+
+                    writer.beginArray();
+
+                    int length = (int) arrayClass.size().invoke(object);
+                    Object iterator = arrayClass.iterator().invoke(object);
+                    DataClass arrayDataClass = arrayClass.arrayDataClass();
+
+                    for (int x = 0; x < length; x++) {
+                        Object av = arrayClass.get().invoke(object, iterator);
+                        toJson(av, arrayDataClass, writer);
+                    }
+
+                    writer.endArray();
+                }
+                case DataClassUnion dataClassUnion -> throw new DataBindException("union not implemented");
+                default -> throw new DataBindException("unexpected data class type");
+            }
+
 		} catch (Throwable t) {
-			throw new DataBindException(String.format("Failed to convert %s to Map.", dataClass.typeClass()), t);
+			throw new TypeException(String.format("Failed to convert %s to Map.", dataClass.typeClass()), t);
 		}
 	}
 
@@ -154,7 +153,7 @@ public class JsonMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T fromJson(String json, Class<?> clss, Reader reader) throws DataBindException {
+	public <T> T fromJson(String json, Class<?> clss, Reader reader) throws TypeException {
 
 		DataClass dataClass = context.getDescriptor(clss);
 
@@ -165,12 +164,19 @@ public class JsonMapper {
 
 	private Map<String, DataClassField> componentMap(DataClassRecord dataClass) {
 		return fieldMaps.computeIfAbsent(dataClass, (clss) -> {
-			return Arrays.asList(clss.fields()).stream().collect(Collectors.toMap(DataClassField::name, item -> item));
+			return Arrays.stream(clss.fields()).collect(Collectors.toMap(DataClassField::name, item -> item));
 		});
 
 	}
 
-	private Object fromJson(DataClass dataClass, JsonReader reader) throws DataBindException {
+	private Object toObject(DataClass dataClass, Object value) throws Throwable {
+		if (dataClass.bridge().isPresent()) {
+			return dataClass.bridge().get().toObject().invoke(value);
+		}
+		return value;
+	}
+
+	private Object fromJson(DataClass dataClass, JsonReader reader) throws TypeException {
 
 		try {
 
@@ -180,26 +186,26 @@ public class JsonMapper {
 			case NUMBER:
 				// This needs to be more defensive. Currently assumes NUMBER, STRING and BOOLEAN are Atoms.
 				DataClassAtom dataClassAtom = (DataClassAtom) dataClass;
-				return dataClassAtom.toObject().invoke(readNumber(dataClassAtom, reader));
+				return toObject(dataClassAtom, readNumber(dataClassAtom, reader));
 
 			case STRING:
 				dataClassAtom = (DataClassAtom) dataClass;
 				String v = reader.nextString();
 				if (dataClassAtom.dataClass() == String.class) {
-					return dataClassAtom.toObject().invoke(v);
+					return toObject(dataClassAtom, v);
 				} else if (dataClassAtom.dataClass() == Character.class) {
 					Character c = Character.valueOf(v.toCharArray()[0]);
-					return dataClassAtom.toObject().invoke(c);
+					return toObject(dataClassAtom, c);
 				} else if (dataClassAtom.dataClass() == char.class) {
 					char c = v.toCharArray()[0];
-					return dataClassAtom.toObject().invoke(c);
+					return toObject(dataClassAtom, c);
 				}
 				throw new DataBindException(
 						String.format("Could not convert string to %s", dataClassAtom.dataClass().getName()));
 			case BOOLEAN:
 				dataClassAtom = (DataClassAtom) dataClass;
 				if (dataClassAtom.dataClass() == boolean.class || dataClassAtom.dataClass() == Boolean.class) {
-					return dataClassAtom.toObject().invoke(reader.nextBoolean());
+					return toObject(dataClassAtom, reader.nextBoolean());
 				}
 				throw new DataBindException(
 						String.format("Could not convert boolean to %s", dataClassAtom.dataClass().getName()));
@@ -213,44 +219,48 @@ public class JsonMapper {
 					throw new IllegalStateException();
 				}
 
-				reader.beginObject();
 
-				// For a union, we need to know which type has been embedded.
-				// For JSON, this is the only time additional information needs to be added to the format
-				// to support the data model.
-				if (dataClass instanceof DataClassUnion) {
-					String name = reader.nextName();
-					if (!name.equalsIgnoreCase("type")) {
-						// The other option here is to try and pattern match the field names against the record models.
-						// That doesn't work great for a stream/token based reader like this.
-						// Check https://serde.rs/enum-representations.html for future implementation options.
-						throw new DataBindException("union expected a type");
+					reader.beginObject();
+
+					// For a union, we need to know which type has been embedded.
+					// For JSON, this is the only time additional information needs to be added to the format
+					// to support the data model.
+					if (dataClass instanceof DataClassUnion) {
+						String name = reader.nextName();
+						if (!name.equalsIgnoreCase("type")) {
+							// The other option here is to try and pattern match the field names against the record
+							// models.
+							// That doesn't work great for a stream/token based reader like this.
+							// Check https://serde.rs/enum-representations.html for future implementation options.
+							throw new DataBindException("union expected a type");
+						}
+					} else {
+
+						DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
+
+						DataClassField[] fields = dataClassRecord.fields();
+						Object[] construct = new Object[fields.length];
+
+						while (reader.hasNext()) {
+
+							String name = reader.nextName();
+
+							// Find the name in the fields.
+							DataClassField field = componentMap(dataClassRecord).get(name);
+							Objects.requireNonNull(field,
+									String.format("field %s not found in class", name, dataClassRecord.typeClass()));
+
+							construct[field.index()] = fromJson(field.dataClass(), reader);
+
+						}
+
+						reader.endObject();
+
+						return toObject(dataClassRecord, dataClassRecord.constructor().invoke(construct));
+
 					}
-				}
+					// return dataClassRecord.toObject().invoke(data);
 
-				DataClassRecord dataClassRecord = (DataClassRecord) dataClass;
-
-				DataClassField[] fields = dataClassRecord.fields();
-				Object[] construct = new Object[fields.length];
-
-				while (reader.hasNext()) {
-
-					String name = reader.nextName();
-
-					// Find the name in the fields.
-					DataClassField field = componentMap(dataClassRecord).get(name);
-					Objects.requireNonNull(field,
-							String.format("field %s not found in class", name, dataClassRecord.dataClass()));
-
-					construct[field.index()] = fromJson(field.dataClass(), reader);
-
-				}
-
-				reader.endObject();
-
-				Object data = dataClassRecord.constructor().invoke(construct);
-
-				return dataClassRecord.toObject().invoke(data);
 
 			case BEGIN_ARRAY:
 
@@ -301,7 +311,7 @@ public class JsonMapper {
 			}
 
 		} catch (Throwable t) {
-			throw new DataBindException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
+			throw new TypeException(String.format("Failed to convert Map to %s.", dataClass.typeClass()), t);
 		}
 	}
 

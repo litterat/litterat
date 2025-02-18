@@ -15,16 +15,15 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-import java.util.List;
-
+import io.litterat.schema.TypeException;
+import io.litterat.test.data.ListOfString;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.ListOfString;
-import io.litterat.xpl.TypeInputStream;
-import io.litterat.xpl.TypeOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class ListOfStringTest {
 
@@ -46,15 +45,16 @@ public class ListOfStringTest {
 		out.close();
 
 		TypeInputStream in = new TypeInputStream(buffer);
-		ListOfString object = in.readObject();
+		Object object = in.readObject();
 
 		// validate result.
 		Assertions.assertNotNull(object);
 		Assertions.assertTrue(object instanceof ListOfString);
 
-		Assertions.assertEquals(TEST_ONE, object.list().get(0));
-		Assertions.assertEquals(TEST_TWO, object.list().get(1));
-		Assertions.assertEquals(TEST_THREE, object.list().get(2));
+		ListOfString objectRead = (ListOfString) object;
+		Assertions.assertEquals(TEST_ONE, objectRead.list().get(0));
+		Assertions.assertEquals(TEST_TWO, objectRead.list().get(1));
+		Assertions.assertEquals(TEST_THREE, objectRead.list().get(2));
 
 	}
 }

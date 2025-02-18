@@ -17,13 +17,13 @@ package io.litterat.xpl.lang.interpret;
 
 import java.lang.invoke.MethodHandle;
 
+import io.litterat.schema.TypeException;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.bind.ModelHelper;
-import io.litterat.model.library.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.FieldSet;
 import io.litterat.xpl.lang.LitteratMachine;
+import io.litterat.xpl.resolve.ModelHelper;
 
 public class FieldSetInterpreter implements StatementInterpreter {
 
@@ -40,10 +40,10 @@ public class FieldSetInterpreter implements StatementInterpreter {
 		this.fieldSetter = resolveFieldSetter(typeMap);
 	}
 
-	private MethodHandle resolveFieldSetter(TypeMap typeMap) throws DataBindException, TypeException {
+	private MethodHandle resolveFieldSetter(TypeMap typeMap) throws TypeException {
 
 		// Get the data class
-		DataClassRecord dataClass = (DataClassRecord) typeMap.library().getTypeClass(fieldSet.type());
+		DataClassRecord dataClass = (DataClassRecord) typeMap.context().getDescriptor(fieldSet.type());
 
 		// find the getter.
 		return ModelHelper.resolveFieldSetter(dataClass, fieldSet.field());

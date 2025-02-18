@@ -17,8 +17,6 @@ package io.litterat.bind;
 
 public class DataBindException extends Exception {
 
-	private static final long serialVersionUID = 2297416016162178731L;
-
 	public DataBindException(String message, Throwable cause) {
 		super(message, cause);
 	}

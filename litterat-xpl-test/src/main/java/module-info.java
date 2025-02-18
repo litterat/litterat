@@ -13,12 +13,14 @@
  */
 open module io.litterat.test.xpl {
 
-	requires io.litterat.bind;
+	requires transitive io.litterat.annotation;
+	requires transitive io.litterat.bind;
+	requires transitive io.litterat.schema;
+
 	requires io.litterat.xpl;
-	requires io.litterat.model;
 
 	// The test data.
-	requires io.litterat.test.bind;
+	requires io.litterat.test.data;
 
 	requires org.junit.jupiter.api;
 

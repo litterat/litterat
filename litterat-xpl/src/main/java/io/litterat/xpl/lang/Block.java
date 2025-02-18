@@ -15,11 +15,11 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "statement")
+@Typename(namespace = "xpl", name = "statement")
 public class Block extends Statement {
 
 	private final Statement[] statements;

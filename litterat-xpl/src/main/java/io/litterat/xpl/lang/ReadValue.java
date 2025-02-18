@@ -15,9 +15,8 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.annotation.Record;
+import io.litterat.schema.meta.Typename;
 
 /**
  *
@@ -26,16 +25,16 @@ import io.litterat.model.annotation.SchemaType;
  */
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "read_value")
+@io.litterat.annotation.Typename(namespace = "xpl", name = "read_value")
 public class ReadValue implements Expression {
 
-	private final TypeName type;
+	private final Typename type;
 
-	public ReadValue(TypeName type) throws NoSuchMethodException, IllegalAccessException {
+	public ReadValue(Typename type) throws NoSuchMethodException, IllegalAccessException {
 		this.type = type;
 	}
 
-	public TypeName type() {
+	public Typename type() {
 		return type;
 	}
 

@@ -13,23 +13,22 @@
  */
 package io.litterat.test.bind;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.data.ImmutableAtom;
-import io.litterat.test.bind.data.SimpleEnum;
-import io.litterat.test.bind.data.UUIDBridge;
+import io.litterat.test.data.ImmutableAtom;
+import io.litterat.test.data.SimpleEnum;
+import io.litterat.test.data.UUIDBridge;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ImmutableAtomTest {
 
@@ -54,8 +53,7 @@ public class ImmutableAtomTest {
 		DataClass descriptor = context.getDescriptor(UUID.class);
 
 		Assertions.assertNotNull(descriptor);
-		Assertions.assertTrue(descriptor instanceof DataClassAtom);
-
+		Assertions.assertInstanceOf(DataClassAtom.class, descriptor);
 		DataClassAtom descriptorAtom = (DataClassAtom) descriptor;
 
 		Assertions.assertEquals(UUID.class, descriptorAtom.typeClass());
@@ -79,7 +77,7 @@ public class ImmutableAtomTest {
 
 		// Validate
 		Assertions.assertNotNull(object);
-		Assertions.assertTrue(object instanceof ImmutableAtom);
+		Assertions.assertInstanceOf(ImmutableAtom.class, object);
 		Assertions.assertEquals(ENUM_TEST, object.enumCount());
 		Assertions.assertEquals(STR_TEST, object.str());
 		Assertions.assertEquals(BOOL_TEST, object.bool());

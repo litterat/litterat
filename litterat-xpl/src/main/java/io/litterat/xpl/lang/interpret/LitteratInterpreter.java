@@ -15,17 +15,16 @@
  */
 package io.litterat.xpl.lang.interpret;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.litterat.bind.DataBindException;
-import io.litterat.model.Atom;
-import io.litterat.model.Definition;
-import io.litterat.model.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.Union;
-import io.litterat.model.atom.StringAtom;
-import io.litterat.model.library.TypeException;
+import io.litterat.bind.DataClass;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Array;
+import io.litterat.schema.meta.Atom;
+import io.litterat.schema.meta.Definition;
+import io.litterat.schema.meta.Record;
+import io.litterat.schema.meta.Typename;
+import io.litterat.schema.meta.Union;
+import io.litterat.schema.meta.atom.StringAtom;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.Block;
 import io.litterat.xpl.lang.BlockArray;
@@ -46,6 +45,9 @@ import io.litterat.xpl.lang.Statement;
 import io.litterat.xpl.lang.Value;
 import io.litterat.xpl.lang.WriteArray;
 import io.litterat.xpl.lang.WriteValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LitteratInterpreter {
 
@@ -70,115 +72,88 @@ public class LitteratInterpreter {
 	private StatementInterpreter compileStatement(TypeMap typeMap, Statement statement)
 			throws NoSuchMethodException, IllegalAccessException, DataBindException, TypeException {
 
-		StatementInterpreter compiledStatement = null;
-		if (statement instanceof FieldSet) {
-			FieldSet fieldSet = (FieldSet) statement;
-			compiledStatement = new FieldSetInterpreter(typeMap, fieldSet,
-					compileExpression(typeMap, fieldSet.objectExpression()),
-					compileExpression(typeMap, fieldSet.valueExpression()));
-		} else if (statement instanceof ReturnNode) {
-			ReturnNode retrn = (ReturnNode) statement;
-			compiledStatement = new ReturnInterpreter(retrn, compileExpression(typeMap, retrn.expression()));
-		} else if (statement instanceof SlotSet) {
-			SlotSet slotSet = (SlotSet) statement;
-			compiledStatement = new SlotSetInterpreter(slotSet, compileExpression(typeMap, slotSet.expression()));
-		} else if (statement instanceof WriteValue) {
-			WriteValue writeType = (WriteValue) statement;
+		return switch (statement) {
+            case FieldSet fieldSet ->  new FieldSetInterpreter(typeMap, fieldSet,
+                    compileExpression(typeMap, fieldSet.objectExpression()),
+                    compileExpression(typeMap, fieldSet.valueExpression()));
+            case ReturnNode returnNode ->
+                    new ReturnInterpreter(returnNode, compileExpression(typeMap, returnNode.expression()));
+            case SlotSet slotSet ->
+                     new SlotSetInterpreter(slotSet, compileExpression(typeMap, slotSet.expression()));
+            case WriteValue writeType -> {
 
-			Definition def = typeMap.library().getDefinition(writeType.type());
-			if (def instanceof Atom) {
-
-				compiledStatement = new WriteAtomInterpreter(writeType,
-						compileExpression(typeMap, writeType.expression()));
-			} else if (def instanceof Record) {
-				compiledStatement = new WriteObjectInterpreter(writeType,
-						compileExpression(typeMap, writeType.expression()));
-
-			} else if (def instanceof TypeName) {
-				compiledStatement = new WriteObjectInterpreter(writeType,
-						compileExpression(typeMap, writeType.expression()));
-			} else if (def instanceof Union) {
-				compiledStatement = new WriteObjectInterpreter(writeType,
-						compileExpression(typeMap, writeType.expression()));
-			} else if (def instanceof StringAtom) {
-				compiledStatement = new WriteObjectInterpreter(writeType,
-						compileExpression(typeMap, writeType.expression()));
-			} else {
-				throw new IllegalArgumentException("Write type not recognised: " + def.getClass().getName());
-			}
-		} else if (statement instanceof Loop) {
-			Loop loop = (Loop) statement;
-			compiledStatement = new LoopInterpreter(loop, compileExpression(typeMap, loop.arrayExpression()),
-					compileStatement(typeMap, loop.loopStatement()));
-		} else if (statement instanceof WriteArray) {
-			WriteArray loop = (WriteArray) statement;
-			compiledStatement = new WriteArrayInterpreter(loop, compileExpression(typeMap, loop.arrayExpression()),
-					compileStatement(typeMap, loop.writeStatement()));
-		} else {
-			throw new IllegalArgumentException("Statement type not recognised: " + statement.getClass().getName());
-		}
-		return compiledStatement;
+                Definition def = typeMap.context().library().getDefinition(writeType.type());
+				yield switch (def) {
+                    case Record _, Typename _, Union _, StringAtom _ -> new WriteObjectInterpreter(writeType,
+                            compileExpression(typeMap, writeType.expression()));
+                    case Atom _ -> new WriteAtomInterpreter(writeType,
+                            compileExpression(typeMap, writeType.expression()));
+                    case Array _ -> new WriteObjectInterpreter(writeType,
+                            compileExpression(typeMap, writeType.expression()));
+                    case null, default ->
+                            throw new IllegalArgumentException("Write type not recognised: " + def.getClass().getName());
+                };
+            }
+            case Loop loop ->
+                    new LoopInterpreter(loop, compileExpression(typeMap, loop.arrayExpression()),
+                            compileStatement(typeMap, loop.loopStatement()));
+            case WriteArray loop ->
+                    new WriteArrayInterpreter(loop, compileExpression(typeMap, loop.arrayExpression()),
+                            compileStatement(typeMap, loop.writeStatement()));
+            case null, default ->
+                    throw new IllegalArgumentException("Statement type not recognised: " + statement.getClass().getName());
+        };
 	}
 
 	private ExpressionInterpreter compileExpression(TypeMap typeMap, Expression expression)
 			throws NoSuchMethodException, IllegalAccessException, DataBindException, TypeException {
-		ExpressionInterpreter compiledExpression = null;
 
-		if (expression instanceof ConstructInstance) {
-			ConstructInstance createInstance = (ConstructInstance) expression;
-			ExpressionInterpreter[] args = new ExpressionInterpreter[createInstance.parameters().length];
-			for (int x = 0; x < args.length; x++) {
-				args[x] = compileExpression(typeMap, createInstance.parameters()[x]);
-			}
+        return switch (expression) {
+            case ConstructInstance createInstance -> {
+                ExpressionInterpreter[] args = new ExpressionInterpreter[createInstance.parameters().length];
+                for (int x = 0; x < args.length; x++) {
+                    args[x] = compileExpression(typeMap, createInstance.parameters()[x]);
+                }
 
-			compiledExpression = new ConstructInstanceInterpreter(typeMap, createInstance, args);
-		} else if (expression instanceof CreateInstance) {
-			CreateInstance createInstance = (CreateInstance) expression;
-			compiledExpression = new CreateInstanceInterpreter(typeMap, createInstance);
-		} else if (expression instanceof BlockArray) {
-			BlockArray blockArray = (BlockArray) expression;
-			ExpressionInterpreter[] args = new ExpressionInterpreter[blockArray.statements().length];
-			for (int x = 0; x < args.length; x++) {
-				args[x] = compileExpression(typeMap, blockArray.statements()[x]);
-			}
-			compiledExpression = new BlockArrayInterpreter(args);
-		} else if (expression instanceof FieldRead) {
-			FieldRead fieldRead = (FieldRead) expression;
-			compiledExpression = new FieldReadInterpreter(typeMap, fieldRead,
-					compileExpression(typeMap, fieldRead.expression()));
-		} else if (expression instanceof ReadValue) {
-			ReadValue readType = (ReadValue) expression;
+                yield new ConstructInstanceInterpreter(typeMap, createInstance, args);
+            }
+            case CreateInstance createInstance ->
+                   new CreateInstanceInterpreter(typeMap, createInstance);
+            case BlockArray blockArray -> {
+                ExpressionInterpreter[] args = new ExpressionInterpreter[blockArray.statements().length];
+                for (int x = 0; x < args.length; x++) {
+                    args[x] = compileExpression(typeMap, blockArray.statements()[x]);
+                }
+                yield new BlockArrayInterpreter(args);
+            }
+            case FieldRead fieldRead -> new FieldReadInterpreter(typeMap, fieldRead,
+                    compileExpression(typeMap, fieldRead.expression()));
+            case ReadValue readType -> {
+                // We've just read a definition which includes a type that hasn't been used yet.
+                // By looking up the descriptor with the Typename, we can resolve the definition.
+                // This isn't the best way, as the type should have been defined prior to this type
+                // in the stream.
+                DataClass fieldDataClass = typeMap.context().getDescriptor(readType.type());
+                typeMap.context();
 
-			Definition def = typeMap.library().getDefinition(readType.type());
-			if (def instanceof Atom) {
-
-				compiledExpression = new ReadAtomInterpreter(readType);
-			} else if (def instanceof Record) {
-				compiledExpression = new ReadObjectInterpreter(readType);
-			} else if (def instanceof TypeName) {
-				compiledExpression = new ReadObjectInterpreter(readType);
-			} else if (def instanceof Union) {
-				compiledExpression = new ReadObjectInterpreter(readType);
-			} else if (def instanceof StringAtom) {
-				compiledExpression = new ReadObjectInterpreter(readType);
-			} else {
-				throw new IllegalArgumentException("Write type not recognised: " + def.getClass().getName());
-			}
-		} else if (expression instanceof ReadArray) {
-			ReadArray readArray = (ReadArray) expression;
-
-			compiledExpression = new ReadArrayInterpreter(readArray,
-					compileExpression(typeMap, readArray.readExpression()));
-		} else if (expression instanceof SlotReference) {
-			SlotReference slotReference = (SlotReference) expression;
-			compiledExpression = new SlotReferenceInterpreter(slotReference);
-		} else if (expression instanceof Value) {
-			Value value = (Value) expression;
-			compiledExpression = new ValueInterpreter(value);
-		} else {
-			throw new IllegalArgumentException("Expression type not recognised: " + expression.getClass().getName());
-		}
-
-		return compiledExpression;
+                Definition def = typeMap.context().library().getDefinition(readType.type());
+                yield switch (def) {
+                    case Record record -> new ReadObjectInterpreter(readType);
+                    case Typename typename -> new ReadObjectInterpreter(readType);
+                    case Union union -> new ReadObjectInterpreter(readType);
+                    case StringAtom stringAtom -> new ReadObjectInterpreter(readType);
+                    case Atom atom -> new ReadAtomInterpreter(readType);
+                    case Array array -> new ReadObjectInterpreter(readType);
+                    case null, default ->
+                            throw new IllegalArgumentException("Write type not recognised: " + def.getClass().getName());
+                };
+            }
+            case ReadArray readArray -> new ReadArrayInterpreter(readArray,
+                    compileExpression(typeMap, readArray.readExpression()));
+            case SlotReference slotReference -> new SlotReferenceInterpreter(slotReference);
+            case Value value -> new ValueInterpreter(value);
+            case null, default ->
+                    throw new IllegalArgumentException("Expression type not recognised: " + expression.getClass().getName());
+        };
 	}
 }

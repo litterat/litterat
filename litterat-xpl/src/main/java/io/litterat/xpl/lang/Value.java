@@ -15,11 +15,11 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "value")
+@Typename(namespace = "xpl", name = "value")
 public class Value implements Expression {
 
 	private final Class<?> clss;

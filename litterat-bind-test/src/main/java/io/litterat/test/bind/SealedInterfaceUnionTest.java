@@ -30,11 +30,11 @@ import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.DataClassUnion;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.union.SealedInterfaceUnion;
-import io.litterat.test.bind.union.SealedInterfaceUnionCircle;
-import io.litterat.test.bind.union.SealedInterfaceUnionList;
-import io.litterat.test.bind.union.SealedInterfaceUnionPoint;
-import io.litterat.test.bind.union.SealedInterfaceUnionRectangle;
+import io.litterat.test.data.union.SealedInterfaceUnion;
+import io.litterat.test.data.union.SealedInterfaceUnionCircle;
+import io.litterat.test.data.union.SealedInterfaceUnionList;
+import io.litterat.test.data.union.SealedInterfaceUnionPoint;
+import io.litterat.test.data.union.SealedInterfaceUnionRectangle;
 
 public class SealedInterfaceUnionTest {
 

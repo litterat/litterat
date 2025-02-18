@@ -15,21 +15,20 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.annotation.Record;
+import io.litterat.schema.meta.Typename;
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "create_instance")
+@io.litterat.annotation.Typename(namespace = "xpl", name = "create_instance")
 public class CreateInstance implements Expression {
 
-	private final TypeName type;
+	private final Typename type;
 
-	public CreateInstance(TypeName type) {
+	public CreateInstance(Typename type) {
 		this.type = type;
 	}
 
-	public TypeName type() {
+	public Typename type() {
 		return type;
 	}
 

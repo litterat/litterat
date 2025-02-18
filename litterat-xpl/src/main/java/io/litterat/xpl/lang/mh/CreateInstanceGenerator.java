@@ -15,16 +15,16 @@
  */
 package io.litterat.xpl.lang.mh;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-
 import io.litterat.bind.DataClass;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.library.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.CreateInstance;
 import io.litterat.xpl.lang.LitteratMachine;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 public class CreateInstanceGenerator implements ExpressionGenerator {
 
@@ -34,9 +34,9 @@ public class CreateInstanceGenerator implements ExpressionGenerator {
 	public CreateInstanceGenerator(final TypeMap typeMap, final CreateInstance createInstance) throws TypeException {
 		this.createInstance = createInstance;
 
-		DataClass dataClass = typeMap.library().getTypeClass(createInstance.type());
+		DataClass dataClass = typeMap.context().getDescriptor(createInstance.type());
 		if (dataClass instanceof DataClassRecord) {
-			this.constructor = ((DataClassRecord) dataClass).creator().orElseThrow();
+			this.constructor = ((DataClassRecord) dataClass).creator();
 		} else {
 			throw new TypeException("Type not a record type");
 		}

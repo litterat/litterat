@@ -17,7 +17,7 @@ package io.litterat.xpl.lang.mh;
 
 import java.lang.invoke.MethodHandle;
 
-import io.litterat.model.library.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.Lambda;
 import io.litterat.xpl.lang.LambdaFunction;

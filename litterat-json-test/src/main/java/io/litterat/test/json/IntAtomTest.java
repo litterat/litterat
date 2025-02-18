@@ -15,14 +15,13 @@
  */
 package io.litterat.test.json;
 
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.test.data.IntAtom;
+import io.litterat.test.data.IntAtomData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import io.litterat.bind.DataBindContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.IntAtom;
-import io.litterat.test.bind.data.IntAtomData;
 
 public class IntAtomTest {
 
@@ -30,11 +29,11 @@ public class IntAtomTest {
 
 	IntAtomData test = new IntAtomData(INT_ATOM_TEST);
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test

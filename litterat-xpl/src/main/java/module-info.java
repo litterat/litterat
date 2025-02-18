@@ -16,7 +16,8 @@ module io.litterat.xpl {
 	exports io.litterat.xpl;
 	exports io.litterat.xpl.lang;
 
-	requires transitive io.litterat.bind;
-	requires transitive io.litterat.model;
-
+	requires transitive io.litterat.annotation;
+    requires transitive io.litterat.bind;
+	requires transitive io.litterat.schema;
+	requires transitive io.litterat.core;
 }

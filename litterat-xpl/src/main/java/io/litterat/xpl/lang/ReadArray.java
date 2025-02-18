@@ -15,10 +15,10 @@
  */
 package io.litterat.xpl.lang;
 
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 import io.litterat.bind.DataClassArray;
-import io.litterat.bind.Record;
-import io.litterat.model.Array;
-import io.litterat.model.annotation.SchemaType;
+import io.litterat.schema.meta.Array;
 
 /**
  *
@@ -27,7 +27,7 @@ import io.litterat.model.annotation.SchemaType;
  */
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "read_array")
+@Typename(namespace = "xpl", name = "read_array")
 public class ReadArray implements Expression {
 
 	private final DataClassArray dataArray;

@@ -1,20 +1,19 @@
 package io.litterat.test.bind;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.litterat.bind.DataBindContext;
 import io.litterat.bind.DataBindException;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
 import io.litterat.bind.mapper.ArrayMapper;
 import io.litterat.bind.mapper.MapMapper;
-import io.litterat.test.bind.data.UnmodifiableLinkedList;
+import io.litterat.test.data.UnmodifiableLinkedList;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class UnmodifiableLinkedListTest {
 
@@ -40,7 +39,7 @@ public class UnmodifiableLinkedListTest {
 		Assertions.assertNotNull(descriptor);
 
 		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.typeClass());
-		Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.dataClass());
+		//Assertions.assertEquals(UnmodifiableLinkedList.class, descriptor.dataClass());
 
 		DataClassField[] fields = descriptor.fields();
 		Assertions.assertNotNull(fields);
@@ -49,7 +48,7 @@ public class UnmodifiableLinkedListTest {
 		DataClassField fieldList = fields[0];
 		Assertions.assertEquals("list", fieldList.name());
 		Assertions.assertEquals(String[].class, fieldList.type());
-		Assertions.assertEquals(false, fieldList.isRequired());
+        Assertions.assertFalse(fieldList.isRequired());
 
 	}
 

@@ -1,0 +1,160 @@
+/*
+ * Copyright (c) 2020, Live Media Pty. Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+ 
+buildscript {
+    repositories {
+       mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+repositories {
+   mavenCentral()
+}
+
+dependencies {
+    implementation project(":litterat-annotation")
+    implementation project(":litterat-bind")
+    implementation project(":litterat-schema")
+    implementation project(":litterat-core")
+
+    implementation project(":litterat-test-data")
+
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.11.4'
+
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.4'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
+
+// This is to enable sealed interfaces to be tested. To be removed when Java 17 is released.
+
+//tasks.withType(JavaCompile) {
+//    options.compilerArgs += "--enable-preview"
+//}
+//tasks.withType(Test) {
+//    jvmArgs += "--enable-preview"
+//}
+//tasks.withType(JavaExec) {
+//    jvmArgs += "--enable-preview"
+//}
+
+
+java {
+//   modularity.inferModulePath = true
+   
+//   sourceCompatibility = JavaVersion.VERSION_17
+//   targetCompatibility = JavaVersion.VERSION_17
+
+//   compileJava {
+//   		options.compilerArgs += ["--enable-preview"]
+//   }
+}
+
+//Buildship doesn't use that hooks (https://discuss.gradle.org/t/when-does-buildship-eclipse-customization-run/20781/2)
+//you need to run `gradle eclipseJdt` separately
+//eclipse.jdt.file.withProperties { props ->
+//    props['org.eclipse.jdt.core.compiler.problem.enablePreviewFeatures']= 'enabled'
+//    props['org.eclipse.jdt.core.compiler.problem.reportPreviewFeatures']= 'ignore'
+//}
+
+//test {
+//	//useJUnitPlatform()
+//
+//	afterSuite { desc, result ->
+//    if (!desc.parent)
+//        println("${result.resultType} " +
+//            "(${result.testCount} tests, " +
+//            "${result.successfulTestCount} successes, " +
+//            "${result.failedTestCount} failures, " +
+//            "${result.skippedTestCount} skipped)")
+//    }
+//}
+
+//jacocoTestReport {
+//    sourceSets project(':litterat-core').sourceSets.main
+//
+//    afterEvaluate {
+//        classDirectories.setFrom(files(classDirectories.files.collect {
+//            fileTree(dir: it, exclude: 'io/litterat/test/**')
+//        }))
+//    }
+//}
+
+sourceSets {
+    test {
+        java.srcDir 'src/main/java'
+    }
+}
+
+
+//eclipse {
+//    classpath {
+//        // remove the source set from the Eclipse classpath because adding main/java to tests confuses eclipse plugin
+//        sourceSets -= [sourceSets.test]
+//    }
+//}
+
+/*
+// TODO Not realeasing to maven at this stage.
+// release information
+
+apply plugin: 'maven-publish'
+apply plugin: 'com.bmuschko.nexus'
+apply plugin: 'io.codearte.nexus-staging'
+
+nexusStaging {
+    packageGroup = "io.litterat" 
+}
+
+archivesBaseName = 'litterat-bind-test'
+group = "io.litterat"
+version = LITTERAT_VERSION
+
+modifyPom {
+  project {
+        name = 'litterat-bind-test'
+        description = 'Litterat bind test samples'
+        url = 'http://litterat.io/'
+        licenses {
+            license {
+                name = 'The Apache License, Version 2.0'
+                url = 'https://github.com/litterat/litterat-json/blob/master/LICENSE'
+            }
+        }
+        developers {
+            developer {
+                id = 'oobles'
+                name = 'David Ryan'
+                email = 'david@livemedia.com.au'
+            }
+        }
+        scm {
+            connection = 'scm:git:https://github.com/litterat/litterat.git'
+            developerConnection = 'scm:git@github.com:litterat/litterat.git'
+            url = 'https://github.com/litterat/litterat'
+        }
+  }
+}
+*/

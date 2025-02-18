@@ -13,9 +13,7 @@
  */
 open module io.litterat.test.bind {
 
-	exports io.litterat.test.bind.data;
-
 	requires transitive io.litterat.bind;
 
-	requires org.junit.jupiter.api;
+	requires org.junit.jupiter.api; requires io.litterat.test.data;
 }

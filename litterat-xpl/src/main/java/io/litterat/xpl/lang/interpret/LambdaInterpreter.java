@@ -15,7 +15,7 @@
  */
 package io.litterat.xpl.lang.interpret;
 
-import io.litterat.model.library.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeStream;
 import io.litterat.xpl.lang.Lambda;
 import io.litterat.xpl.lang.LambdaFunction;
@@ -34,6 +34,7 @@ public class LambdaInterpreter implements LambdaFunction {
 	@Override
 	public Object execute(Object... args) throws TypeException {
 		try {
+			lambda.signature().arguments();
 			if (args.length != lambda.signature().arguments().length) {
 				throw new TypeException(String.format("incorrect arguments. Expected %s. Received %s ",
 						lambda.signature().arguments().length, args.length));
@@ -41,7 +42,9 @@ public class LambdaInterpreter implements LambdaFunction {
 			LitteratMachine machine = new LitteratMachine(((TypeStream) args[0]).typeMap(), this.lambda.slots());
 
 			// Set the arguments into variable slots in the machine.
+
 			for (int x = 0; x < args.length; x++) {
+
 				machine.setVariable(x, args[x]);
 			}
 

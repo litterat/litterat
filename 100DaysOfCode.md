@@ -3,18 +3,23 @@
 
 Based on [www.100daysofcode.com](https://www.100daysofcode.com/) I'm taking the #100DaysOfCode challenge working on Litterat. This will act as a journal of progress. Litterat is a completely new Java serialization library designed to work with Java 11+ and play nicely with Java (i.e. not using unsafe or reading/writing directly to fields). 
 
+Immediate issues
+ - Revisit DataClass and data projections.
+ - Record projections and if the projected class is listed as a DataClass
+ - Field projections
+ - ToData interface. Not particularly nice or flexible.
+ - Interfaces instead of MethodHandles?
+ - Re-look at array binding. Allow user defined wrappers.
+
+
 Next steps list. A general list of things that could be done next in no particular order.
 
- litterat-bind
+ litterat-core
  - Investigate if default values for fields belong in this library.
  - Dates, timestamps and other atoms. To be completed as needed.
  - Create bind error examples and test edge cases. To be completed as issues found.
-
- litterat-model
- - Review the data model language and look at data model annotations. 
- - Rewrite the ModelBinder to use updated model and bind DataClasses correctly.
  - Review model arrays and look at multi-dimensional arrays as part of schema design.
- - Implement Annotation interface
+ - Investigate how Annotations might work.
  
  litterat-xpl
  - Review the lang package and SchemaResolver to match more correctly to the model.
@@ -22,12 +27,70 @@ Next steps list. A general list of things that could be done next in no particul
  Other
  - Implement the jvm-serializers performance test.
  - Investigate how litterat could be used in a web service such as Helidon.
- 
+ - Implement a YAML front end.
  
  Documents to write:
  - Litterat bind end user guide. User guide to using library & examples.
  - Litterat serialization guide. For people writing serialization formats.
 
+## Day 78 - August 18 - DataClassReference
+
+Started debugging by adding methods to register classes using Typename and Class after finding issues on day #77. Found that the Record definitions being generated did not correctly populate the fields; the field type was set to null. The reason it was null was because an Atom is a Definition, not an Element. The DataClass hierarchy is not matching the Element hierarchy and the Typename was not correctly represented.  Pulling further on this thread lead to the realisation that DataClassProxy was very similar to Typename so after much deliberation renamed it to DataClassReference.
+
+Adding DataClassReference to the DataClass objects has implications for how Records are generated. In particular the descriptor now needs to distinguish if a record field member should be DataClassReference or bring the actual definition. e.g. DataClassArray or DataClassUnion being defined in the Record itself instead of through a defined Typename.
+
+## Day 77 - August 16 - Debugging XPL
+
+Finished the first pass at refactoring XPL and started debugging. First run hit the issue documented yesterday. When looking up the TypeContext/TypeLibrary with just a Typename, the type is not yet registered. As the Java class loader may not have even loaded the class, it is impossible to know about it. Pulling at this thread could require investigating class loaders and if we can find classes from a package name. Probably worth pre-registering the classes required for now manually and add to the todo list.
+
+## Day 76 - August 15 - Refactoring XPL
+
+Continued the XPL refactoring. Required changes to the core TypeContext interface to make it possible to lookup a DataClass based on a Typename. It may still be required to allow a Typename to find a Class and allow two way name binding. It is either that or require a package is pre-loaded so that all names are known. Pre-loading the packages has the advantage that from a security view point the developer is in charge of what classes get bound.
+
+Also made changes to the TypeContext to require a Typename when registering an atom. Not sure if this is the best way, but will do for now. Atoms in general will need to be revisited for all parts of the library.
+
+Still need to refactor the SchemaResolver and then ensure existing tests pass.
+
+## Day 75 - August 11 - Implemented Proxy and DataClassProxy
+
+Implemented Proxy and DataClassProxy classes and fixed up the implementations for ArrayMapper, MapMapper and JsonMapper. All tests for core and json now run successfully.
+
+Spent a little bit of time looking at XPL. It will take a bit longer to refactor.
+
+## Day 74 - August 10 - Refactoring JSON and XPL projects
+
+Continuing the refactoring. Moved all the bind tests into the core-test library. All tests working except for the one that uses proxy which has changed. I'll need to return to this test soon. Also refactored all the json-test classes. In a similar way all tests pass except for the proxy record test.
+
+Started to move across all the XPL classes, but this is going to need a lot more work to refactor. XPL was based on the idea that it interacts with the model instead of the bind library. As such there's quite a bit of interactions which are using the wrong interface. The initial XPL design was also prior to working out the core meta data elements. Now that it done it should be aligned with those elements and the various instructions be based on those core elements. 
+
+
+## Day 73 - August 9 - Connecting DataClass to meta data
+
+Spent more time merging the DataClass to the meta data. The main part of the solution is adding definition method to DataClass  that returns the meta data definition. An interesting of creating the DataClassProxy class is that it doesn't currently have a corresponding definition in meta data. The DataClassProxy is an artifact of the bind code environment and not related to the schema. Currently the definition will return null, but an aim of the library is to minimise nulls. It might be worth adding an ignored meta data Proxy class. Something for later after doing more testing with the proxy concept.
+
+Got stuck with the gradle/eclipse issue that keeps putting modules on the classpath and need to be manually moved to the module path. I also found that gradle/eclipse continue to have issues with module based test running in the same project when reflection is required. As it is not possible to export the test data classes the classes are not available to the method handles public lookup. The issue of which lookup type will need to be revisited. End result of hitting my head against this wall for a while is to split the tests back into their own package. The issue of getting the dependent project modules onto the module path is still a problem.
+
+## Day 72 - August 8 - Working out relationship between TypeLibrary and TypeContext
+
+One of the difficult aspects of the refactor has been working out the relationship between the TypeLibrary that holds the type definitions and the TypeContext that holds the binding MethodHandles. Ultimately, the serialization code only deals with the TypeContext. However, for a schema first code, it needs to be possible to import a schema and then bind that to classes. Initially, I was thinking of merging the two concepts into one so that the data model also held the MethodHandles. This might still happen, however, for now to keep options open it feels better to keep them separate. 
+
+The TypeContextClassBinder has the job of creating the definitions and bindings between the TypeLibrary and TypeContext. It's going to take a bit of time to work out the difference between creating a Definition versus creating a DataClass. When doing reflection on a class the same tasks need to occur but the output is different. It makes sense that the code for both of these is the same to reduce duplication and errors. For now each type (Atom,Record,Union,Array) have been split out into their own Binder classes. The old DefaultResolver grew into 1300 line class which is going to take a while to pick apart and repurpose for the dual job of both Definiton and DataClasses.
+
+During the refactor, another interesting problem that had been bugging me have also been solved. Some of the DataClass objects have a toObject/toData MethodHandles which is required because some classes have a ToData interface. This interface is annoying because it isn't on all classes so much of the time it called the identity function. To resolve the issue, I've created a DataClassProxy type. This way the proxy requirement is separate from other types. This will add a little more complexity to the serialization classes, but is a more correct reflection of the actual code. There's still some interesting things to explore with regard to if the data class or the target class will always know which object is required. In particular, when you have a schema first code situation, the definition will bind to the data class. The data class will need to know about the target class to ensure that the correct type is produced during deserialization. During serialization it is a little easier because the target class will correctly produce the data class to be serialized.
+
+Finished the day moving everything around and the general structure is there for the combined library. The links between TypeLibrary and TypeContext are in place with DefaultClassBinder. Still need to add actual connection from DataClasses to Model objects, for example DataClassRecord having either a Typename or direct Record instance. Also need to refactor each of the binders to produce both the DataClass and the Model object. Quite a bit of progress but still quite a bit to go...
+
+
+## Day 71 - August 4 - Continuing the refactoring
+
+Brought across the test data from the bind library. Trying to put the test data into the same library this time. Using three different src folders for main/test/data. Hopefully this will simplify testing and release later. I'll need to figure out the process to access the src/data classes from litterat-json and litterat-xpl later.
+
+Having trouble working out the main interface name and package name. Currently using io.litterat.library.TypeLibrary. The plan is for this to contain both data models and the binding interfaces. In a code first scenario the classes are used to generate the model, then the model and class is used to generate the binding interfaces. In a schema first solution, the schema is loaded into the TypeLibrary. The model and classes are then used to generate the binding interfaces. I should be able to use a lot of the DefaultResolver code for both generating the models and the binding interfaces. The class just needs to be separated. Not ready to commit anything yet.
+
+
+## Day 70 - August 3 - Refactoring
+
+Started the refactor by creating litterat-core. Added annotation, bind, code, model and atom classes. The bind classes will need the most work as they are tightly coupled with the original DataClass bind classes. Before they can be refactored a decision needs to be made about the type library. Bringing the model and bind libraries together should in theory make this easier. The idea is that the with code first development, the analysis produces a type library (model) and from that a binding is reflected back on the classes.
 
 ## Day 69 - August 2 - Planning the refactor
 

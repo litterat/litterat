@@ -12,11 +12,10 @@
  * the License.
  */
 open module io.litterat.test.json {
-
-	requires transitive io.litterat.bind;
-	requires io.litterat.test.bind;
+	requires transitive io.litterat.core;
 	requires io.litterat.json;
 
-	requires org.junit.jupiter.api;
+	requires io.litterat.test.data;
 
+    requires org.junit.jupiter.api;
 }

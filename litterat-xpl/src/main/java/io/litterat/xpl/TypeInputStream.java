@@ -15,37 +15,29 @@
  */
 package io.litterat.xpl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-
-import io.litterat.model.TypeName;
-import io.litterat.model.library.TypeException;
-import io.litterat.model.library.TypeLibrary;
-import io.litterat.model.library.TypeNameDefinition;
-import io.litterat.model.meta.SchemaTypes;
+import io.litterat.core.TypeContext;
+import io.litterat.schema.TypeException;
+import io.litterat.schema.meta.Typename;
 import io.litterat.xpl.io.ByteArrayBaseInput;
 import io.litterat.xpl.io.ByteBufferBaseInput;
 import io.litterat.xpl.io.StreamBaseInput;
-import io.litterat.xpl.resolve.SchemaResolver;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 public class TypeInputStream implements TypeStream {
 
 	private final TypeBaseInput input;
 	private final TypeMap typeMap;
-	private final TypeResolver resolver;
 
 	public TypeInputStream(TypeMap typeMap, TypeBaseInput input) {
 		this.typeMap = typeMap;
 		this.input = input;
-		this.resolver = new SchemaResolver(typeMap);
-
-		// Register the base types to communicate schema definitions.
-		typeMap.registerMetaData(resolver);
 	}
 
 	public TypeInputStream(TypeBaseInput input) {
-		this(new TypeMap(new TypeLibrary()), input);
+		this(new TypeMap(TypeContext.builder().build()), input);
 	}
 
 	public TypeInputStream(byte[] buffer) throws TypeException {
@@ -81,29 +73,19 @@ public class TypeInputStream implements TypeStream {
 		return input;
 	}
 
-	private void readAndRegister() throws IOException, TypeException {
-
-		TypeNameDefinition def = this.readObject(SchemaTypes.TYPE_NAME_DEFINITION);
-		TypeMapEntry entry = typeMap.getEntry(def.streamId());
-		if (entry == null) {
-			// TODO Check if the definitions match.
-
-			// Generate the reader/writer.
-			entry = resolver.map(def.typeName());
-
-			typeMap.register(def.streamId(), entry);
-		} else {
-			if (!def.typeName().equals(entry.typeName())) {
-				throw new IOException("No match for type on stream");
-			}
-		}
-
-	}
-
+	/**
+	 * Reads the next identifier which signifies the next value. If the identifier is a registration
+	 * value then the meta data value is read and the type registered.
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws TypeException
+	 */
 	private int readNextIdentifier() throws IOException, TypeException {
 		int token = input().readUVarInt32();
 		while (token == DEFINE_TYPE) {
-			readAndRegister();
+			TypeStreamEntry def = this.readObject(TypeStreamEntry.class);
+			typeMap.registerEntry(def);
 			token = input().readUVarInt32();
 		}
 		return token;
@@ -125,7 +107,12 @@ public class TypeInputStream implements TypeStream {
 			if (entry == null) {
 				throw new IOException("type not known in stream: " + type);
 			}
-			return (T) entry.reader().read(this);
+
+			Object value = entry.reader().read(this);
+			if (entry.dataClass().bridge().isPresent()) {
+				value = entry.dataClass().bridge().get().toObject().invoke(value);
+			}
+			return (T) value;
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
@@ -150,14 +137,18 @@ public class TypeInputStream implements TypeStream {
 			if (entry != clssEntry) {
 				throw new IOException("wrong type on stream");
 			}
-			return (T) entry.reader().read(this);
+			Object value = entry.reader().read(this);
+			if (entry.dataClass().bridge().isPresent()) {
+				value = entry.dataClass().bridge().get().toObject().invoke(value);
+			}
+			return (T) value;
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T readObject(TypeName typeName) throws IOException {
+	public <T> T readObject(Typename typeName) throws IOException {
 		try {
 
 			int type = readNextIdentifier();
@@ -165,11 +156,15 @@ public class TypeInputStream implements TypeStream {
 			if (entry == null) {
 				throw new IOException("type not mapped to stream: " + typeName.toString());
 			}
-			if (!entry.typeName().equals(typeName)) {
+			if (!entry.typename().equals(typeName)) {
 				throw new IOException("wrong type on stream: expected " + typeName.toString() + " found: "
-						+ entry.typeName().toString());
+						+ entry.typename().toString());
 			}
-			return (T) entry.reader().read(this);
+			Object value = entry.reader().read(this);
+			if (entry.dataClass().bridge().isPresent()) {
+				value = entry.dataClass().bridge().get().toObject().invoke(value);
+			}
+			return (T) value;
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}

@@ -15,10 +15,9 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
-import io.litterat.model.library.TypeException;
+import io.litterat.schema.TypeException;
+import io.litterat.annotation.Record;
+import io.litterat.schema.meta.Typename;
 
 /**
  * This is a specialization of the form out.writeX( o.getY() ); where X is the type being written
@@ -28,17 +27,17 @@ import io.litterat.model.library.TypeException;
  */
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "field_set")
+@io.litterat.annotation.Typename(namespace = "xpl", name = "field_set")
 public class FieldSet extends Statement {
 
 	private final Expression objectExpression;
-	private final TypeName type;
+	private final Typename type;
 	private final String field;
 	private final Expression valueExpression;
 
 	// private MethodHandle writerHandle;
 
-	public FieldSet(Expression objectExpression, Expression valueExpression, TypeName type, String field)
+	public FieldSet(Expression objectExpression, Expression valueExpression, Typename type, String field)
 			throws TypeException {
 		this.objectExpression = objectExpression;
 		this.type = type;
@@ -50,7 +49,7 @@ public class FieldSet extends Statement {
 		return objectExpression;
 	}
 
-	public TypeName type() {
+	public Typename type() {
 		return type;
 	}
 

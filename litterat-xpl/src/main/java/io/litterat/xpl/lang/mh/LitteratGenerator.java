@@ -18,7 +18,7 @@ package io.litterat.xpl.lang.mh;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.litterat.model.library.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.Block;
 import io.litterat.xpl.lang.ConstructInstance;

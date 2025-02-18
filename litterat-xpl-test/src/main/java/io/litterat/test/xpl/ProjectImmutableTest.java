@@ -15,15 +15,14 @@
  */
 package io.litterat.test.xpl;
 
-import java.io.IOException;
-
+import io.litterat.schema.TypeException;
+import io.litterat.test.data.ProjectImmutable;
+import io.litterat.xpl.TypeInputStream;
+import io.litterat.xpl.TypeOutputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.library.TypeException;
-import io.litterat.test.bind.data.ProjectImmutable;
-import io.litterat.xpl.TypeInputStream;
-import io.litterat.xpl.TypeOutputStream;
+import java.io.IOException;
 
 public class ProjectImmutableTest {
 

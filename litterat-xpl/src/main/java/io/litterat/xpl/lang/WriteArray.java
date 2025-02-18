@@ -15,16 +15,16 @@
  */
 package io.litterat.xpl.lang;
 
+import io.litterat.annotation.Record;
+import io.litterat.annotation.Typename;
 import io.litterat.bind.DataClassArray;
-import io.litterat.bind.Record;
-import io.litterat.model.annotation.SchemaType;
 
 /**
  * Writes an array
  */
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "write_array")
+@Typename(namespace = "xpl", name = "write_array")
 public class WriteArray extends Statement {
 
 	private final DataClassArray dataClassArray;

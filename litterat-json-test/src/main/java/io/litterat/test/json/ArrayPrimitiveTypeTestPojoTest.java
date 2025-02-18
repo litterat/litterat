@@ -15,15 +15,14 @@
  */
 package io.litterat.test.json;
 
-import java.util.Arrays;
-
+import io.litterat.core.TypeContext;
+import io.litterat.json.JsonMapper;
+import io.litterat.test.data.ArrayPrimitiveTypeTestPojo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.bind.DataBindContext;
-import io.litterat.json.JsonMapper;
-import io.litterat.test.bind.data.ArrayPrimitiveTypeTestPojo;
+import java.util.Arrays;
 
 public class ArrayPrimitiveTypeTestPojoTest {
 
@@ -67,11 +66,11 @@ public class ArrayPrimitiveTypeTestPojoTest {
 		test.setString(string);
 	}
 
-	DataBindContext context;
+	TypeContext context;
 
 	@BeforeEach
 	public void setup() {
-		context = DataBindContext.builder().build();
+		context = TypeContext.builder().build();
 	}
 
 	@Test

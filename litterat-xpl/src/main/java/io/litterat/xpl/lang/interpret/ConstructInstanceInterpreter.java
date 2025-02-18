@@ -15,17 +15,16 @@
  */
 package io.litterat.xpl.lang.interpret;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-
 import io.litterat.bind.DataClass;
-import io.litterat.bind.DataClassAtom;
 import io.litterat.bind.DataClassField;
 import io.litterat.bind.DataClassRecord;
-import io.litterat.model.library.TypeException;
+import io.litterat.schema.TypeException;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.lang.ConstructInstance;
 import io.litterat.xpl.lang.LitteratMachine;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 
 public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 
@@ -40,7 +39,7 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 		this.createInstance = createInstance;
 		this.params = params;
 
-		DataClassRecord typeClass = (DataClassRecord) typeMap.library().getTypeClass(createInstance.type());
+		DataClassRecord typeClass = (DataClassRecord) typeMap.context().getDescriptor(createInstance.type());
 		this.constructor = typeClass.constructor();
 		this.toObject = collectToObject(typeClass);
 	}
@@ -74,15 +73,23 @@ public class ConstructInstanceInterpreter implements ExpressionInterpreter {
 			DataClassField field = dataClass.fields()[x];
 			DataClass fieldDataClass = field.dataClass();
 
+			if (fieldDataClass.bridge().isPresent()) {
+				toObject[x] = fieldDataClass.bridge().get().toObject();
+			} else {
+				toObject[x] = MethodHandles.identity(fieldDataClass.dataClass());
+			}
+			/*
 			if (fieldDataClass instanceof DataClassAtom) {
 				DataClassAtom fieldAtom = (DataClassAtom) fieldDataClass;
-				toObject[x] = fieldAtom.toObject();
-			} else if (fieldDataClass instanceof DataClassRecord) {
-				DataClassRecord fieldRecord = (DataClassRecord) fieldDataClass;
-				toObject[x] = fieldRecord.toObject();
+				toObject[x] = MethodHandles.identity(field.dataClass().typeClass());
 			} else {
 				toObject[x] = MethodHandles.identity(field.dataClass().typeClass());
 			}
+
+			if (fieldDataClass.bridge().isPresent()) {
+				toObject[x] = MethodHandles. fieldDataClass.bridge().get()
+			}
+			 */
 		}
 
 		return toObject;

@@ -12,10 +12,12 @@
  * the License.
  */
 module io.litterat.bind {
-
 	exports io.litterat.bind;
 	exports io.litterat.bind.mapper;
+    exports io.litterat.bind.bridge;
 
-	requires org.objectweb.asm;
+    requires org.objectweb.asm;
 	requires org.objectweb.asm.tree;
+
+	requires io.litterat.annotation;
 }

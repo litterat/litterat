@@ -15,24 +15,23 @@
  */
 package io.litterat.xpl.lang;
 
-import io.litterat.bind.Record;
-import io.litterat.model.TypeName;
-import io.litterat.model.annotation.SchemaType;
-import io.litterat.model.library.TypeException;
+import io.litterat.schema.TypeException;
+import io.litterat.annotation.Record;
+import io.litterat.schema.meta.Typename;
 
 /**
  * This reads a getter from an object.
  */
 
 @Record
-@SchemaType(namespace = "xpl.lang", name = "field_read")
+@io.litterat.annotation.Typename(namespace = "xpl", name = "field_read")
 public class FieldRead implements Expression {
 
 	private final Expression expressionNode;
-	private final TypeName type;
+	private final Typename type;
 	private final String field;
 
-	public FieldRead(Expression expressionNode, TypeName type, String field) throws TypeException {
+	public FieldRead(Expression expressionNode, Typename type, String field) throws TypeException {
 
 		this.expressionNode = expressionNode;
 		this.type = type;
@@ -43,7 +42,7 @@ public class FieldRead implements Expression {
 		return expressionNode;
 	}
 
-	public TypeName type() {
+	public Typename type() {
 		return type;
 	}
 

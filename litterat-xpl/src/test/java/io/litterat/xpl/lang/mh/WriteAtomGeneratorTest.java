@@ -20,7 +20,8 @@ import java.lang.invoke.MethodHandle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.litterat.model.library.TypeLibrary;
+import io.litterat.core.TypeContext;
+import io.litterat.core.meta.Meta;
 import io.litterat.xpl.TypeBaseOutput;
 import io.litterat.xpl.TypeMap;
 import io.litterat.xpl.io.ByteArrayBaseInput;
@@ -37,14 +38,14 @@ public class WriteAtomGeneratorTest {
 		float value = 1.23f;
 
 		Value valueRef = new Value(float.class, value);
-		WriteValue writeNode = new WriteValue(TypeLibrary.FLOAT, valueRef);
+		WriteValue writeNode = new WriteValue(Meta.FLOAT, valueRef);
 		ValueGenerator valueGen = new ValueGenerator(valueRef);
 		WriteAtomGenerator writeTypeGen = new WriteAtomGenerator(writeNode, valueGen);
 
 		Class<?>[] slots = new Class[] { TypeMap.class, TypeBaseOutput.class };
 
-		TypeLibrary library = new TypeLibrary();
-		TypeMap typeMap = new TypeMap(library);
+		TypeContext context = TypeContext.builder().build();
+		TypeMap typeMap = new TypeMap(context);
 		LitteratMachine am = new LitteratMachine(typeMap, slots);
 
 		MethodHandle handle = writeTypeGen.bind(am);
